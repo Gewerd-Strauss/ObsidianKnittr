@@ -77,116 +77,139 @@ main()
 {
 
     /*
-Steps:
-Obsidian-Sided:
-0. Load Config
-1. Finish manuscript (must contain csl, bib, conforming includes/image formats) * 
-2. Insert `output: word_document|html_document|...` into the frontmatter and save
-2.2 get manuscript's path
+    Steps:
+    Obsidian-Sided:
+    0. Load Config
+    1. Finish manuscript (must contain csl, bib, conforming includes/image formats) * 
+    2. Insert `output: word_document|html_document|...` into the frontmatter and save
+    2.2 get manuscript's path
 
-AHK-script sided: 
-3. run obsidianhtml (get manuscript's path)
-4. get output path from cmd-log ;; TODO: automate this step so I don't have to do the complicated clipboard stuff.
-5. rename to .rmd
-6. open r at that location
-7. load knitr ;; TODO: automate properly, instead of using R Studio.
-8. set pwd 
-9. knit at location
-10. Copy resulting output to predefined output folder
-11. open output folder
+    AHK-script sided: 
+    3. run obsidianhtml (get manuscript's path) ;; TODO: check if 'max_note_depth' is correctly applied by making a chain of 20 notes including into each other.
 
-
-
-
-* until https://github.com/obsidian-html/obsidian-html/issues/520 is not fixed
-
-*/
-OnExit("fRemoveTempDir")
-; 0
-if !script.load()
-{
-    tmp:=[]
-    tmp.Config:=[]
-    tmp.config.searchroot:=A_ScriptDir
-
-    script.config:=tmp
-    script.save()
-    script.load()
-}
-;, script.Update()  ;DO NOT ACTIVATE THISLINE UNTIL YOU DUMBO HAS FIXED THE DAMN METHOD. God damn it.
-;Conf:=ini(script.config)
-
-; 2.2
-out:=guiShow()
-output:=out.1
-manuscriptpath:=out.2
-
-; 3. 
-manuscriptpath_q:=quote(manuscriptpath)
-SplitPath, % manuscriptpath, OutFileName, manuscriptLocation
-cmd =
-(Join&
-obsidianhtml run -f "%manuscriptpath%"
-)
-; cmd:=Quote(cmd)
-Clipboard:=input:=cmd
-RunWait, % A_ComSpec " /K " input, , , CMD_PID
-
-; 4
-ttip("Please copy the path of the md-output, then close the window")
-WinWaitClose, % "ahk_pid " CMD_PID
-md_Path:=Clipboard
-
-; 5, 6
-rmd_Path:=ConvertMDToRMD(md_Path,"index")
-
-; 7
-knit(rmd_Path,output)
-WinWaitActive, % "ahk_exe rstudio.exe"
-WinWaitClose, % "ahk_exe rstudio.exe"
-CopyBack(rmd_Path,script.config.Destination,manuscriptpath)
-
-;global md_Path2:=md_Path
-; 
-; "obsidianhtml run -f ""D:\Dokumente neu\000 AAA Dokumente\000 AAA HSRW\General\AHK scripts\Projects\Finished\ObsidianScripts\Overview.md"""
-; "obsidianhtml run -f ""D:\Dokumente neu\000 AAA Dokumente\000 AAA HSRW\General\AHK scripts\Projects\Finished\ObsidianScripts\Overview.md"""
-; obsidianhtml run -f "D:\Dokumente neu\000 AAA Dokumente\000 AAA HSRW\General\AHK scripts\Projects\Finished\ObsidianScripts\Overview.md"
-return md_Path
-}
+    loop, 20
+    FileAppend, % "![[" A_Index "]]", % "D:\Dokumente neu\Obsidian NoteTaking\The Universe\000 Start here\MaxInclusionTest\" A_Index ".md"
+    4. get output path from cmd-log ;; TODO: automate this step so I don't have to do the complicated clipboard stuff.
+    5. rename to .rmd
+    6. open r at that location
+    7. load BuildRScriptContent ;; TODO: automate properly, instead of using R Studio.
+    8. set pwd 
+    9. BuildRScriptContent at location
+    10. Copy resulting output to predefined output folder
+    11. open output folder
 
 
-knit(Path,output_type)
-{
 
-Clipboard:= "C:\Program Files\RStudio\rstudio.exe " Path
-    run, % "C:\Program Files\RStudio\rstudio.exe " Path
-    WinWaitActive, % "ahk_exe rstudio.exe"
-    WinWaitClose, % "ahk_exe rstudio.exe"
-    if 1>2
+
+    * until https://github.com/obsidian-html/obsidian-html/issues/520 is not fixed
+
+    */
+    OnExit("fRemoveTempDir")
+    ; 0
+    if !script.load()
     {
-        SplitPath, % Path, OutFileName, EnvironmentPath, OutExtension, OutNameNoExt, OutDrive
-                cmd =
-        (Join&
-        getwd()
-        setwd("%EnvironmentPath%")
-        C:\Program Files\R\R-4.2.0\bin\Rscript.exe -e '%EnvironmentPath% "rmarkdown::render("%OutFileName%","%output_type%")"'
-        )
-
-        /*
-getwd()
-        setwd("%EnvironmentPath%")
-
-        ;rmarkdown::render("Filname.Rmd")
-
-        # To make it in to PDF you can use the below code also
-        rmarkdown::render("Filename", "pdf_document")
-*/
-        ; cmd:=Quote(cmd)
-        Clipboard:=input:=cmd
-        RunWait, % A_ComSpec " /K " input, , , CMD_PID
+        InitialSettings=
+        (LTrim
+        [Config]
+searchroot=
+obsidianhtml_configfile=
+Destination=0
+RScriptPath=C:\Program Files\R\R-4.2.0\bin\Rscript.exe
+version=1.3.0
+)
+        script.load()
     }
+    ;, script.Update()  ;DO NOT ACTIVATE THISLINE UNTIL YOU DUMBO HAS FIXED THE DAMN METHOD. God damn it.
+    ;Conf:=ini(script.config)
 
-    return 
+    ; 2.2
+    out:=guiShow()
+    output_type:=out.1
+    if (output_type="Both")
+        output_type:=["word_document","html_document"]
+    manuscriptpath:=out.2
+
+    ; 3. 
+    obsidianhtml_configfile:=script.config.config.obsidianhtml_configfile
+    manuscriptpath_q:=quote(manuscriptpath)
+    SplitPath, % manuscriptpath, OutFileName, manuscriptLocation
+    ; cmd =
+    ; (Join&
+    ; obsidianhtml run -f "%manuscriptpath%" -i "%obsidianhtml_configfile%"
+    ; ) ;; figure out how to use these.
+    cmd =
+    (Join%A_Space%
+    obsidianhtml run 
+    -f "%manuscriptpath%" 
+    -i "%obsidianhtml_configfile%"
+    ) ; -i "%obsidianhtml_configfile%" ;; not doable if you use 
+    ;-i "%obsidianhtml_configfile%" 
+    ; -v
+    ; cmd:=Quote(cmd)
+    Clipboard:=input:=cmd
+    RunWait, % A_ComSpec " /K " input, , , CMD_PID
+
+    ; 4
+    ttip("Please copy the path of the md-output, then close the window")
+    WinWaitClose, % "ahk_pid " CMD_PID
+    md_Path:=Clipboard
+
+    ; 5, 6
+    rmd_Path:=ConvertMDToRMD(md_Path,"index")
+
+    ; 7
+    rmd_Path:=CopyBack(rmd_Path,script.config.Destination,manuscriptpath)
+    script_contents:=BuildRScriptContent(rmd_Path,output_type)
+    RunRScript(rmd_Path,output_type,script_contents,script.config.config.RScriptPath)
+
+    return md_Path
+}
+
+RunRScript(Path,output_type,script_contents,RScript_Path:="")
+{
+    SplitPath, % Path, OutFileName, OutDir, OutExtension, OutNameNoExt, OutDrive
+    FileDelete, % OutDir "\build.R"
+    FileAppend, % script_contents, % OutDir "\build.R"
+    if (RScript_Path="")
+        run, % "C:\Program Files\R\R-4.2.0\bin\Rscript.exe" A_Space OutDir "\build.R", % OutDir
+    else
+        run, % RScript_Path A_Space OutDir "\build.R", % OutDir
+}
+
+BuildRScriptContent(Path,output_type)
+{
+    ; Str:="setwd(""C:\Users\Claudius Main\Desktop\TempTemporal\TestPaper_apa"")`n"
+    Path2:=strreplace(Path,"\","\\")
+    Str=
+    (LTRIM
+    getwd()
+    #setwd("%Path2%")
+    getwd()
+
+    )
+    if IsObject(output_type)
+    {
+        for k,format in output_type
+        {
+            Str2=
+            (LTRIM
+            
+            rmarkdown::render(`"index.rmd`",`"%format%`")`n
+            )
+            Str.=Str2
+        }
+
+    }
+    else
+    {
+        Str2=
+        (LTRIM
+
+        rmarkdown::render(`"index.rmd`",`"%output_type%`")`n
+        )
+        Str.=Str2
+    }
+    return Str
 }
 CopyBack(Source,Destination,manuscriptpath)
 {
@@ -194,16 +217,19 @@ CopyBack(Source,Destination,manuscriptpath)
     SplitPath, % manuscriptpath ,  , ,,manuscriptname, 
     if Destination
     {
-        FileCopyDir, % Dir, % Destination "\" manuscriptname "\", true
+        if FileExist(Destination "\" manuscriptname "\") ;; make sure the output is clean
+            FileRemoveDir, % Destination "\" manuscriptname "\", true
+        FileCopyDir, % Dir, % Output_Path:=Destination "\" manuscriptname "\", true
         run, % "Explorer " Destination "\" manuscriptname "\"
     }
-
     else
     {
-        FileCopyDir, % Dir, % A_Desktop "\TempTemporal\" manuscriptname "\" , true
+        if FileExist(A_Desktop "\TempTemporal\" manuscriptname "\") ;; make sure the output is clean
+            FileRemoveDir, % A_Desktop "\TempTemporal\" manuscriptname "\", true
+        FileCopyDir, % Dir, % Output_Path:= A_Desktop "\TempTemporal\" manuscriptname "\" , true
         run, % "Explorer " A_Desktop "\TempTemporal\" manuscriptname "\"
     }
-    return
+    return Output_Path  OutFileName
 }
 ConvertMDToRMD(md_Path,notename)
 {
@@ -233,7 +259,7 @@ guiCreate()
     Gui, Color, 1d1f21, 373b41, 
     Gui, Font, s11 cWhite, Segoe UI 
     gui, add, text,xm ym, Choose output type:
-    gui, add, ddl, vDDLval, html_output|word_output||
+    gui, add, ddl, vDDLval, Both||html_document|word_document|
     Gui, add, button, gChooseFile, Choose Manuscript
     Gui, Font, s7 cWhite, Verdana
     gui, add, button, gguiSubmit, Submit
@@ -286,7 +312,7 @@ fRemoveTempDir()
     if FileExist(OutDir)
     {
         MsgBox, % "Error occured - Directory '" OutDir "' could not be removed"
-        Run, OutDir
+        Run, % "explorer " OutDir
     }
     return
 }
