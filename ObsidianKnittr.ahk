@@ -26,9 +26,10 @@ FileGetTime, ModDate,%A_ScriptFullPath%,M
 FileGetTime, CrtDate,%A_ScriptFullPath%,C
 CrtDate:=SubStr(CrtDate,7,  2) "." SubStr(CrtDate,5,2) "." SubStr(CrtDate,1,4)
 ModDate:=SubStr(ModDate,7,  2) "." SubStr(ModDate,5,2) "." SubStr(ModDate,1,4)
+
 global script := {   base         : script
                     ,name         : regexreplace(A_ScriptName, "\.\w+")
-                    ,version      : FileOpen(A_ScriptDir "\version.ini","r").Read()
+                    ,version      : ""
                     ,author       : "Gewerd Strauss"
 					,authorID	  : "Laptop-C"
 					,authorlink   : ""
@@ -69,6 +70,7 @@ global script := {   base         : script
 		script.Debug(script.error.Level,script.error.Label,script.error.Message,script.error.AddInfo,script.error.Vars)
 */
 
+; RunRScript("C:\Users\Claudius Main\Desktop\TempTemporal\TestPaper_apa\index.rmd","",T,RScript_Path:="")
 md_path:=main()
 ExitApp, 
 return
@@ -108,25 +110,31 @@ main()
     ; 0
     if !script.load()
     {
+        InputBox, given_obsidianhtml_configfile, % script.name " - Initiate settings","Please give the path of your configfile for obsidianhtml."
+        InputBox, given_searchroot, % script.name " - Initiate settings","Please give the path of your configfile for obsidianhtml."
+
         InitialSettings=
         (LTrim
         [Config]
-searchroot=
-obsidianhtml_configfile=
-Destination=0
-RScriptPath=C:\Program Files\R\R-4.2.0\bin\Rscript.exe
-version=1.3.0
-)
+        searchroot=%given_searchroot%
+        obsidianhtml_configfile=%given_obsidianhtml_configfile%
+        Destination=0
+        RScriptPath=C:\Program Files\R\R-4.2.0\bin\Rscript.exe
+        [Version]
+        version=1.3.0
+        )
+        FileAppend, % InitialSettings, % script.configfile
         script.load()
     }
+    script.version:=script.config.Version.Version
     ;, script.Update()  ;DO NOT ACTIVATE THISLINE UNTIL YOU DUMBO HAS FIXED THE DAMN METHOD. God damn it.
     ;Conf:=ini(script.config)
 
     ; 2.2
     out:=guiShow()
     output_type:=out.1
-    if (output_type="Both")
-        output_type:=["word_document","html_document"]
+    if (output_type="All") || output_type.HasVal("All")
+        output_type:=["html_document" , "pdf_document" , "word_document" , "odt_document" , "rtf_document" , "md_document" , "powerpoint_presentation" , "ioslides_presentation" , "tufte::tufte_html" , "github_document"]
     manuscriptpath:=out.2
 
     ; 3. 
@@ -137,60 +145,126 @@ version=1.3.0
     ; (Join&
     ; obsidianhtml run -f "%manuscriptpath%" -i "%obsidianhtml_configfile%"
     ; ) ;; figure out how to use these.
+    bVerboseCheckbox:=out.3
+    
+    Verbose:=(bVerboseCheckbox?" -v ":" ")
     cmd =
     (Join%A_Space%
+    
     obsidianhtml run 
     -f "%manuscriptpath%" 
     -i "%obsidianhtml_configfile%"
-    ) ; -i "%obsidianhtml_configfile%" ;; not doable if you use 
-    ;-i "%obsidianhtml_configfile%" 
-    ; -v
-    ; cmd:=Quote(cmd)
-    Clipboard:=input:=cmd
-    RunWait, % A_ComSpec " /K " input, , , CMD_PID
+    %Verbose%
+    ) 
+    ttip("Running ObsidianHTML",5)
+    if (script.config.config.RetrieveFromCMD || true)
+    {
+        obsidianhtml_configfile:=script.config.config.obsidianhtml_configfile
+        ;CMD2:="cmd.exe /q /c obsidianhtml run -f " Verbose " """ manuscriptpath """ " "  -i " "" obsidianhtml_configfile """"
+        ObsidianHTML_Info:="ObsidianHTML Version: " ComObjCreate("WScript.Shell").Exec("obsidianhtml version").StdOut.ReadAll() "`n"
+
+        Result.=ComObjCreate("WScript.Shell").Exec(cmd).StdOut.ReadAll()
+        if RegExMatch(Result, "md: (?<MDPath>.*)(\s*)html: (?<HTMLPath>.*)", v)
+        {
+            if FileExist(vMDPath)
+                md_Path:=vMDPath
+            Else
+            {
+                Clipboard:=result
+                FileDelete, % A_ScriptDir "\log.txt"
+                FileAppend, % ObsidianHTML_Info "---`nIssued Command:`n---`n" Cmd "`n---`n`nCommand Line output below:`n" result, % A_ScriptDir "\log.txt"
+                run, % A_ScriptDir "\log.txt"
+                MsgBox 0x40010, % script.name, % "File  md_Path does not seem to exist. Please check manually."
+            }
+        }
+        else
+        {
+            Clipboard:=result
+            FileDelete, % A_ScriptDir "\log.txt"
+            FileAppend, % ObsidianHTML_Info "---`nIssued Command:`n---`n" Cmd "`n---`n`nCommand Line output below:`n" result, % A_ScriptDir "\log.txt"
+            run, % A_ScriptDir "\log.txt"
+            MsgBox, 0x40010, % script.name " - Output could not be parsed.", % "DO NOT CONTINUE WITHOUT FULLY READING THIS!`n`nThe command line output of obsidianhtml does not contain the required information.`nThe output has been copied to the clipboard.`n`nTo carry on, find the path of the md-file and copy it to your clipboard.`nONLY THEN close this window."
+        }
+    }
+    else
+    {
+        input:=cmd
+        ; Result:=ComObjCreate("WScript.Shell").Exec("cmd.exe /q /c dir").StdOut.ReadAll()
+        RunWait, % A_ComSpec " /K " input, , , CMD_PID
+        ttip("Please copy the path of the md-output, then close the window")
+        WinWaitClose, % "ahk_pid " CMD_PID
+        md_Path:=Clipboard
+    }
 
     ; 4
-    ttip("Please copy the path of the md-output, then close the window")
-    WinWaitClose, % "ahk_pid " CMD_PID
-    md_Path:=Clipboard
-
+    ttip("Converting to .rmd-file",5)
     ; 5, 6
     rmd_Path:=ConvertMDToRMD(md_Path,"index")
-
+    ttip("Moving to output folder",5)
     ; 7
     rmd_Path:=CopyBack(rmd_Path,script.config.Destination,manuscriptpath)
+    ttip("Creating R-BuildScript",5)
     script_contents:=BuildRScriptContent(rmd_Path,output_type)
+    ttip("Executing R-BuildScript",5)
     RunRScript(rmd_Path,output_type,script_contents,script.config.config.RScriptPath)
-
+    OpenFolder(rmd_Path)
     return md_Path
 }
-
+OpenFolder(Path)
+{
+    SplitPath, % Path,, OutDir
+    run, % OutDir
+}
 RunRScript(Path,output_type,script_contents,RScript_Path:="")
 {
     SplitPath, % Path, OutFileName, OutDir, OutExtension, OutNameNoExt, OutDrive
     FileDelete, % OutDir "\build.R"
     FileAppend, % script_contents, % OutDir "\build.R"
     if (RScript_Path="")
-        run, % "C:\Program Files\R\R-4.2.0\bin\Rscript.exe" A_Space OutDir "\build.R", % OutDir
-    else
-        run, % RScript_Path A_Space OutDir "\build.R", % OutDir
+        RScript_Path:="C:\Program Files\R\R-4.2.0\bin\Rscript.exe"
+    CMD:=quote(RScript_Path) A_Space quote(strreplace(OutDir "\build.R","\","\\"))
+    run, % CMD, % OutDir
+    if script.config.config.bundleAHKStarter
+    {
+        RSCRIPT_PATH:=RScript_Path
+        BUILD_RPATH:=strreplace(OutDir "\build.R","\","\\")
+        OUTDIR_PATH:=OutDir
+        Ahk_build=
+        (Join`s LTRIM
+
+            `nrun, `% `"`"`"%RSCRIPT_PATH%"""
+            A_Space """%BUILD_RPATH%"""
+            , `% "%OUTDIR_PATH%"
+        )
+        if FileExist(OutDir "\AHK_build.ahk")
+            FileDelete, % OutDir "\AHK_build.ahk"
+        FileAppend, % Ahk_build, % OutDir "\AHK_build.ahk"
+    }
+    
 }
 
 BuildRScriptContent(Path,output_type)
 {
     ; Str:="setwd(""C:\Users\Claudius Main\Desktop\TempTemporal\TestPaper_apa"")`n"
-    Path2:=strreplace(Path,"\","\\")
+    SplitPath, % Path, , Path2
+    Path2:=strreplace(Path2,"\","\\")
     Str=
     (LTRIM
     getwd()
-    #setwd("%Path2%")
+    setwd("%Path2%")
     getwd()
 
     )
     if IsObject(output_type)
     {
+        bDoPDFLast:=false
         for k,format in output_type
         {
+            if (format="pdf_document")
+            {
+                bDoPDFLast:=true
+                continue
+            }
             Str2=
             (LTRIM
             
@@ -198,7 +272,15 @@ BuildRScriptContent(Path,output_type)
             )
             Str.=Str2
         }
-
+        if bDoPDFLast
+        {
+            Str2=
+            (LTrim
+            
+            rmarkdown::render(`"index.rmd`",`"pdf_document`")`n
+            )
+            Str.=Str2
+        }
     }
     else
     {
@@ -220,14 +302,14 @@ CopyBack(Source,Destination,manuscriptpath)
         if FileExist(Destination "\" manuscriptname "\") ;; make sure the output is clean
             FileRemoveDir, % Destination "\" manuscriptname "\", true
         FileCopyDir, % Dir, % Output_Path:=Destination "\" manuscriptname "\", true
-        run, % "Explorer " Destination "\" manuscriptname "\"
+        ;run, % "Explorer " Destination "\" manuscriptname "\"
     }
     else
     {
         if FileExist(A_Desktop "\TempTemporal\" manuscriptname "\") ;; make sure the output is clean
             FileRemoveDir, % A_Desktop "\TempTemporal\" manuscriptname "\", true
         FileCopyDir, % Dir, % Output_Path:= A_Desktop "\TempTemporal\" manuscriptname "\" , true
-        run, % "Explorer " A_Desktop "\TempTemporal\" manuscriptname "\"
+        ;run, % "Explorer " A_Desktop "\TempTemporal\" manuscriptname "\"
     }
     return Output_Path  OutFileName
 }
@@ -241,6 +323,11 @@ ConvertMDToRMD(md_Path,notename)
 guiCreate()
 {
     global
+    PotentialOutputs:=["All","html_document" , "pdf_document" , "word_document" , "odt_document" , "rtf_document" , "md_document" , "powerpoint_presentation" , "ioslides_presentation" , "tufte::tufte_html" , "github_document"]
+    ; for k,v in 
+    ; {
+    ;     PotentialOutputs.=v "|"
+    ; }
     gui_control_options := "xm w220 " . cForeground . " -E0x200"  ; remove border around edit field
     Gui, Margin, 16, 16
     Gui, +AlwaysOnTop -SysMenu -ToolWindow -caption +Border +LabelGC
@@ -259,8 +346,12 @@ guiCreate()
     Gui, Color, 1d1f21, 373b41, 
     Gui, Font, s11 cWhite, Segoe UI 
     gui, add, text,xm ym, Choose output type:
-    gui, add, ddl, vDDLval, Both||html_document|word_document|
+    gui, add, listview,  vvLV1 cWhite checked, % "Type"
+    for k,v in PotentialOutputs
+        LV_Add("",v)
+    ; gui, add, ddl, vDDLval, All||html_document|word_document|odt_document|rtf_document|md_document|
     Gui, add, button, gChooseFile, Choose Manuscript
+    gui, add, checkbox,  vbVerboseCheckbox, Verbose?
     Gui, Font, s7 cWhite, Verdana
     gui, add, button, gguiSubmit, Submit
     Gui, Add, Text,x25,% " Version: " script.version " Author: " script.author
@@ -269,13 +360,21 @@ guiCreate()
 guiShow()
 {
     global
+    ; ttip("remove testing path in guiSHow")
+    ; manuscriptpath:="D:\Dokumente neu\Obsidian NoteTaking\The Universe\200 University\03\BE18 Data Analysis and applied Statistics\BE18 Lecture 02.md"
+    ; DDLval:="Both"
     while (manuscriptpath="")
     {
         guiCreate()
+        
         gui, show,, % script.name " - Choose manuscript"
         WinWaitClose, % script.name " - Choose manuscript"
     }
-    return [DDLval,manuscriptpath]
+    return [sel,manuscriptpath,bVerboseCheckbox + 0]
+}
+GCEscape()
+{
+    guiEscape()
 }
 guiEscape()
 {
@@ -285,17 +384,71 @@ guiEscape()
 guiSubmit()
 {
     global
+    gui, 1: default
+    sel:=f_GetSelectedLVEntries()
     gui, submit
     gui, destroy
-    return [DDLval,manuscriptpath]  
+    if (manuscriptpath="") && (sel.count()=0)
+    {
+        ; script.config.lastrun.last_output_type:=["html_document","word_document"]
+        if (script.config.LastRun.manuscriptpath!="") && (script.config.LastRun.last_output_type!="")
+        {
+            if IsObject(strsplit(script.config.LastRun.last_output_type,", "))
+            {
+                ; tmpsel:=""
+                ; for k,v in script.config.LastRun.last_output_type
+                ; {
+                ;     tmpsel.= v
+                ;     if (k<script.config.LastRun.last_output_type.count())
+                ;         tmpsel.= ", "
+
+                        
+                ; }
+                ; script.config.lastrun.last_output_type:=tmpsel
+                sel:=strsplit(script.config.lastrun.last_output_type,", ")
+            }
+            else
+                sel:=script.config.lastrun.last_output_type
+            ; script.Save()
+            manuscriptpath:=script.config.lastrun.manuscriptpath
+
+        }
+    }
+    script.config.LastRun.manuscriptpath:=manuscriptpath
+    script.config.LastRun.last_output_type:=""
+    for k,v in sel
+    {
+        
+        script.config.LastRun.last_output_type.=v
+        if (k<sel.count())
+            script.config.LastRun.last_output_type.=", "
+
+    }
+    script.save()
+    return [DDLval,manuscriptpath,sel]  
+}
+
+f_GetSelectedLVEntries()
+{
+    vRowNum:=0
+    sel:=[]
+    loop
+    {
+        vRowNum:=LV_GetNext(vRowNum,"C")
+        if not vRowNum  ; The above returned zero, so there are no more selected rows.
+            break
+        LV_GetText(sCurrText1,vRowNum,1)
+        sel.push(sCurrText1)
+    }
+    return sel
 }
 
 ChooseFile()
 {
     global
     ttip(Clipboard)
-    
-    if CF_bool:=FileExist(Clipboard)
+    SplitPath, % Clipboard, , , Ext
+    if CF_bool:=FileExist(Clipboard) && (Ext="md") && !GetKeyState("LShift","P")
         manuscriptpath:=(CF_bool?Clipboard:script.config.searchroot)
     else
     {
@@ -318,271 +471,6 @@ fRemoveTempDir()
 }
 
 
-; --uID:4291014243
- ; Metadata:
-  ; Snippet: Ini.ahk  ;  (v.2022.07.01.1)
-  ; --------------------------------------------------------------
-  ; Author: anonymous1184
-  ; Source: https://gist.github.com/anonymous1184/737749e83ade98c84cf619aabf66b063
-  ; 
-  ; --------------------------------------------------------------
-  ; Library: Personal Library
-  ; Section: 23 - Other
-  ; Dependencies: /
-  ; AHK_Version: v1
-  ; --------------------------------------------------------------
-  ; Keywords: config handling
-
- ;; Description:
-  ;; Desc
-
- ;;; Example:
-  ;;; https://gist.github.com/anonymous1184/737749e83ade98c84cf619aabf66b063
-  ;;; https://www.reddit.com/r/AutoHotkey/comments/s1it4j/automagically_readwrite_configuration_files/
-
- 
- ; Version: 2022.11.08.1
- ; Usages and examples: https://redd.it/s1it4j
- 
- Ini(Path, Sync:=true) {
-     return new Ini_File(Path, Sync)
- }
- 
- ; Version: 2022.11.08.1
- 
- class Object_Proxy {
- 
-     ;region Public
- 
-     Clone() {
-         clone := new Object_Proxy()
-         clone.__data := this.__data.Clone()
-         return clone
-     }
- 
-     Count() {
-         return this.__data.Count()
-     }
- 
-     Delete(Parameters*) {
-         return this.__data.Delete(Parameters*)
-     }
- 
-     GetAddress(Key) {
-         return this.__data.GetAddress(Key)
-     }
- 
-     GetCapacity(Parameters*) {
-         return this.__data.GetCapacity(Parameters*)
-     }
- 
-     HasKey(Key) {
-         return this.__data.HasKey(Key)
-     }
- 
-     Insert(Parameters*) {
-         throw Exception("Deprecated.", -1, A_ThisFunc)
-     }
- 
-     InsertAt(Parameters*) {
-         this.__data.InsertAt(Parameters*)
-     }
- 
-     Length() {
-         return this.__data.Length()
-     }
- 
-     MaxIndex() {
-         return this.__data.MaxIndex()
-     }
- 
-     MinIndex() {
-         return this.__data.MinIndex()
-     }
- 
-     Pop() {
-         return this.__data.Pop()
-     }
- 
-     Push(Parameters*) {
-         return this.__data.Push(Parameters*)
-     }
- 
-     Remove(Parameters*) {
-         throw Exception("Deprecated.", -1, A_ThisFunc)
-     }
- 
-     RemoveAt(Parameters*) {
-         return this.__data.RemoveAt(Parameters*)
-     }
- 
-     SetCapacity(Parameters*) {
-         return this.__data.SetCapacity(Parameters*)
-     }
-     ;endregion
- 
-     ;region Private
- 
-     _NewEnum() {
-         return this.__data._NewEnum()
-     }
-     ;endregion
- 
-     ;region Meta
- 
-     __Get(Parameters*) ; Key[, Key...]
-     {
-         return this.__data[Parameters*]
-     }
- 
-     __Init() {
-         ObjRawSet(this, "__data", {})
-     }
- 
-     __Set(Parameters*) ; Key, Value[, Value...]
-     {
-         value := Parameters.Pop()
-         this.__data[Parameters*] := value
-         return value
-     }
-     ;endregion
- 
- }
- 
- 
- class Ini_File extends Object_Proxy {
- 
-     ;region Public
- 
-     Persist() {
-         IniRead buffer, % this.__path
-         sections := {}
-         for _,name in StrSplit(buffer, "`n")
-             sections[name] := true
-         for name in this.__data {
-             this[name].Persist()
-             sections.Delete(name)
-         }
-         for name in sections
-             IniDelete % this.__path, % name
-     }
- 
-     Sync(Set:="") {
-         if (Set = "")
-             return this.__sync
-         for name in this
-             this[name].Sync(Set)
-         return this.__sync := !!Set
-     }
-     ;endregion
- 
-     ;region Overload
- 
-     Delete(Name) {
-         if (this.__sync)
-             IniDelete % this.__path, % Name
-     }
-     ;endregion
- 
-     ;region Meta
- 
-     __New(Path, Sync) {
-         ObjRawSet(this, "__path", Path)
-         ObjRawSet(this, "__sync", false)
-         IniRead buffer, % Path
-         for _,name in StrSplit(buffer, "`n") {
-             IniRead data, % Path, % name
-             this[name] := new Ini_Section(Path, name, data)
-         }
-         this.Sync(Sync)
-     }
- 
-     __Set(Key, Value) {
-         isObj := IsObject(Value)
-         base := isObj ? ObjGetBase(Value) : false
-         if (isObj && !base)
-         || (base && base.__Class != "Ini_Section") {
-             path := this.__path
-             sync := this.__sync
-             this[Key] := new Ini_Section(path, Key, Value, sync)
-             return obj ; Stop, hammer time!
-         }
-     }
-     ;endregion
- 
- }
- 
- class Ini_Section extends Object_Proxy {
- 
-     ;region Public
- 
-     Persist() {
-         IniRead buffer, % this.__path, % this.__name
-         keys := {}
-         for _,key in StrSplit(buffer, "`n") {
-             key := StrSplit(key, "=")[1]
-             keys[key] := true
-         }
-         for key,value in this {
-             keys.Delete(key)
-             value := StrLen(value) ? " " value : ""
-             IniWrite % value, % this.__path, % this.__name, % key
-         }
-         for key in keys
-             IniDelete % this.__path, % this.__name, % key
-     }
- 
-     Sync(Set:="") {
-         if (Set = "")
-             return this.__sync
-         return this.__sync := !!Set
-     }
-     ;endregion
- 
-     ;region Overload
- 
-     Delete(Key) {
-         if (this.__sync)
-             IniDelete % this.__path, % this.__name, % key
-     }
-     ;endregion
- 
-     ;region Meta
- 
-     __New(Path, Name, Data, Sync:=false) {
-         ObjRawSet(this, "__path", Path)
-         ObjRawSet(this, "__name", Name)
-         ObjRawSet(this, "__sync", Sync)
-         if (!IsObject(Data))
-             Ini_ToObject(Data)
-         for key,value in Data
-             this[key] := value
-     }
- 
-     __Set(Key, Value) {
-         if (this.__sync) {
-             Value := StrLen(Value) ? " " Value : ""
-             IniWrite % Value, % this.__path, % this.__name, % key
-         }
-     }
-     ;endregion
- 
- }
- 
- ;region Auxiliary
- 
- Ini_ToObject(ByRef Data) {
-     info := Data, Data := {}
-     for _,pair in StrSplit(info, "`n") {
-         pair := StrSplit(pair, "=",, 2)
-         Data[pair[1]] := pair[2]
-     }
- }
- ;endregion
- 
-
-
-; --uID:4291014243
 
 ; --uID:4179423054
  ; Metadata:
