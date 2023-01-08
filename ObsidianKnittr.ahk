@@ -432,6 +432,7 @@ GCSubmit()
 {
     ret:=guiSubmit()
     return ret
+}
 guiEscape()
 {
     gui, destroy
