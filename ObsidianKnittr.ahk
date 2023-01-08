@@ -167,6 +167,7 @@ main()
         if RegExMatch(Result, "md: (?<MDPath>.*)(\s*)html: (?<HTMLPath>.*)", v)
         {
             if FileExist(vMDPath)
+                ObsidianKnittr_Info.= "`nOutput Folder: " GetOutputPath(ConvertMDToRMD(vMDPath,"index"),script.config.Destination,manuscriptpath).1 "`nRaw input copy:" GetOutputPath(ConvertMDToRMD(vMDPath,"index"),script.config.Destination,manuscriptpath).2 "`n"
                 md_Path:=vMDPath
             Else
             {
@@ -179,6 +180,7 @@ main()
         }
         else
         {
+            ObsidianKnittr_Info.= "`nOutput Folder: " GetOutputPath(ConvertMDToRMD(vMDPath,"index"),script.config.Destination,manuscriptpath).1 "`nRaw input copy:" GetOutputPath(ConvertMDToRMD(vMDPath,"index"),script.config.Destination,manuscriptpath).2 "`n"
             Clipboard:=result
             FileDelete, % A_ScriptDir "\log.txt"
             FileAppend, % ObsidianHTML_Info "---`nIssued Command:`n---`n" Cmd "`n---`n`nCommand Line output below:`n" result, % A_ScriptDir "\log.txt"
@@ -313,6 +315,25 @@ CopyBack(Source,Destination,manuscriptpath)
     }
     return Output_Path  OutFileName
 }
+
+
+GetOutputPath(Source,Destination,manuscriptpath)
+{
+    SplitPath, Source, OutFileName, Dir, 
+    SplitPath, % manuscriptpath ,  , ,,manuscriptname, 
+    if Destination
+    {
+        Output_Path:=Destination "\" manuscriptname "\"
+        Raw_InputFile:=Output_Path "\" manuscriptname "_vault.md"
+    }
+    else
+    {
+        Output_Path:= A_Desktop "\TempTemporal\" manuscriptname 
+        Raw_InputFile:=Output_Path "\" manuscriptname "_vault.md "
+    }
+    return [Output_Path,Raw_InputFile]
+}
+
 ConvertMDToRMD(md_Path,notename)
 {
     ;C:\Users\Claudius Main\AppData\Local\Temp\obshtml_97ghbf1f\md
