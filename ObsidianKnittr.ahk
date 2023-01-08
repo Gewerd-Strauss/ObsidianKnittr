@@ -157,8 +157,6 @@ main()
     %Verbose%
     ) 
     ttip("Running ObsidianHTML",5)
-    if (script.config.config.RetrieveFromCMD || true)
-    {
         obsidianhtml_configfile:=script.config.config.obsidianhtml_configfile
         ;CMD2:="cmd.exe /q /c obsidianhtml run -f " Verbose " """ manuscriptpath """ " "  -i " "" obsidianhtml_configfile """"
         ObsidianHTML_Info:="ObsidianHTML Version: " ComObjCreate("WScript.Shell").Exec("obsidianhtml version").StdOut.ReadAll() "`n"
@@ -166,7 +164,9 @@ main()
         Result.=ComObjCreate("WScript.Shell").Exec(cmd).StdOut.ReadAll()
         if RegExMatch(Result, "md: (?<MDPath>.*)(\s*)html: (?<HTMLPath>.*)", v)
         {
+            ObsidianHTML_Info:="`nObsidianHTML:`nVersion: " ComObjCreate("WScript.Shell").Exec("obsidianhtml version").StdOut.ReadAll()  "`nInput:`n" manuscriptpath "`nOutput Folder:`n" vMDPath "`nConfig:`n" obsidianhtml_configfile "`nCustom Config contents:`n" ReadObsidianHTML_Config(obsidianhtml_configfile).2 "`n---`n"
             if FileExist(vMDPath)
+                ObsidianKnittr_Info.= "`nOutput Folder: " GetOutputPath(ConvertMDToRMD(vMDPath,"index"),script.config.Destination,manuscriptpath).1 "`nRaw input copy:" GetOutputPath(ConvertMDToRMD(vMDPath,"index"),script.config.Destination,manuscriptpath).2 "`n"
                 md_Path:=vMDPath
             Else
             {
@@ -179,22 +179,13 @@ main()
         }
         else
         {
+            ObsidianKnittr_Info.= "`nOutput Folder: " GetOutputPath(ConvertMDToRMD(vMDPath,"index"),script.config.Destination,manuscriptpath).1 "`nRaw input copy:" GetOutputPath(ConvertMDToRMD(vMDPath,"index"),script.config.Destination,manuscriptpath).2 "`n"
             Clipboard:=result
             FileDelete, % A_ScriptDir "\log.txt"
             FileAppend, % ObsidianHTML_Info "---`nIssued Command:`n---`n" Cmd "`n---`n`nCommand Line output below:`n" result, % A_ScriptDir "\log.txt"
             run, % A_ScriptDir "\log.txt"
             MsgBox, 0x40010, % script.name " - Output could not be parsed.", % "DO NOT CONTINUE WITHOUT FULLY READING THIS!`n`nThe command line output of obsidianhtml does not contain the required information.`nThe output has been copied to the clipboard.`n`nTo carry on, find the path of the md-file and copy it to your clipboard.`nONLY THEN close this window."
         }
-    }
-    else
-    {
-        input:=cmd
-        ; Result:=ComObjCreate("WScript.Shell").Exec("cmd.exe /q /c dir").StdOut.ReadAll()
-        RunWait, % A_ComSpec " /K " input, , , CMD_PID
-        ttip("Please copy the path of the md-output, then close the window")
-        WinWaitClose, % "ahk_pid " CMD_PID
-        md_Path:=Clipboard
-    }
 
     ; 4
     ttip("Converting to .rmd-file",5)
@@ -209,6 +200,32 @@ main()
     RunRScript(rmd_Path,output_type,script_contents,script.config.config.RScriptPath)
     OpenFolder(rmd_Path)
     return md_Path
+}
+ReadObsidianHTML_Config(configpath)
+{
+    if !FileExist(configpath)
+        return "E01: No config found"
+    FileRead, txt, % configpath
+    if (txt="")
+        return "E02: Empty config file"
+    conf:=[]
+    confstr:=""
+    for index, Line in strsplit(txt,"`n")
+    {
+        Line:=trim(Line)
+        if ((!Instr(Line, ":") && Instr(Line, "# ")) ) ;|| SubStr(Line,1,1)="#")
+            continue
+        if RegExMatch(Line, "(?<Key>.*):(?<Value>.*)", v)
+        {
+            if (SubStr(Line,1,1)="#")
+                continue
+            conf[Trim(vKey)]:=Trim(vValue)
+            confstr.= Trim(vKey) "=" Trim(vValue) "`n"
+        }
+    }
+    if (confstr="")
+        return "E03: Config file contains no valid YAML config found in provided file."
+    return [conf,confstr]
 }
 OpenFolder(Path)
 {
@@ -313,6 +330,22 @@ CopyBack(Source,Destination,manuscriptpath)
     }
     return Output_Path  OutFileName
 }
+GetOutputPath(Source,Destination,manuscriptpath)
+{
+    SplitPath, Source, OutFileName, Dir, 
+    SplitPath, % manuscriptpath ,  , ,,manuscriptname, 
+    if Destination
+    {
+        Output_Path:=Destination "\" manuscriptname "\"
+        Raw_InputFile:=Output_Path "\" manuscriptname "_vault.md"
+    }
+    else
+    {
+        Output_Path:= A_Desktop "\TempTemporal\" manuscriptname 
+        Raw_InputFile:=Output_Path "\" manuscriptname "_vault.md "
+    }
+    return [Output_Path,Raw_InputFile]
+}
 ConvertMDToRMD(md_Path,notename)
 {
     ;C:\Users\Claudius Main\AppData\Local\Temp\obshtml_97ghbf1f\md
@@ -368,6 +401,7 @@ guiShow()
         guiCreate()
         
         gui, show,, % script.name " - Choose manuscript"
+        enableGuiDrag(1)
         WinWaitClose, % script.name " - Choose manuscript"
     }
     return [sel,manuscriptpath,bVerboseCheckbox + 0]
@@ -471,7 +505,105 @@ fRemoveTempDir()
 }
 
 
+; --uID:87004804
+ ; Metadata:
+  ; Snippet: enableGuiDrag  ;  (v.1.0)
+  ; --------------------------------------------------------------
+  ; Author: Goyyah, SKAN
+  ; Source: http://autohotkey.com/board/topic/80594-how-to-enable-drag-for-a-gui-without-a-titlebar
+  ; 
+  ; --------------------------------------------------------------
+  ; Library: Personal Library
+  ; Section: 06 - gui - interacting
+  ; Dependencies: /
+  ; AHK_Version: v1
+  ; --------------------------------------------------------------
 
+
+ ;; Description:
+  ;; Enables Drag on a GUI without requiring a titlebar.
+  ;; 
+  ;; Further Details and an alternative solution: https://www.autohotkey.com/boards/viewtopic.php?p=320&sid=70f513570fdd3a4de42f54b1b26bdb95#p320
+  ;; 
+
+ ;;; Example:
+  ;;; pic=%A_temp%\pic.png
+  ;;; URLDownloadToFile,http://cdn.autohotkey.com/static/ahk_logo_ipb.png,%pic%
+  ;;; ltext:=lines(100)
+  ;;; 
+  ;;; Gui, Add, CheckBox, x12 y10 w80 h30 , CheckBox
+  ;;; Gui, Add, Radio, x12 y40 w80 h30 , Radio
+  ;;; Gui, Add, Edit, x2 y70 w90 h30 , Edit
+  ;;; Gui, Add, GroupBox, x92 y10 w100 h90 , GroupBox
+  ;;; Gui, Add, DropDownList, x102 y30 w80 h20 , DropDownList
+  ;;; Gui, Add, ComboBox, x102 y60 w80 h20 , ComboBox
+  ;;; Gui, Add, Progress, x192 y10 w100 h30 , 25
+  ;;; Gui, Add, ListBox, x192 y40 w100 h60 , ListBox
+  ;;; Gui, Add, ListView, x2 y100 w190 h80 , ListView
+  ;;; Gui, Add, DateTime, x192 y130 w100 h30 , 
+  ;;; Gui, Add, MonthCal, x2 y180 w230 h170 , 
+  ;;; Gui, Add, Slider, x192 y100 w100 h30 , 25
+  ;;; Gui, Add, Hotkey, x192 y160 w100 h20 , 
+  ;;; Gui, Add, UpDown, x232 y180 w20 h170 , UpDown
+  ;;; Gui, Add, Picture, x312 y10 w150 h40 , %pic%
+  ;;; Gui, Add, Picture, x312 y60 w150 h44 , %pic%
+  ;;; Gui, Add, Picture, x312 y120 w150 h44 , %pic%
+  ;;; ;Tab2 doesnt work for some reason... Solution by Nazzal below...
+  ;;; Gui, Add, Tab, x252 y180 w220 h170 , Tab1|Tab2
+  ;;; gui, Add, Link,, <a href="http://www.Autohotkey.com">hello`, this is a link. Autohotkey.com</a>
+  ;;; Gui, Add, Edit, w200 h80, Scrollable Edit Control`n%ltext%
+  ;;; Gui, Show, w479 h358, Draggable GUI with Controls
+  ;;; 
+  ;;; enableGuiDrag()
+  ;;; return
+  ;;; 
+  ;;; GuiClose:
+  ;;; FileDelete, %A_temp%\pic.png
+  ;;; ExitApp
+  ;;; 
+  ;;; lines(numberoflines) {
+  ;;; 	z=
+  ;;; 	loop, %numberoflines%
+  ;;; 		z=%z%Line%A_Index%`n
+  ;;; 	StringTrimRight,z,z,1
+  ;;; 	return z
+  ;;; }
+  ;;; 
+  ;;; enableGuiDrag(GuiLabel=1) {
+  ;;; 	WinGetPos,,,A_w,A_h,A
+  ;;; 	Gui, %GuiLabel%:Add, Text, x0 y0 w%A_w% h%A_h% +BackgroundTrans gGUI_Drag
+  ;;; 	return
+  ;;; 	
+  ;;; 	GUI_Drag:
+  ;;; 	PostMessage 0xA1,2  ;-- Goyyah/SKAN trick
+  ;;; 	;http://autohotkey.com/board/topic/80594-how-to-enable-drag-for-a-gui-without-a-titlebar
+  ;;; 	return
+  ;;; }
+  ;;; 
+
+ enableGuiDrag(GuiLabel=1) {
+ 	WinGetPos,,,A_w,A_h,A
+ 	Gui, %GuiLabel%:Add, Text, x0 y0 w%A_w% h%A_h% +BackgroundTrans gGUI_Drag
+ 	return
+ 	
+ 	GUI_Drag:
+ 	SendMessage 0xA1,2  ;-- Goyyah/SKAN trick
+ 	;
+    WinGetPos, X, Y, Width, Height, ObsidianKnittr - Choose manuscript
+    script.config.GuiPositioning:=[]
+    script.config.GuiPositioning.X:=X
+    script.config.GuiPositioning.Y:=Y
+    script.config.GuiPositioning.W:=Width
+    script.config.GuiPositioning.H:=Height
+    Settimer, lSavePos, -800
+ 	return
+    lSavePos:
+    script.Save()
+    return
+ }
+
+
+; --uID:87004804
 ; --uID:4179423054
  ; Metadata:
   ; Snippet: Quote  ;  (v.1)

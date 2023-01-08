@@ -2,8 +2,8 @@ ObsidianHTML Version: 3.3.1
 
 ---
 Issued Command:
----
 obsidianhtml run     -f "D:\Dokumente neu\Obsidian NoteTaking\The Universe\300 Personal\311 Programming\ObsidianHTML_FootnotewithTags_andDoublePoint.md"     -i "D:\Dokumente neu\000 AAA Dokumente\000 AAA HSRW\General\AHK scripts\Projects\Finished\ObsidianScripts\INI-Files\ObsidianHTML_Config.yml"
+
 ---
 
 Command Line output below:
@@ -12,30 +12,30 @@ INFO: Config var was set. (provided by user through commandline)
 INFO: Config var was set. (deduced)
 	obsidian_folder_path_str: D:/Dokumente neu/Obsidian NoteTaking/The Universe
 INFO: Creating tempdir
-INFO: Created temporary directory C:/Users/Claudius Main/AppData/Local/Temp/obshtml_8t5fw8u4
+INFO: Created temporary directory C:/Users/Claudius Main/AppData/Local/Temp/obshtml_ooh0unj8
 INFO: Internal config var was set. (provided by user through commandline):
-	[internal] output_folder_path: C:/Users/Claudius Main/AppData/Local/Temp/obshtml_8t5fw8u4 
-INFO: Created empty output folder path C:\Users\Claudius Main\AppData\Local\Temp\obshtml_8t5fw8u4\md
+	[internal] output_folder_path: C:/Users/Claudius Main/AppData/Local/Temp/obshtml_ooh0unj8 
+INFO: Created empty output folder path C:\Users\Claudius Main\AppData\Local\Temp\obshtml_ooh0unj8\md
 INFO: Config var was set. (default behavior)
-	md_folder_path_str: C:/Users/Claudius Main/AppData/Local/Temp/obshtml_8t5fw8u4/md
+	md_folder_path_str: C:/Users/Claudius Main/AppData/Local/Temp/obshtml_ooh0unj8/md
 INFO: Config var was set. (default behavior)
-	md_entrypoint_path_str: C:/Users/Claudius Main/AppData/Local/Temp/obshtml_8t5fw8u4/md/index.md
-INFO: Created empty output folder path C:\Users\Claudius Main\AppData\Local\Temp\obshtml_8t5fw8u4\html
+	md_entrypoint_path_str: C:/Users/Claudius Main/AppData/Local/Temp/obshtml_ooh0unj8/md/index.md
+INFO: Created empty output folder path C:\Users\Claudius Main\AppData\Local\Temp\obshtml_ooh0unj8\html
 INFO: Config var was set. (default behavior)
-	html_output_folder_path_str: C:/Users/Claudius Main/AppData/Local/Temp/obshtml_8t5fw8u4/html
+	html_output_folder_path_str: C:/Users/Claudius Main/AppData/Local/Temp/obshtml_ooh0unj8/html
 DEPRECATION WARNING: The setting obsidian_folder_path_str is deprecated. See https://obsidian-html.github.io/Configurations/Deprecated%20Configurations/Deprecated%20Configurations.html for more information.
 DEPRECATION WARNING: The setting exclude_subfolders is deprecated. See https://obsidian-html.github.io/Configurations/Deprecated%20Configurations/Deprecated%20Configurations.html for more information.
 DEPRECATION WARNING: The setting toggles/features/styling/add_toc is deprecated. See https://obsidian-html.github.io/Configurations/Deprecated%20Configurations/Deprecated%20Configurations.html for more information.
 DEPRECATION WARNING: The setting toggles/features/styling/toc_pane is deprecated. See https://obsidian-html.github.io/Configurations/Deprecated%20Configurations/Deprecated%20Configurations.html for more information.
 DEPRECATION WARNING: The setting toggles/features/styling/flip_panes is deprecated. See https://obsidian-html.github.io/Configurations/Deprecated%20Configurations/Deprecated%20Configurations.html for more information.
-> COPYING VAULT D:\Dokumente neu\Obsidian NoteTaking\The Universe TO C:\Users\CLAUDI~1\AppData\Local\Temp\tmpgmh0btbc
+> COPYING VAULT D:\Dokumente neu\Obsidian NoteTaking\The Universe TO C:\Users\CLAUDI~1\AppData\Local\Temp\tmpripff_o0
 Paths that will be ignored: []
 < COPYING VAULT: Done
 > CLEARING OUTPUT FOLDERS
 > CREATING OUTPUT FOLDERS
-> COMPILING MARKDOWN FROM OBSIDIAN CODE (C:\Users\Claudius Main\AppData\Local\Temp\tmpgmh0btbc\300 Personal\311 Programming\ObsidianHTML_FootnotewithTags_andDoublePoint.md)
-> COMPILING HTML FROM MARKDOWN CODE (C:\Users\Claudius Main\AppData\Local\Temp\obshtml_8t5fw8u4\md\index.md)
-	> COMPILING INDEX FROM DIR STRUCTURE (C:\Users\Claudius Main\AppData\Local\Temp\obshtml_8t5fw8u4\html\obs.html\dir_index.html)
+> COMPILING MARKDOWN FROM OBSIDIAN CODE (C:\Users\Claudius Main\AppData\Local\Temp\tmpripff_o0\300 Personal\311 Programming\ObsidianHTML_FootnotewithTags_andDoublePoint.md)
+> COMPILING HTML FROM MARKDOWN CODE (C:\Users\Claudius Main\AppData\Local\Temp\obshtml_ooh0unj8\md\index.md)
+	> COMPILING INDEX FROM DIR STRUCTURE (C:\Users\Claudius Main\AppData\Local\Temp\obshtml_ooh0unj8\html\obs.html\dir_index.html)
 	< COMPILING INDEX FROM DIR STRUCTURE: Done
 	> SECOND PASS HTML
 	< SECOND PASS HTML: Done
