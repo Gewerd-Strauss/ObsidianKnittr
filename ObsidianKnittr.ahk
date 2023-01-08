@@ -399,7 +399,7 @@ guiCreate()
     Gui, add, button, gChooseFile, Choose Manuscript
     gui, add, checkbox,  vbVerboseCheckbox, Verbose?
     Gui, Font, s7 cWhite, Verdana
-    gui, add, button, gguiSubmit, Submit
+    gui, add, button, gGCSubmit, Submit
     Gui, Add, Text,x25,% " Version: " script.version " Author: " script.author
     return
 }
@@ -428,6 +428,10 @@ GCEscape()
 {
     guiEscape()
 }
+GCSubmit()
+{
+    ret:=guiSubmit()
+    return ret
 guiEscape()
 {
     gui, destroy
