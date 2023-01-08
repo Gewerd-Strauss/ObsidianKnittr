@@ -338,6 +338,7 @@ CopyBack(Source,Destination,manuscriptpath)
         if FileExist(Destination "\" manuscriptname "\") ;; make sure the output is clean
             FileRemoveDir, % Destination "\" manuscriptname "\", true
         FileCopyDir, % Dir, % Output_Path:=Destination "\" manuscriptname "\", true
+        FileCopy, % manuscriptpath, % Output_Path "\" manuscriptname "_vault.md", 1
         ;run, % "Explorer " Destination "\" manuscriptname "\"
     }
     else
@@ -345,6 +346,7 @@ CopyBack(Source,Destination,manuscriptpath)
         if FileExist(A_Desktop "\TempTemporal\" manuscriptname "\") ;; make sure the output is clean
             FileRemoveDir, % A_Desktop "\TempTemporal\" manuscriptname "\", true
         FileCopyDir, % Dir, % Output_Path:= A_Desktop "\TempTemporal\" manuscriptname "\" , true
+        FileCopy, % manuscriptpath, % Output_Path "\" manuscriptname "_vault.md ", 1
         ;run, % "Explorer " A_Desktop "\TempTemporal\" manuscriptname "\"
     }
     return Output_Path  OutFileName
