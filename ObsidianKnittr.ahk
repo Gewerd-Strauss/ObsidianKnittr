@@ -394,21 +394,37 @@ guiCreate()
     gui, add, text,xm ym, Choose output type:
     gui, add, listview,  vvLV1 cWhite checked, % "Type"
     for k,v in PotentialOutputs
-        LV_Add("",v)
+    {
+        
+        Options:=
+        Options:=((Instr(script.config.lastrun.last_output_type,v))?"Check":"-Check")
+        LV_Add(Options,v)
+    }
     ; gui, add, ddl, vDDLval, All||html_document|word_document|odt_document|rtf_document|md_document|
     Gui, add, button, gChooseFile, Choose Manuscript
+    gui, add, edit, disabled w330 vChosenFile
     gui, add, checkbox,  vbVerboseCheckbox, Verbose?
+    gui, add, checkbox,  vbFullLogCheckbox, Full Log on successful execution?
     Gui, Font, s7 cWhite, Verdana
     gui, add, button, gGCSubmit, Submit
     Gui, Add, Text,x25,% " Version: " script.version " Author: " script.author
+
+    ; script.config.lastrun.last_output_type:=["html_document","word_document"]
+    if (script.config.LastRun.manuscriptpath!="") && (script.config.LastRun.last_output_type!="")
+    {
+        SplitPath, % script.config.lastrun.manuscriptpath, , OutDir, , manuscriptname,
+        SplitPath, % OutDir, OutFileName, OutDir,
+        guicontrol,, bVerboseCheckbox, % (script.config.LastRun.Verbose)
+        guicontrol,, bFullLogCheckbox, % (script.config.LastRun.FullLog)
+        guicontrol,, ChosenFile, % manuscriptname "(" OutFileName ") - " script.config.lastrun.manuscriptpath
+    }
+    
     return
 }
+
 guiShow()
 {
     global
-    ; ttip("remove testing path in guiSHow")
-    ; manuscriptpath:="D:\Dokumente neu\Obsidian NoteTaking\The Universe\200 University\03\BE18 Data Analysis and applied Statistics\BE18 Lecture 02.md"
-    ; DDLval:="Both"
     while (manuscriptpath="")
     {
         guiCreate()
@@ -445,34 +461,29 @@ guiSubmit()
     sel:=f_GetSelectedLVEntries()
     gui, submit
     gui, destroy
+    if (script.config.LastRun.manuscriptpath!="") && (manuscriptpath="")
+    {
+        manuscriptpath:=script.config.LastRun.manuscriptpath
+        bVerboseCheckbox:=script.config.LastRun.Verbose+0
+        bFullLogCheckbox:=script.config.LastRun.FullLog+0  
+    }
     if (manuscriptpath="") && (sel.count()=0)
     {
-        ; script.config.lastrun.last_output_type:=["html_document","word_document"]
         if (script.config.LastRun.manuscriptpath!="") && (script.config.LastRun.last_output_type!="")
         {
             if IsObject(strsplit(script.config.LastRun.last_output_type,", "))
-            {
-                ; tmpsel:=""
-                ; for k,v in script.config.LastRun.last_output_type
-                ; {
-                ;     tmpsel.= v
-                ;     if (k<script.config.LastRun.last_output_type.count())
-                ;         tmpsel.= ", "
-
-                        
-                ; }
-                ; script.config.lastrun.last_output_type:=tmpsel
                 sel:=strsplit(script.config.lastrun.last_output_type,", ")
-            }
             else
                 sel:=script.config.lastrun.last_output_type
-            ; script.Save()
             manuscriptpath:=script.config.lastrun.manuscriptpath
-
+            bVerboseCheckbox:=script.config.LastRun.Verbose+0
+            bFullLogCheckbox:=script.config.LastRun.FullLog+0  
         }
     }
     script.config.LastRun.manuscriptpath:=manuscriptpath
     script.config.LastRun.last_output_type:=""
+    script.config.LastRun.Verbose:=bVerboseCheckbox+0
+    script.config.LastRun.FullLog:=bFullLogCheckbox+0
     for k,v in sel
     {
         
@@ -510,8 +521,13 @@ ChooseFile()
     else
     {
         FileSelectFile, manuscriptpath, 3, % (FileExist(Clipboard)?Clipboard:script.config.config.searchroot)  , % "Choose manuscript file", *.md
+        if (manuscriptpath="")
+            return
     }
-        return manuscriptpath
+    SplitPath, % manuscriptpath, , OutDir, , manuscriptname,
+    SplitPath, % OutDir, OutFileName,
+    guicontrol,, ChosenFile, % manuscriptname "(" OutFileName ") - " manuscriptpath
+    return manuscriptpath
 }
 
 fRemoveTempDir()
