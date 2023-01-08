@@ -1,3 +1,6 @@
+
+
+
 #NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
 #SingleInstance,Force
 #MaxHotkeysPerInterval, 99999999
@@ -141,10 +144,6 @@ main()
     obsidianhtml_configfile:=script.config.config.obsidianhtml_configfile
     manuscriptpath_q:=quote(manuscriptpath)
     SplitPath, % manuscriptpath, OutFileName, manuscriptLocation
-    ; cmd =
-    ; (Join&
-    ; obsidianhtml run -f "%manuscriptpath%" -i "%obsidianhtml_configfile%"
-    ; ) ;; figure out how to use these.
     bVerboseCheckbox:=out.3
     
     Verbose:=(bVerboseCheckbox?" -v ":" ")
@@ -205,6 +204,7 @@ main()
     rmd_Path:=ConvertMDToRMD(md_Path,"index")
     ttip("Moving to output folder",5)
     ; 7
+
     rmd_Path:=CopyBack(rmd_Path,script.config.Destination,manuscriptpath)
     ttip("Creating R-BuildScript",5)
     script_contents:=BuildRScriptContent(rmd_Path,output_type)
@@ -242,6 +242,7 @@ OpenFolder(Path)
     SplitPath, % Path,, OutDir
     run, % OutDir
 }
+
 RunRScript(Path,output_type,script_contents,RScript_Path:="")
 {
     SplitPath, % Path, OutFileName, OutDir, OutExtension, OutNameNoExt, OutDrive
@@ -320,6 +321,7 @@ BuildRScriptContent(Path,output_type)
     }
     return Str
 }
+
 CopyBack(Source,Destination,manuscriptpath)
 {
     SplitPath, Source, OutFileName, Dir, 
@@ -366,14 +368,11 @@ ConvertMDToRMD(md_Path,notename)
     ;run, % md_Path
     return md_Path "\" notename ".rmd"
 }
+
 guiCreate()
 {
     global
     PotentialOutputs:=["All","html_document" , "pdf_document" , "word_document" , "odt_document" , "rtf_document" , "md_document" , "powerpoint_presentation" , "ioslides_presentation" , "tufte::tufte_html" , "github_document"]
-    ; for k,v in 
-    ; {
-    ;     PotentialOutputs.=v "|"
-    ; }
     gui_control_options := "xm w220 " . cForeground . " -E0x200"  ; remove border around edit field
     Gui, Margin, 16, 16
     Gui, +AlwaysOnTop -SysMenu -ToolWindow -caption +Border +LabelGC
@@ -455,6 +454,7 @@ guiEscape()
     gui, destroy
     return
 }
+
 guiSubmit()
 {
     global
