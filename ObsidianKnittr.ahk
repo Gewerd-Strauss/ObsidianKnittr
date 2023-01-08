@@ -166,6 +166,7 @@ main()
         Result.=ComObjCreate("WScript.Shell").Exec(cmd).StdOut.ReadAll()
         if RegExMatch(Result, "md: (?<MDPath>.*)(\s*)html: (?<HTMLPath>.*)", v)
         {
+            ObsidianHTML_Info:="`nObsidianHTML:`nVersion: " ComObjCreate("WScript.Shell").Exec("obsidianhtml version").StdOut.ReadAll()  "`nInput:`n" manuscriptpath "`nOutput Folder:`n" vMDPath "`nConfig:`n" obsidianhtml_configfile "`nCustom Config contents:`n" ReadObsidianHTML_Config(obsidianhtml_configfile).2 "`n---`n"
             if FileExist(vMDPath)
                 ObsidianKnittr_Info.= "`nOutput Folder: " GetOutputPath(ConvertMDToRMD(vMDPath,"index"),script.config.Destination,manuscriptpath).1 "`nRaw input copy:" GetOutputPath(ConvertMDToRMD(vMDPath,"index"),script.config.Destination,manuscriptpath).2 "`n"
                 md_Path:=vMDPath
@@ -211,6 +212,30 @@ main()
     RunRScript(rmd_Path,output_type,script_contents,script.config.config.RScriptPath)
     OpenFolder(rmd_Path)
     return md_Path
+}
+ReadObsidianHTML_Config(configpath)
+{
+    if !FileExist(configpath)
+        return "E01: No config found"
+    FileRead, txt, % configpath
+    if (txt="")
+        return "E02: Empty config file"
+    conf:=[]
+    confstr:=""
+    for index, Line in strsplit(txt,"`n")
+    {
+        Line:=trim(Line)
+        if !Instr(Line, ":") && Instr(Line, "# ")
+            continue
+        if RegExMatch(Line, "(?<Key>.*):(?<Value>.*)", v)
+        {
+            conf[Key]:=Value
+            confstr.= Key "=" Value "`n"
+        }
+    }
+    if (confstr="")
+        return "E03: Config file contains no valid YAML config found in provided file."
+    return [conf,confstr]
 }
 OpenFolder(Path)
 {
