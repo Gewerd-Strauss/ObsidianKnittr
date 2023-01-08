@@ -438,8 +438,9 @@ guiShow()
         if (manuscriptpath!="")
             break
     }
-    return [sel,manuscriptpath,bVerboseCheckbox + 0]
+    return [sel,manuscriptpath,bVerboseCheckbox + 0,bFullLogCheckbox + 0]
 }
+
 GCEscape()
 {
     guiEscape()
