@@ -157,7 +157,7 @@ main()
     %Verbose%
     ) 
     ttip("Running ObsidianHTML",5)
-    if (script.config.config.RetrieveFromCMD || true)
+    ; if (script.config.config.RetrieveFromCMD || true)
     {
         obsidianhtml_configfile:=script.config.config.obsidianhtml_configfile
         ;CMD2:="cmd.exe /q /c obsidianhtml run -f " Verbose " """ manuscriptpath """ " "  -i " "" obsidianhtml_configfile """"
@@ -188,15 +188,15 @@ main()
             MsgBox, 0x40010, % script.name " - Output could not be parsed.", % "DO NOT CONTINUE WITHOUT FULLY READING THIS!`n`nThe command line output of obsidianhtml does not contain the required information.`nThe output has been copied to the clipboard.`n`nTo carry on, find the path of the md-file and copy it to your clipboard.`nONLY THEN close this window."
         }
     }
-    else
-    {
-        input:=cmd
-        ; Result:=ComObjCreate("WScript.Shell").Exec("cmd.exe /q /c dir").StdOut.ReadAll()
-        RunWait, % A_ComSpec " /K " input, , , CMD_PID
-        ttip("Please copy the path of the md-output, then close the window")
-        WinWaitClose, % "ahk_pid " CMD_PID
-        md_Path:=Clipboard
-    }
+    ; else
+    ; {
+        ; input:=cmd
+        ; ; Result:=ComObjCreate("WScript.Shell").Exec("cmd.exe /q /c dir").StdOut.ReadAll()
+        ; RunWait, % A_ComSpec " /K " input, , , CMD_PID
+        ; ttip("Please copy the path of the md-output, then close the window")
+        ; WinWaitClose, % "ahk_pid " CMD_PID
+        ; md_Path:=Clipboard
+    ; }
 
     ; 4
     ttip("Converting to .rmd-file",5)
