@@ -115,16 +115,28 @@ main()
     {
         InputBox, given_obsidianhtml_configfile, % script.name " - Initiate settings","Please give the path of your configfile for obsidianhtml."
         InputBox, given_searchroot, % script.name " - Initiate settings","Please give the path of your configfile for obsidianhtml."
-
+        InputBox, given_rscriptpath, % script.name " - Initialise settings", "Please give the absolute path of your installed 'Rscript.exe'-file you wish to use.`nIf you don't want to use this step, leave this empty and continue.", , , , , , , , % "C:\Program Files\R\R-MAJORVERSION.MINORVERSION.PATCH\bin\Rscript.exe"
         InitialSettings=
         (LTrim
         [Config]
-        searchroot=%given_searchroot%
-        obsidianhtml_configfile=%given_obsidianhtml_configfile%
+        bundleAHKRecompileStarter
         Destination=0
-        RScriptPath=C:\Program Files\R\R-4.2.0\bin\Rscript.exe
+        FullLogOnSuccess=0
+        obsidianhtml_configfile=%given_obsidianhtml_configfile%
+        RScriptPath=%given_rscriptpath%
+        searchroot=%given_searchroot%
         [Version]
-        version=1.3.0
+        version=1.5.0
+        [LastRun]
+        FullLog=0
+        last_output_type=
+        manuscriptpath=
+        Verbose=0
+        [GuiPositioning]
+        H=
+        W=
+        X=
+        Y=
         )
         FileAppend, % InitialSettings, % script.configfile
         script.load()
@@ -259,7 +271,7 @@ RunRScript(Path,output_type,script_contents,RScript_Path:="")
         RScript_Path:="C:\Program Files\R\R-4.2.0\bin\Rscript.exe"
     CMD:=quote(RScript_Path) A_Space quote(strreplace(OutDir "\build.R","\","\\"))
     run, % CMD, % OutDir
-    if script.config.config.bundleAHKStarter
+    if script.config.config.bundleAHKRecompileStarter && (RScript_Path!="")
     {
         RSCRIPT_PATH:=RScript_Path
         BUILD_RPATH:=strreplace(OutDir "\build.R","\","\\")
