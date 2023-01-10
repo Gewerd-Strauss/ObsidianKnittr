@@ -1,9 +1,7 @@
-
-
-
 #NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
 #SingleInstance,Force
 #MaxHotkeysPerInterval, 99999999
+#Warn All, Outputdebug
 ;#Persistent 
  ;#Warn  ; Enable warnings to assist with detecting common errors.
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
@@ -12,7 +10,6 @@ DetectHiddenWindows, On
 SetKeyDelay -1,-1
 SetBatchLines,-1
 SetTitleMatchMode, 2
-#Include, <ScriptObj/ScriptObj>
 /*
 for creditsRaw, use "/" in the "URL"-field when the snippet is not published yet (e.g. for code you've written yourself and not published yet)
 space author, SnippetNameX and URLX out by spaces or tabs, and remember to include "-" inbetween both fields
@@ -61,19 +58,7 @@ global script := {   base         : script
                     ,config:		[]
 					,configfile   : A_ScriptDir "\INI-Files\" regexreplace(A_ScriptName, "\.\w+") ".ini"
                     ,configfolder : A_ScriptDir "\INI-Files"}
-/*	
-	For throwing errors via script.debug
-	script.Error:={	 Level		:""
-					,Label		:""
-					,Message	:""	
-					,Error		:""		
-					,Vars:		:[]
-					,AddInfo:	:""}
-	if script.error
-		script.Debug(script.error.Level,script.error.Label,script.error.Message,script.error.AddInfo,script.error.Vars)
-*/
 
-; RunRScript("C:\Users\Claudius Main\Desktop\TempTemporal\TestPaper_apa\index.rmd","",T,RScript_Path:="")
 md_path:=main()
 ExitApp, 
 return
@@ -82,34 +67,34 @@ main()
 {
 
     /*
-    Steps:
-    Obsidian-Sided:
-    0. Load Config
-    1. Finish manuscript (must contain csl, bib, conforming includes/image formats) * 
-    2. Insert `output: word_document|html_document|...` into the frontmatter and save
-    2.2 get manuscript's path
+        Steps:
+        Obsidian-Sided:
+        0. Load Config
+        1. Finish manuscript (must contain csl, bib, conforming includes/image formats) * 
+        2. Insert `output: word_document|html_document|...` into the frontmatter and save
+        2.2 get manuscript's path
 
-    AHK-script sided: 
-    3. run obsidianhtml (get manuscript's path) ;; TODO: check if 'max_note_depth' is correctly applied by making a chain of 20 notes including into each other.
+        AHK-script sided: 
+        3. run obsidianhtml (get manuscript's path) ;; TODO: check if 'max_note_depth' is correctly applied by making a chain of 20 notes including into each other.
 
-    loop, 20
-    FileAppend, % "![[" A_Index "]]", % "D:\Dokumente neu\Obsidian NoteTaking\The Universe\000 Start here\MaxInclusionTest\" A_Index ".md"
-    4. get output path from cmd-log ;; TODO: automate this step so I don't have to do the complicated clipboard stuff.
-    5. rename to .rmd
-    6. open r at that location
-    7. load BuildRScriptContent ;; TODO: automate properly, instead of using R Studio.
-    8. set pwd 
-    9. BuildRScriptContent at location
-    10. Copy resulting output to predefined output folder
-    11. open output folder
-
-
+        loop, 20
+        FileAppend, % "![[" A_Index "]]", % "D:\Dokumente neu\Obsidian NoteTaking\The Universe\000 Start here\MaxInclusionTest\" A_Index ".md"
+        4. get output path from cmd-log ;; TODO: automate this step so I don't have to do the complicated clipboard stuff.
+        5. rename to .rmd
+        6. open r at that location
+        7. load BuildRScriptContent ;; TODO: automate properly, instead of using R Studio.
+        8. set pwd 
+        9. BuildRScriptContent at location
+        10. Copy resulting output to predefined output folder
+        11. open output folder
 
 
-    * until https://github.com/obsidian-html/obsidian-html/issues/520 is not fixed
+
+
+        * until https://github.com/obsidian-html/obsidian-html/issues/520 is not fixed
 
     */
-    OnExit("fRemoveTempDir")
+    OnExit("fRemoveTempDir").Bind(md_path)
     ; 0
     if !script.load()
     {
@@ -142,8 +127,6 @@ main()
         script.load()
     }
     script.version:=script.config.Version.Version
-    ;, script.Update()  ;DO NOT ACTIVATE THISLINE UNTIL YOU DUMBO HAS FIXED THE DAMN METHOD. God damn it.
-    ;Conf:=ini(script.config)
 
     ; 2.2
     out:=guiShow()
@@ -207,16 +190,6 @@ main()
             run, % A_ScriptDir "\Executionlog.txt"
             MsgBox, 0x40010, % script.name " - Output could not be parsed.", % "DO NOT CONTINUE WITHOUT FULLY READING THIS!`n`nThe command line output of obsidianhtml does not contain the required information.`nThe output has been copied to the clipboard, and written to file under '" A_ScriptDir "\Executionlog.txt" "'`n`nTo carry on, find the path of the md-file and copy it to your clipboard.`nONLY THEN close this window."
         }
-    ; else
-    ; {
-        ; input:=cmd
-        ; ; Result:=ComObjCreate("WScript.Shell").Exec("cmd.exe /q /c dir").StdOut.ReadAll()
-        ; RunWait, % A_ComSpec " /K " input, , , CMD_PID
-        ; ttip("Please copy the path of the md-output, then close the window")
-        ; WinWaitClose, % "ahk_pid " CMD_PID
-        ; md_Path:=Clipboard
-    ; }
-
     ; 4
     ttip("Converting to .rmd-file",5)
     ; 5, 6
@@ -260,34 +233,6 @@ OpenFolder(Path)
 {
     SplitPath, % Path,, OutDir
     run, % OutDir
-}
-
-RunRScript(Path,output_type,script_contents,RScript_Path:="")
-{
-    SplitPath, % Path, OutFileName, OutDir, OutExtension, OutNameNoExt, OutDrive
-    FileDelete, % OutDir "\build.R"
-    FileAppend, % script_contents, % OutDir "\build.R"
-    if (RScript_Path="")
-        RScript_Path:="C:\Program Files\R\R-4.2.0\bin\Rscript.exe"
-    CMD:=quote(RScript_Path) A_Space quote(strreplace(OutDir "\build.R","\","\\"))
-    run, % CMD, % OutDir
-    if script.config.config.bundleAHKRecompileStarter && (RScript_Path!="")
-    {
-        RSCRIPT_PATH:=RScript_Path
-        BUILD_RPATH:=strreplace(OutDir "\build.R","\","\\")
-        OUTDIR_PATH:=OutDir
-        Ahk_build=
-        (Join`s LTRIM
-
-            `nrun, `% `"`"`"%RSCRIPT_PATH%"""
-            A_Space """%BUILD_RPATH%"""
-            , `% "%OUTDIR_PATH%"
-        )
-        if FileExist(OutDir "\AHK_build.ahk")
-            FileDelete, % OutDir "\AHK_build.ahk"
-        FileAppend, % Ahk_build, % OutDir "\AHK_build.ahk"
-    }
-    
 }
 
 BuildRScriptContent(Path,output_type)
@@ -341,6 +286,34 @@ BuildRScriptContent(Path,output_type)
     return Str
 }
 
+RunRScript(Path,output_type,script_contents,RScript_Path:="")
+{
+    SplitPath, % Path, OutFileName, OutDir, OutExtension, OutNameNoExt, OutDrive
+    FileDelete, % OutDir "\build.R"
+    FileAppend, % script_contents, % OutDir "\build.R"
+    if (RScript_Path="")
+        RScript_Path:="C:\Program Files\R\R-4.2.0\bin\Rscript.exe"
+    CMD:=quote(RScript_Path) A_Space quote(strreplace(OutDir "\build.R","\","\\"))
+    run, % CMD, % OutDir
+    if script.config.config.bundleAHKRecompileStarter && (RScript_Path!="")
+    {
+        RSCRIPT_PATH:=RScript_Path
+        BUILD_RPATH:=strreplace(OutDir "\build.R","\","\\")
+        OUTDIR_PATH:=OutDir
+        Ahk_build=
+        (Join`s LTRIM
+
+            `nrun, `% `"`"`"%RSCRIPT_PATH%"""
+            A_Space """%BUILD_RPATH%"""
+            , `% "%OUTDIR_PATH%"
+        )
+        if FileExist(OutDir "\AHK_build.ahk")
+            FileDelete, % OutDir "\AHK_build.ahk"
+        FileAppend, % Ahk_build, % OutDir "\AHK_build.ahk"
+    }
+    
+}
+
 CopyBack(Source,Destination,manuscriptpath)
 {
     SplitPath, Source, OutFileName, Dir, 
@@ -351,19 +324,16 @@ CopyBack(Source,Destination,manuscriptpath)
             FileRemoveDir, % Destination "\" manuscriptname "\", true
         FileCopyDir, % Dir, % Output_Path:=Destination "\" manuscriptname "\", true
         FileCopy, % manuscriptpath, % Output_Path "\" manuscriptname "_vault.md", 1
-        ;run, % "Explorer " Destination "\" manuscriptname "\"
     }
-    else
+    Else
     {
         if FileExist(A_Desktop "\TempTemporal\" manuscriptname "\") ;; make sure the output is clean
             FileRemoveDir, % A_Desktop "\TempTemporal\" manuscriptname "\", true
         FileCopyDir, % Dir, % Output_Path:= A_Desktop "\TempTemporal\" manuscriptname "\" , true
         FileCopy, % manuscriptpath, % Output_Path "\" manuscriptname "_vault.md ", 1
-        ;run, % "Explorer " A_Desktop "\TempTemporal\" manuscriptname "\"
     }
     return Output_Path  OutFileName
 }
-
 
 GetOutputPath(Source,Destination,manuscriptpath)
 {
@@ -384,15 +354,28 @@ GetOutputPath(Source,Destination,manuscriptpath)
 
 ConvertMDToRMD(md_Path,notename)
 {
-    ;C:\Users\Claudius Main\AppData\Local\Temp\obshtml_97ghbf1f\md
     FileCopy, % md_Path "\" notename ".md", % md_Path "\" notename ".rmd",true
-    ;run, % md_Path
     return md_Path "\" notename ".rmd"
 }
+
+fRemoveTempDir(md_Path)
+{
+    global 
+    SplitPath, md_Path, OutFileName, OutDir, OutExtension, OutNameNoExt, OutDrive
+    FileRemoveDir, % OutDir,1
+    if FileExist(OutDir)
+    {
+        MsgBox, % "Error occured - Directory '" OutDir "' could not be removed"
+        Run, % "explorer " OutDir
+    }
+    return
+}
+
 
 guiCreate()
 {
     global
+    gui, destroy
     PotentialOutputs:=["All","html_document" , "pdf_document" , "word_document" , "odt_document" , "rtf_document" , "md_document" , "powerpoint_presentation" , "ioslides_presentation" , "tufte::tufte_html" , "github_document"]
     gui_control_options := "xm w220 " . cForeground . " -E0x200"  ; remove border around edit field
     Gui, Margin, 16, 16
@@ -416,7 +399,6 @@ guiCreate()
     for k,v in PotentialOutputs
     {
         
-        Options:=
         Options:=((Instr(script.config.lastrun.last_output_type,v))?"Check":"-Check")
         LV_Add(Options,v)
     }
@@ -441,26 +423,22 @@ guiCreate()
     
     return
 }
-
 guiShow()
 {
     global
-    while (manuscriptpath="")
-    {
-        guiCreate()
-        w:=script.config.GuiPositioning.w
-        h:=script.config.GuiPositioning.H
-        x:=(script.config.GuiPositioning.X!=""?script.config.GuiPositioning.X:200)
-        y:=(script.config.GuiPositioning.Y!=""?script.config.GuiPositioning.Y:200)
-        gui,1: show,x%x% y%y%, % script.name " - Choose manuscript"
-        enableGuiDrag(1)
-        WinWaitClose, % script.name " - Choose manuscript"
-        if (manuscriptpath!="")
-            break
-    }
-    return [sel,manuscriptpath,bVerboseCheckbox + 0,bFullLogCheckbox + 0]
+    guiCreate()
+    w:=script.config.GuiPositioning.W
+    h:=script.config.GuiPositioning.H
+    x:=(script.config.GuiPositioning.X!=""?script.config.GuiPositioning.X:200)
+    y:=(script.config.GuiPositioning.Y!=""?script.config.GuiPositioning.Y:200)
+    gui,1: show,x%x% y%y%, % script.name " - Choose manuscript"
+    enableGuiDrag(1)
+    WinWaitClose, % script.name " - Choose manuscript"
+    if (manuscriptpath!="")
+        return [sel,manuscriptpath,bVerboseCheckbox + 0,bFullLogCheckbox + 0]
+    Else
+        ExitApp
 }
-
 GCEscape()
 {
     guiEscape()
@@ -475,7 +453,6 @@ guiEscape()
     gui, destroy
     return
 }
-
 guiSubmit()
 {
     global
@@ -532,7 +509,6 @@ f_GetSelectedLVEntries()
     }
     return sel
 }
-
 ChooseFile()
 {
     global
@@ -551,21 +527,6 @@ ChooseFile()
     guicontrol,, ChosenFile, % manuscriptname "(" OutFileName ") - " manuscriptpath
     return manuscriptpath
 }
-
-fRemoveTempDir()
-{
-    global 
-    SplitPath, md_Path, OutFileName, OutDir, OutExtension, OutNameNoExt, OutDrive
-    FileRemoveDir, % OutDir,1
-    if FileExist(OutDir)
-    {
-        MsgBox, % "Error occured - Directory '" OutDir "' could not be removed"
-        Run, % "explorer " OutDir
-    }
-    return
-}
-
-
 #Include, <ScriptObj/ScriptObj>
 #Include, <enableGuiDrag>
 #Include, <Quote>
