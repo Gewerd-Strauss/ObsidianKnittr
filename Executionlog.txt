@@ -5,6 +5,7 @@ Verbose:
 Full Log:1
 Output Folder: C:\Users\Claudius Main\Desktop\TempTemporal\
 Raw input copy:C:\Users\Claudius Main\Desktop\TempTemporal\\_vault.md 
+Full Log:0
 
 ObsidianHTML:
 Version: 3.3.1
