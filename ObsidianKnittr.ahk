@@ -140,7 +140,7 @@ main()
     manuscriptpath_q:=quote(manuscriptpath)
     SplitPath, % manuscriptpath, OutFileName, manuscriptLocation
     bVerboseCheckbox:=out.3
-    
+    bFullLogCheckbox:=out.4
     Verbose:=(bVerboseCheckbox?" -v ":" ")
     cmd =
     (Join%A_Space%
@@ -155,7 +155,7 @@ main()
         obsidianhtml_configfile:=script.config.config.obsidianhtml_configfile
         GeneralInfo:="Execution: " A_Now "| " A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min "`n`n"
     
-        ObsidianKnittr_Info:=script.name ":`nVerbose:" bVerboseCheckbox "`nFull Log:" ((script.config.config.FullLogOnSuccess || bFullLogCheckbox)) 
+        ObsidianKnittr_Info:=script.name ":`nVerbose:" bVerboseCheckbox "`nFull Log:" (script.config.config.FullLogOnSuccess || bFullLogCheckbox)
 
         Result.=ComObjCreate("WScript.Shell").Exec(cmd).StdOut.ReadAll()
         if RegExMatch(Result, "md: (?<MDPath>.*)(\s*)html: (?<HTMLPath>.*)", v)
