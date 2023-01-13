@@ -59,7 +59,7 @@ global script := {   base         : script
 					,configfile   : A_ScriptDir "\INI-Files\" regexreplace(A_ScriptName, "\.\w+") ".ini"
                     ,configfolder : A_ScriptDir "\INI-Files"}
 
-md_path:=main()
+main()
 ExitApp, 
 return
 
@@ -94,7 +94,7 @@ main()
         * until https://github.com/obsidian-html/obsidian-html/issues/520 is not fixed
 
     */
-    OnExit("fRemoveTempDir").Bind(md_path)
+    ; OnExit("fRemoveTempDir").Bind(md_path)
     ; 0
     if !script.load()
     {
@@ -203,7 +203,8 @@ main()
     ttip("Executing R-BuildScript",5)
     RunRScript(rmd_Path,output_type,script_contents,script.config.config.RScriptPath)
     OpenFolder(rmd_Path)
-    return md_Path
+    fRemoveTempDir(md_Path)
+    return
 }
 ReadObsidianHTML_Config(configpath)
 {
