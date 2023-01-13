@@ -295,7 +295,7 @@ RunRScript(Path,output_type,script_contents,RScript_Path:="")
         RScript_Path:="C:\Program Files\R\R-4.2.0\bin\Rscript.exe"
     CMD:=quote(RScript_Path) A_Space quote(strreplace(OutDir "\build.R","\","\\"))
     run, % CMD, % OutDir
-    if script.config.config.bundleAHKRecompileStarter && (RScript_Path!="")
+    if script.config.config.bundleAHKStarter && (RScript_Path!="")
     {
         RSCRIPT_PATH:=RScript_Path
         BUILD_RPATH:=strreplace(OutDir "\build.R","\","\\")
