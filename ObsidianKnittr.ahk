@@ -464,8 +464,8 @@ guiSubmit()
     if (script.config.LastRun.manuscriptpath!="") && (manuscriptpath="")
     {
         manuscriptpath:=script.config.LastRun.manuscriptpath
-        bVerboseCheckbox:=script.config.LastRun.Verbose+0
-        bFullLogCheckbox:=script.config.LastRun.FullLog+0  
+        bVerboseCheckbox:=bVerboseCheckbox+0
+        bFullLogCheckbox:=bFullLogCheckbox+0  
     }
     if (manuscriptpath="") && (sel.count()=0)
     {
