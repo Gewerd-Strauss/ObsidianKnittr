@@ -160,7 +160,8 @@ main()
         Result.=ComObjCreate("WScript.Shell").Exec(cmd).StdOut.ReadAll()
         if RegExMatch(Result, "md: (?<MDPath>.*)(\s*)html: (?<HTMLPath>.*)", v)
         {
-            ObsidianHTML_Info:="`nObsidianHTML:`nVersion: " ComObjCreate("WScript.Shell").Exec("obsidianhtml version").StdOut.ReadAll()  "`nInput:`n" manuscriptpath "`nOutput Folder:`n" vMDPath "`nConfig:`n" obsidianhtml_configfile "`nCustom Config contents:`n" ReadObsidianHTML_Config(obsidianhtml_configfile).2 "`n---`n"
+            script.config.version.ObsidianHTML_Version:=ObsidianHTML_Version:=RegexReplace(ComObjCreate("WScript.Shell").Exec("obsidianhtml version").StdOut.ReadAll(),"\s*")
+            ObsidianHTML_Info:="`nObsidianHTML:`nVersion: " ObsidianHTML_Version "`nInput:`n" manuscriptpath "`nOutput Folder:`n" vMDPath "`nConfig:`n" obsidianhtml_configfile "`nCustom Config contents:`n" ReadObsidianHTML_Config(obsidianhtml_configfile).2 "`n---`n"
             if FileExist(vMDPath)
             {
                 ObsidianKnittr_Info.= "`nOutput Folder: " GetOutputPath(ConvertMDToRMD(vMDPath,"index"),script.config.Destination,manuscriptpath).1 "`nRaw input copy:" GetOutputPath(ConvertMDToRMD(vMDPath,"index"),script.config.Destination,manuscriptpath).2 "`n"
@@ -184,7 +185,9 @@ main()
         {
             if RegExMatch(Result, "Created empty output folder path (?<MDPath>.*)(\s*)", v)
             {
-                ObsidianHTML_Info:="`nObsidianHTML:`nVersion: " ComObjCreate("WScript.Shell").Exec("obsidianhtml version").StdOut.ReadAll()  "`nInput:`n" manuscriptpath "`nOutput Folder:`n" vMDPath "`nConfig:`n" obsidianhtml_configfile "`nCustom Config contents:`n" ReadObsidianHTML_Config(obsidianhtml_configfile).2 "`n---`n"
+                script.config.version.ObsidianHTML_Version:=ObsidianHTML_Version:=RegexReplace(ComObjCreate("WScript.Shell").Exec("obsidianhtml version").StdOut.ReadAll(),"\s*")
+                ObsidianHTML_Info:="`nObsidianHTML:`nVersion: " ObsidianHTML_Version  "`nInput:`n" manuscriptpath "`nOutput Folder:`n" vMDPath "`nConfig:`n" obsidianhtml_configfile "`nCustom Config contents:`n" ReadObsidianHTML_Config(obsidianhtml_configfile).2 "`n---`n"
+                
                 if FileExist(vMDPath)
                 {
                     ObsidianKnittr_Info.= "`nOutput Folder: " GetOutputPath(ConvertMDToRMD(vMDPath,"index"),script.config.Destination,manuscriptpath).1 "`nRaw input copy:" GetOutputPath(ConvertMDToRMD(vMDPath,"index"),script.config.Destination,manuscriptpath).2 "`n"
@@ -206,8 +209,9 @@ main()
             }
             else
             {
+                script.config.version.ObsidianHTML_Version:=ObsidianHTML_Version:=RegexReplace(ComObjCreate("WScript.Shell").Exec("obsidianhtml version").StdOut.ReadAll(),"\s*")
                 ObsidianKnittr_Info.= "`nOutput Folder: " GetOutputPath(ConvertMDToRMD(vMDPath,"index"),script.config.Destination,manuscriptpath).1 "`nRaw input copy:" GetOutputPath(ConvertMDToRMD(vMDPath,"index"),script.config.Destination,manuscriptpath).2 "`n"
-                ObsidianHTML_Info:="`nObsidianHTML:`nVersion: " ComObjCreate("WScript.Shell").Exec("obsidianhtml version").StdOut.ReadAll() "`nInput:`n" manuscriptpath "`nOutput Folder:`n" vMDPath "`nConfig:`n" obsidianhtml_configfile "`n---`n"
+                ObsidianHTML_Info:="`nObsidianHTML:`nVersion: " ObsidianHTML_Version "`nInput:`n" manuscriptpath "`nOutput Folder:`n" vMDPath "`nConfig:`n" obsidianhtml_configfile "`n---`n"
                 Clipboard:=result
                 FileDelete, % A_ScriptDir "\Executionlog.txt"
                 FileAppend, % GeneralInfo ObsidianKnittr_Info ObsidianHTML_Info "`n`nIssued Command:`n" Cmd "`n---`n`nCommand Line output below:`n`n" result, % A_ScriptDir "\Executionlog.txt"
@@ -232,6 +236,7 @@ main()
     RunRScript(rmd_Path,output_type,script_contents,script.config.config.RScriptPath)
     OpenFolder(rmd_Path)
     fRemoveTempDir(md_Path)
+    script.save()
     return
 }
 ReadObsidianHTML_Config(configpath)
@@ -447,7 +452,7 @@ guiCreate()
     gui, add, checkbox,  vbFullLogCheckbox, Full Log on successful execution?
     Gui, Font, s7 cWhite, Verdana
     gui, add, button, gGCSubmit, Submit
-    Gui, Add, Text,x25,% " Version: " script.version " Author: " script.author
+    Gui, Add, Text,x25,% "v." script.version " | Author: " script.author " | Obsidian-HTML: " script.config.version.ObsidianHTML_Version
 
     ; script.config.lastrun.last_output_type:=["html_document","word_document"]
     if (script.config.LastRun.manuscriptpath!="") && (script.config.LastRun.last_output_type!="")
