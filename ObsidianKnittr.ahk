@@ -1,4 +1,5 @@
 #NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
+#Requires AutoHotkey v1.1.36+ ;; version at which script was written.
 #SingleInstance,Force
 #MaxHotkeysPerInterval, 99999999
 #Warn All, Outputdebug
@@ -26,7 +27,6 @@ FileGetTime, ModDate,%A_ScriptFullPath%,M
 FileGetTime, CrtDate,%A_ScriptFullPath%,C
 CrtDate:=SubStr(CrtDate,7,  2) "." SubStr(CrtDate,5,2) "." SubStr(CrtDate,1,4)
 ModDate:=SubStr(ModDate,7,  2) "." SubStr(ModDate,5,2) "." SubStr(ModDate,1,4)
-
 global script := {   base         : script
                     ,name         : regexreplace(A_ScriptName, "\.\w+")
                     ,version      : ""
