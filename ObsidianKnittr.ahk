@@ -192,12 +192,15 @@ main()
         }
     ; 4
     ttip("Converting to .rmd-file",5)
+    rmd_Path:=ConvertMDToRMD(md_Path,"index",true)
     ; 5, 6
-    rmd_Path:=ConvertMDToRMD(md_Path,"index")
     ttip("Moving to output folder",5)
-    ; 7
-
     rmd_Path:=CopyBack(rmd_Path,script.config.Destination,manuscriptpath)
+    ; 7
+    ttip("Converting Image SRC's")
+        NewContents:=ConvertSRC_SYNTAX(rmd_Path)
+        FileDelete, % rmd_Path 
+        FileAppend, % NewContents,% rmd_Path
     ttip("Creating R-BuildScript",5)
     script_contents:=BuildRScriptContent(rmd_Path,output_type)
     ttip("Executing R-BuildScript",5)
@@ -324,6 +327,10 @@ CopyBack(Source,Destination,manuscriptpath)
         if FileExist(Destination "\" manuscriptname "\") ;; make sure the output is clean
             FileRemoveDir, % Destination "\" manuscriptname "\", true
         FileCopyDir, % Dir, % Output_Path:=Destination "\" manuscriptname "\", true
+        ; FileRead, manuscriptcontent,% manuscriptpath
+        ; manuscriptcontent:=ConvertSRC_SYNTAX(manuscriptcontent)
+        ; FileDelete, % Output_Path "\"  "index.md"
+        FileAppend,% manuscriptcontent, % Output_Path "\index.md"
         FileCopy, % manuscriptpath, % Output_Path "\" manuscriptname "_vault.md", 1
     }
     Else
@@ -331,6 +338,10 @@ CopyBack(Source,Destination,manuscriptpath)
         if FileExist(A_Desktop "\TempTemporal\" manuscriptname "\") ;; make sure the output is clean
             FileRemoveDir, % A_Desktop "\TempTemporal\" manuscriptname "\", true
         FileCopyDir, % Dir, % Output_Path:= A_Desktop "\TempTemporal\" manuscriptname "\" , true
+        ; FileRead, manuscriptcontent,% manuscriptpath
+        ; manuscriptcontent:=ConvertSRC_SYNTAX(manuscriptcontent)
+        ; FileDelete, % Output_Path "\"  "index.md"
+        ; FileAppend, % manuscriptcontent, % Output_Path "\index.md"
         FileCopy, % manuscriptpath, % Output_Path "\" manuscriptname "_vault.md ", 1
     }
     return Output_Path  OutFileName
@@ -353,7 +364,7 @@ GetOutputPath(Source,Destination,manuscriptpath)
     return [Output_Path,Raw_InputFile]
 }
 
-ConvertMDToRMD(md_Path,notename)
+ConvertMDToRMD(md_Path,notename,bConvertSRC:=false)
 {
     FileCopy, % md_Path "\" notename ".md", % md_Path "\" notename ".rmd",true
     return md_Path "\" notename ".rmd"
@@ -533,4 +544,4 @@ ChooseFile()
 #Include, <Quote>
 #Include, <ttip>
 
-
+#Include, %A_ScriptDir%/SRC_ImageConverter.ahk
