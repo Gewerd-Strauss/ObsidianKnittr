@@ -96,6 +96,9 @@ main()
     */
     ; OnExit("fRemoveTempDir").Bind(md_path)
     ; 0
+    menu, tray, add, 
+    Menu, tray, add, Update ObsidianHTML to Master Branch ,fUpdateObsidianHTMLToMaster
+    Menu, tray, add, Update ObsidianHTML to Last Release ,fUpdateObsidianHTMLToLastRelease
     if !script.load()
     {
         InputBox, given_obsidianhtml_configfile, % script.name " - Initiate settings","Please give the path of your configfile for obsidianhtml."
@@ -570,6 +573,22 @@ ChooseFile()
     guicontrol,, ChosenFile, % manuscriptname "(" OutFileName ") - " manuscriptpath
     return manuscriptpath
 }
+
+fUpdateObsidianHTMLToLastRelease()
+{
+    RunWait, % A_Comspec "  /k echo y | pip uninstall obsidianhtml", , 
+    RunWait, % A_Comspec "  /k echo y | pip install obsidianhtml", , 
+    MsgBox,, % script.name, % "Successfully updated to last Release."
+    return
+}
+fUpdateObsidianHTMLToMaster()
+{
+    RunWait, % A_Comspec "  /k echo y | pip uninstall obsidianhtml", , 
+    RunWait, % A_Comspec "  /k echo y | pip install git+https://github.com/obsidian-html/obsidian-html.git", , 
+    MsgBox,, % script.name, % "Successfully updated to Master."
+    return
+}
+
 #Include, <ScriptObj/ScriptObj>
 #Include, <enableGuiDrag>
 #Include, <Quote>
