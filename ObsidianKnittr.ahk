@@ -182,13 +182,38 @@ main()
         }
         else
         {
-            ObsidianKnittr_Info.= "`nOutput Folder: " GetOutputPath(ConvertMDToRMD(vMDPath,"index"),script.config.Destination,manuscriptpath).1 "`nRaw input copy:" GetOutputPath(ConvertMDToRMD(vMDPath,"index"),script.config.Destination,manuscriptpath).2 "`n"
-            ObsidianHTML_Info:="`nObsidianHTML:`nVersion: " ComObjCreate("WScript.Shell").Exec("obsidianhtml version").StdOut.ReadAll() "`nInput:`n" manuscriptpath "`nOutput Folder:`n" vMDPath "`nConfig:`n" obsidianhtml_configfile "`n---`n"
-            Clipboard:=result
-            FileDelete, % A_ScriptDir "\Executionlog.txt"
-            FileAppend, % GeneralInfo ObsidianKnittr_Info ObsidianHTML_Info "`n`nIssued Command:`n" Cmd "`n---`n`nCommand Line output below:`n`n" result, % A_ScriptDir "\Executionlog.txt"
-            run, % A_ScriptDir "\Executionlog.txt"
-            MsgBox, 0x40010, % script.name " - Output could not be parsed.", % "DO NOT CONTINUE WITHOUT FULLY READING THIS!`n`nThe command line output of obsidianhtml does not contain the required information.`nThe output has been copied to the clipboard, and written to file under '" A_ScriptDir "\Executionlog.txt" "'`n`nTo carry on, find the path of the md-file and copy it to your clipboard.`nONLY THEN close this window."
+            if RegExMatch(Result, "Created empty output folder path (?<MDPath>.*)(\s*)", v)
+            {
+                ObsidianHTML_Info:="`nObsidianHTML:`nVersion: " ComObjCreate("WScript.Shell").Exec("obsidianhtml version").StdOut.ReadAll()  "`nInput:`n" manuscriptpath "`nOutput Folder:`n" vMDPath "`nConfig:`n" obsidianhtml_configfile "`nCustom Config contents:`n" ReadObsidianHTML_Config(obsidianhtml_configfile).2 "`n---`n"
+                if FileExist(vMDPath)
+                {
+                    ObsidianKnittr_Info.= "`nOutput Folder: " GetOutputPath(ConvertMDToRMD(vMDPath,"index"),script.config.Destination,manuscriptpath).1 "`nRaw input copy:" GetOutputPath(ConvertMDToRMD(vMDPath,"index"),script.config.Destination,manuscriptpath).2 "`n"
+                    FileDelete, & vMDPath "\Executionlog.txt"
+                    if (script.config.config.FullLogOnSuccess || bFullLogCheckbox)
+                        FileAppend, % GeneralInfo ObsidianKnittr_Info ObsidianHTML_Info "`n`nIssued Command:`n" Cmd "`n---`n`nCommand Line output below:`n`n" result, % vMDPath "\Executionlog.txt"
+                    else
+                        FileAppend, % GeneralInfo ObsidianKnittr_Info ObsidianHTML_Info "`n`nIssued Command:`n" Cmd "`n---`n", % vMDPath "\Executionlog.txt"
+                    md_Path:=vMDPath
+                }
+                Else
+                {
+                    Clipboard:=result
+                    FileDelete, % A_ScriptDir "\Executionlog.txt"
+                    FileAppend, % GeneralInfo ObsidianKnittr_Info ObsidianHTML_Info "`n`nIssued Command:`n" Cmd "`n---`n`nCommand Line output below:`n`n" result, % A_ScriptDir "\Executionlog.txt"
+                    run, % A_ScriptDir "\Executionlog.txt"
+                    MsgBox 0x40010, % script.name, % "File  md_Path does not seem to exist. Please check manually."
+                }
+            }
+            else
+            {
+                ObsidianKnittr_Info.= "`nOutput Folder: " GetOutputPath(ConvertMDToRMD(vMDPath,"index"),script.config.Destination,manuscriptpath).1 "`nRaw input copy:" GetOutputPath(ConvertMDToRMD(vMDPath,"index"),script.config.Destination,manuscriptpath).2 "`n"
+                ObsidianHTML_Info:="`nObsidianHTML:`nVersion: " ComObjCreate("WScript.Shell").Exec("obsidianhtml version").StdOut.ReadAll() "`nInput:`n" manuscriptpath "`nOutput Folder:`n" vMDPath "`nConfig:`n" obsidianhtml_configfile "`n---`n"
+                Clipboard:=result
+                FileDelete, % A_ScriptDir "\Executionlog.txt"
+                FileAppend, % GeneralInfo ObsidianKnittr_Info ObsidianHTML_Info "`n`nIssued Command:`n" Cmd "`n---`n`nCommand Line output below:`n`n" result, % A_ScriptDir "\Executionlog.txt"
+                run, % A_ScriptDir "\Executionlog.txt"
+                MsgBox, 0x40010, % script.name " - Output could not be parsed.", % "DO NOT CONTINUE WITHOUT FULLY READING THIS!`n`nThe command line output of obsidianhtml does not contain the required information.`nThe output has been copied to the clipboard, and written to file under '" A_ScriptDir "\Executionlog.txt" "'`n`nTo carry on, find the path of the md-file and copy it to your clipboard.`nONLY THEN close this window."
+            }
         }
     ; 4
     ttip("Converting to .rmd-file",5)
