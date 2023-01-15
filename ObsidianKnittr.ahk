@@ -225,14 +225,15 @@ ReadObsidianHTML_Config(configpath)
             continue
         if RegExMatch(Line, "(?<Key>.*):(?<Value>.*)", v)
         {
-            conf[Key]:=Value
-            confstr.= Key "=" Value "`n"
+            conf[vKey]:=vValue
+            confstr.= vKey "=" vValue "`n"
         }
     }
     if (confstr="")
         return "E03: Config file contains no valid YAML config found in provided file."
     return [conf,confstr]
 }
+
 OpenFolder(Path)
 {
     SplitPath, % Path,, OutDir
