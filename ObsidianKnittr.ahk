@@ -360,9 +360,6 @@ CopyBack(Source,Destination,manuscriptpath)
         if FileExist(Destination "\" manuscriptname "\") ;; make sure the output is clean
             FileRemoveDir, % Destination "\" manuscriptname "\", true
         FileCopyDir, % Dir, % Output_Path:=Destination "\" manuscriptname "\", true
-        ; FileRead, manuscriptcontent,% manuscriptpath
-        ; manuscriptcontent:=ConvertSRC_SYNTAX(manuscriptcontent)
-        ; FileDelete, % Output_Path "\"  "index.md"
         FileAppend,% manuscriptcontent, % Output_Path "\index.md"
         FileCopy, % manuscriptpath, % Output_Path "\" manuscriptname "_vault.md", 1
     }
@@ -371,10 +368,6 @@ CopyBack(Source,Destination,manuscriptpath)
         if FileExist(A_Desktop "\TempTemporal\" manuscriptname "\") ;; make sure the output is clean
             FileRemoveDir, % A_Desktop "\TempTemporal\" manuscriptname "\", true
         FileCopyDir, % Dir, % Output_Path:= A_Desktop "\TempTemporal\" manuscriptname "\" , true
-        ; FileRead, manuscriptcontent,% manuscriptpath
-        ; manuscriptcontent:=ConvertSRC_SYNTAX(manuscriptcontent)
-        ; FileDelete, % Output_Path "\"  "index.md"
-        ; FileAppend, % manuscriptcontent, % Output_Path "\index.md"
         FileCopy, % manuscriptpath, % Output_Path "\" manuscriptname "_vault.md ", 1
     }
     return Output_Path  OutFileName
@@ -592,7 +585,6 @@ fUpdateObsidianHTMLToMaster()
 #Include, <enableGuiDrag>
 #Include, <Quote>
 #Include, <ttip>
-
 #Include, %A_ScriptDir%/SRC_ImageConverter.ahk
 
 
@@ -622,3 +614,4 @@ Base64PNG_to_HICON( B64, nBytes:="", W:="", H:="" ) {
                          , "UInt",0x30000, "Int",W, "Int",H, "UInt",0, "UPtr" )
     Return hICON
     }
+
