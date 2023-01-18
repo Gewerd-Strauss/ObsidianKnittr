@@ -471,6 +471,8 @@ guiCreate()
     gui, add, edit, disabled w330 vChosenFile
     gui, add, checkbox,  vbVerboseCheckbox, Verbose?
     gui, add, checkbox,  vbFullLogCheckbox, Full Log on successful execution?
+    gui, add, checkbox, vbSRCConverterVersion, Use V2 conversion?
+    gui, add, checkbox, vbKeepFilename, Keep Filename?
     Gui, Font, s7 cWhite, Verdana
     gui, add, button, gGCSubmit, Submit
     Gui, Add, Text,x25,% "v." script.version " | Author: " script.author " | Obsidian-HTML: " script.config.version.ObsidianHTML_Version
@@ -482,6 +484,8 @@ guiCreate()
         SplitPath, % OutDir, OutFileName, OutDir,
         guicontrol,, bVerboseCheckbox, % (script.config.LastRun.Verbose)
         guicontrol,, bFullLogCheckbox, % (script.config.LastRun.FullLog)
+        guicontrol,, bSRCConverterVersion, % (script.config.LastRun.Conversion)
+        guicontrol,, bKeepFilename, % (script.config.LastRun.KeepFileName)
         guicontrol,, ChosenFile, % manuscriptname "(" OutFileName ") - " script.config.lastrun.manuscriptpath
     }
     
@@ -499,7 +503,7 @@ guiShow()
     enableGuiDrag(1)
     WinWaitClose, % script.name " - Choose manuscript"
     if (manuscriptpath!="")
-        return [sel,manuscriptpath,bVerboseCheckbox + 0,bFullLogCheckbox + 0]
+        return [sel,manuscriptpath,bVerboseCheckbox + 0,bFullLogCheckbox + 0,bSRCConverterVersion + 0,bKeepFilename + 0]
     Else
         ExitApp
 }
@@ -547,6 +551,9 @@ guiSubmit()
     script.config.LastRun.last_output_type:=""
     script.config.LastRun.Verbose:=bVerboseCheckbox+0
     script.config.LastRun.FullLog:=bFullLogCheckbox+0
+    script.config.LastRun.Conversion:=bSRCConverterVersion+0
+    script.config.LastRun.KeepFileName:=bKeepFilename+0
+    
     for k,v in sel
     {
         
