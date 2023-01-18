@@ -133,8 +133,11 @@ main()
     ; 2.2
     out:=guiShow()
     output_type:=out.1
-    if (output_type="All") || output_type.HasVal("All")
+
+    if (output_type="All") || HasVal(output_type,"All")
         output_type:=["html_document" , "pdf_document" , "word_document" , "odt_document" , "rtf_document" , "md_document" , "powerpoint_presentation" , "ioslides_presentation" , "tufte::tufte_html" , "github_document"]
+    if (HasVal(output_type,"First in YAML"))
+        output_type:=""
     manuscriptpath:=out.2
 
     ; 3. 
