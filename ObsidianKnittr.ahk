@@ -143,7 +143,7 @@ main()
     ; 3. 
     obsidianhtml_configfile:=script.config.config.obsidianhtml_configfile
     manuscriptpath_q:=quote(manuscriptpath)
-    SplitPath, % manuscriptpath, OutFileName, manuscriptLocation
+    SplitPath, % manuscriptpath, OutFileName, manuscriptLocation,, manuscriptName
     bVerboseCheckbox:=out.3
     bFullLogCheckbox:=out.4
     Verbose:=(bVerboseCheckbox?" -v ":" ")
@@ -232,10 +232,16 @@ main()
     rmd_Path:=CopyBack(rmd_Path,script.config.Destination,manuscriptpath)
     ; 7
     ttip("Converting Image SRC's")
-        NewContents:=ConvertSRC_SYNTAX(rmd_Path)
+    if bSRCConverterVersion
+        NewContents:=ConvertSRC_SYNTAX_V2(rmd_Path)
+    else
+        NewContents:=ConvertSRC_SYNTAX_V3(rmd_Path)
         FileDelete, % rmd_Path 
         FileAppend, % NewContents,% rmd_Path
     ttip("Creating R-BuildScript",5)
+    if bKeepFilename
+        script_contents:=BuildRScriptContent(rmd_Path,output_type,manuscriptName)
+    else
     script_contents:=BuildRScriptContent(rmd_Path,output_type)
     ttip("Executing R-BuildScript",5)
     RunRScript(rmd_Path,output_type,script_contents,script.config.config.RScriptPath)
@@ -275,18 +281,24 @@ OpenFolder(Path)
     run, % OutDir
 }
 
-BuildRScriptContent(Path,output_type)
+BuildRScriptContent(Path,output_type,output_filename="")
 {
     ; Str:="setwd(""C:\Users\Claudius Main\Desktop\TempTemporal\TestPaper_apa"")`n"
-    SplitPath, % Path, , Path2
-    Path2:=strreplace(Path2,"\","\\")
+    SplitPath, % Path, , Path2, , Name
+    RScriptFilePath:=strreplace(Path2,"\","\\")
+    RScriptFolder:=strreplace(Path2,"\","/")
     Str=
     (LTRIM
     getwd()
-    setwd("%Path2%")
+    if (getwd() != "%RScriptFolder%")
+    {
+        setwd("%RScriptFilePath%")
+        getwd()
+    }
     getwd()
 
     )
+    Name:=(output_filename!=""?output_filename:"index")
     if IsObject(output_type)
     {
         bDoPDFLast:=false
@@ -300,7 +312,7 @@ BuildRScriptContent(Path,output_type)
             Str2=
             (LTRIM
             
-            rmarkdown::render(`"index.rmd`",`"%format%`")`n
+            rmarkdown::render(`"index.rmd`",`"%format%`",`"%Name%"`)`n
             )
             Str.=Str2
         }
@@ -309,18 +321,29 @@ BuildRScriptContent(Path,output_type)
             Str2=
             (LTrim
             
-            rmarkdown::render(`"index.rmd`",`"pdf_document`")`n
+            rmarkdown::render(`"index.rmd`",`"pdf_document`",`"%Name%"`)`n
             )
             Str.=Str2
         }
     }
     else
     {
+        if (output_type!="")
+    {
         Str2=
         (LTRIM
 
-        rmarkdown::render(`"index.rmd`",`"%output_type%`")`n
+            rmarkdown::render(`"index.rmd`",`"%output_type%`",`"%Name%"`)`n
         )
+        }
+        else
+        {
+            Str2=
+            (LTRIM
+
+            rmarkdown::render(`"index.rmd`",NULL,`"%Name%"`)`n
+            )
+        }
         Str.=Str2
     }
     return Str
