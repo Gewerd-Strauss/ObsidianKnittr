@@ -1,7 +1,139 @@
 ; #Requires Autohotkey v1.1+
-ConvertSRC_SYNTAX("C:\Users\Claudius Main\Desktop\TempTemporal\Embed2\index.md")
+ConvertSRC_SYNTAX_V3("C:\Users\Claudius Main\Desktop\TempTemporal\ObsidianHTML Special characters in Image titles\index.md")
+;ConvertSRC_SYNTAX_V3("C:\Users\Claudius Main\Desktop\TempTemporal\BE22 Report Author1\index.md")
+;ConvertSRC_SYNTAX_V2("C:\Users\Claudius Main\Desktop\TempTemporal\ObsidianHTML Special characters in Image titles\index.md")
 
-ConvertSRC_SYNTAX(md_Path)
+ConvertSRC_SYNTAX_V3(PathOrContent) { ;; converts % propely, does not recognise and convert double quotes. Hard-fails on single quotes (not escaped)
+    if (FileExist(PathOrContent))
+        FileRead buffer, % PathOrContent
+    else
+        buffer := PathOrContent
+    p := 1
+    ;@ahk-neko-ignore 1 line
+    regex = <img src="(?<SRC>[^"]+)"  width="(?<WIDTH>[^"]*)" alt="(?<ALT>[^"]*)" title="(?<TITLE>[^"]*)" \/>
+    while (p := RegExMatch(buffer, "iO)" regex, match, p)) {
+        options := ""
+        src := DecodeUriComponent(match.src)
+        if (match.width)
+            options .= "out.width='" match.width "', "
+        if (match.alt)
+            options .= "fig.cap='" DecodeEntities(match.alt) "', "
+        if (match.title)
+            options .= "fig.title='" DecodeEntities(match.title) "', "
+        options := RTrim(options, ", ")
+        tpl =
+            (LTrim
+
+
+            ``````{r, echo=FALSE, %options%}
+            knitr::include_graphics("%src%")
+            ``````
+
+            
+            )
+        buffer := StrReplace(buffer, match[0], tpl)
+        p += StrLen(tpl)
+    }
+    buffer:=Regexreplace(buffer, "``````\{r setup(|.|\n)*``````","") ;; get rid of all potential r setup chunks
+    ;Clipboard:=buffer
+    tpl =
+        (LTrim
+        ---
+        ``````{r setup, include=FALSE}
+        knitr::opts_chunk$set(echo = FALSE)
+        ``````
+
+        )
+    buffer := RegExReplace(buffer, "\n---", tpl, , 1, 1)
+    Clipboard:=buffer
+    return buffer
+}
+
+DecodeEntities(sText) {
+    return _Decode(sText, 1)
+}
+
+DecodeUriComponent(sText) {
+    return _Decode(sText, 2)
+}
+
+; nMode
+; 1 = HTML entity decode
+; 2 = decodeURIComponent
+_Decode(sText, nMode) {
+    static document := ""
+    if (document = "") {
+        document := ComObjCreate("HTMLFile")
+        document.write("<meta http-equiv='X-UA-Compatible' content='IE=Edge'>")
+    }
+    switch (nMode) {
+        case 1:
+            document.write(sText)
+            txt := document.documentElement.innerText
+            document.close()
+        case 2:
+            txt := document.parentWindow.decodeURIComponent(sText)
+        default:
+            txt := "Unknown " A_ThisFunc "() mode."
+    }
+    return txt
+}
+
+
+ConvertSRC_SYNTAX_V2(PathOrContent)
+{ ;;  fails on single percentage signs (must be %%), double quotes ("). Converts single quotes (') to double quotes (").
+  if (FileExist(PathOrContent))
+      FileRead buffer, % PathOrContent
+  else
+      buffer := PathOrContent
+  p := 1
+  regex = <img src="(?<SRC>[^"]+)"  width="(?<WIDTH>[^"]*)" alt="(?<ALT>[^"]*)" title="(?<TITLE>[^"]*)" \/>
+  while (p := RegExMatch(buffer, "iO)" regex, match, p)){
+      options := ""
+      src := WinHttpRequest.DecodeUriComponent(match.src)
+      ;options .= "fig.src='" src "', " ;; src does not belong in options afaik.
+      ;m("t: " match.title,"decoded t: " WinHttpRequest.DecodeUriComponent(match.title), "w: " match.width,"a: " match.alt,"decoded a: " WinHttpRequest.DecodeUriComponent(match.alt))
+      if (match.width)
+          options .= "out.width='" match.width "', "
+      if (match.alt)
+          options .= "fig.cap='" strreplace(strreplace(WinHttpRequest.DecodeUriComponent(match.alt),"'",""""),"%","%%") "', "
+      if (match.title)
+          options .= "fig.title='" strreplace(strreplace(WinHttpRequest.DecodeUriComponent(match.title),"'",""""),"%","%%") "', "
+      /* This is undefined
+      if (extra)
+          options .= "out.extra='" extra "', "
+      if (align)
+          options .= "fig.align='" align "', "
+      */
+      options := RTrim(options, ", ")
+      tpl =
+          (LTrim
+
+
+          ``````{r, echo=FALSE, %options%}
+          knitr::include_graphics("%src%")
+          ``````
+
+
+          )
+      buffer := StrReplace(buffer, match[0], tpl)
+      p += StrLen(tpl)
+  }
+  buffer:=Regexreplace(buffer, "``````\{r setup(|.|\n)*``````","") ;; get rid of all potential r setup chunks
+  Clipboard:=buffer
+  tpl =
+      (LTrim
+      ---
+      ``````{r setup, include=FALSE}
+      knitr::opts_chunk$set(echo = FALSE)
+      ``````
+
+      )
+  buffer := RegExReplace(buffer, "\n---", tpl, , 1, 1)
+  Clipboard:=buffer
+  return buffer
+}
+ConvertSRC_SYNTAX_V1(md_Path)
 {
     if FileExist(md_Path)
         FileRead, buffer, % md_Path
@@ -13,7 +145,10 @@ ConvertSRC_SYNTAX(md_Path)
     while (p := RegExMatch(buffer, "iO)" regex, match, p)) {
         align := ""
         cap := match.alt
+        HTTPRequest := WinHttpRequest()
+        Result:=HTTPRequest.DecodeUri(match.src)
         src := strreplace(match.src,"%20",A_Space)
+        src:=Result
         title := match.title
         width := match.width
         options:=""
@@ -24,9 +159,9 @@ ConvertSRC_SYNTAX(md_Path)
         if align
             options.=(options!=""?"', ":"") "fig.align='" align 
         if cap
-            options.=(options!=""?"', ":"") "fig.cap='" cap 
+            options.=(options!=""?"', ":"") "fig.cap='" strreplace(cap,"'","""")
         if title
-            options.=(options!=""?"', ":"") "fig.title='" title
+            options.=(options!=""?"', ":"") "fig.title='" strreplace(title,"'","""")
         if (options!="")
             options:=", " options "'"
         tpl = ;; Yes, the additional spaces in above and below the knitr-block are required, for god knows what reasons.
@@ -48,7 +183,6 @@ ConvertSRC_SYNTAX(md_Path)
     ---
     ``````{r setup, include=FALSE}
     knitr::opts_chunk$set(echo = FALSE)
-
     ``````
     
     )
