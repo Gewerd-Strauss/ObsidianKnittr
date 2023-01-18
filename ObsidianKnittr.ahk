@@ -244,7 +244,7 @@ main()
     if bKeepFilename
         script_contents:=BuildRScriptContent(rmd_Path,output_type,manuscriptName)
     else
-    script_contents:=BuildRScriptContent(rmd_Path,output_type)
+        script_contents:=BuildRScriptContent(rmd_Path,output_type)
     ttip("Executing R-BuildScript",5)
     RunRScript(rmd_Path,output_type,script_contents,script.config.config.RScriptPath)
     OpenFolder(rmd_Path)
@@ -331,12 +331,12 @@ BuildRScriptContent(Path,output_type,output_filename="")
     else
     {
         if (output_type!="")
-    {
-        Str2=
-        (LTRIM
+        {
+            Str2=
+            (LTRIM
 
             rmarkdown::render(`"index.rmd`",`"%output_type%`",`"%Name%"`)`n
-        )
+            )
         }
         else
         {
@@ -442,7 +442,7 @@ guiCreate()
 {
     global
     gui, destroy
-    PotentialOutputs:=["All","html_document" , "pdf_document" , "word_document" , "odt_document" , "rtf_document" , "md_document" , "powerpoint_presentation" , "ioslides_presentation" , "tufte::tufte_html" , "github_document"]
+    PotentialOutputs:=["First in YAML" , "html_document" , "pdf_document" , "word_document" , "odt_document" , "rtf_document" , "md_document" , "powerpoint_presentation" , "ioslides_presentation" , "tufte::tufte_html" , "github_document" , "All"]
     gui_control_options := "xm w220 " . cForeground . " -E0x200"  ; remove border around edit field
     Gui, Margin, 16, 16
     Gui, +AlwaysOnTop -SysMenu -ToolWindow -caption +Border +LabelGC
@@ -470,9 +470,9 @@ guiCreate()
     }
     ; gui, add, ddl, vDDLval, All||html_document|word_document|odt_document|rtf_document|md_document|
     Gui, add, button, gChooseFile, Choose Manuscript
-    gui, add, edit, disabled w330 vChosenFile
-    gui, add, checkbox,  vbVerboseCheckbox, Verbose?
-    gui, add, checkbox,  vbFullLogCheckbox, Full Log on successful execution?
+    gui, add, edit, w330 vChosenFile hwndChsnFile disabled
+    gui, add, checkbox, vbVerboseCheckbox, Verbose?
+    gui, add, checkbox, vbFullLogCheckbox, Full Log on successful execution?
     gui, add, checkbox, vbSRCConverterVersion, Use V2 conversion?
     gui, add, checkbox, vbKeepFilename, Keep Filename?
     Gui, Font, s7 cWhite, Verdana
