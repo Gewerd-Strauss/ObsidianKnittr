@@ -254,6 +254,8 @@ main()
     }
     Else
         run, % rmd_Path
+    ttip("Building AHK-Starterscript",5)
+    BuildAHKScriptContent(rmd_Path,script_contents,script.config.config.RScriptPath)
     OpenFolder(rmd_Path)
     fRemoveTempDir(md_Path)
     script.save()
@@ -367,6 +369,15 @@ RunRScript(Path,output_type,script_contents,RScript_Path:="")
         RScript_Path:="C:\Program Files\R\R-4.2.0\bin\Rscript.exe"
     CMD:=quote(RScript_Path) A_Space quote(strreplace(OutDir "\build.R","\","\\"))
     run, % CMD, % OutDir
+    
+}
+BuildAHKScriptContent(Path,script_contents,RScript_Path:="")
+{
+    SplitPath, % Path, OutFileName, OutDir, OutExtension, OutNameNoExt, OutDrive
+    FileDelete, % OutDir "\build.R"
+    FileAppend, % script_contents, % OutDir "\build.R"
+    if (RScript_Path="")
+        RScript_Path:="C:\Program Files\R\R-4.2.0\bin\Rscript.exe"
     if script.config.config.bundleAHKStarter && (RScript_Path!="")
     {
         RSCRIPT_PATH:=RScript_Path
@@ -383,9 +394,8 @@ RunRScript(Path,output_type,script_contents,RScript_Path:="")
             FileDelete, % OutDir "\AHK_build.ahk"
         FileAppend, % Ahk_build, % OutDir "\AHK_build.ahk"
     }
-    
+    return
 }
-
 CopyBack(Source,Destination,manuscriptpath)
 {
     SplitPath, Source, OutFileName, Dir, 
