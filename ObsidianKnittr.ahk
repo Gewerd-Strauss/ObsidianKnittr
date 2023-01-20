@@ -4,7 +4,6 @@
 #MaxHotkeysPerInterval, 99999999
 #Warn All, Outputdebug
 ;#Persistent 
- ;#Warn  ; Enable warnings to assist with detecting common errors.
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 DetectHiddenWindows, On
@@ -139,15 +138,17 @@ main()
     if (HasVal(output_type,"First in YAML"))
         output_type:=""
     manuscriptpath:=out.2
+    bVerboseCheckbox:=out.3
+    bFullLogCheckbox:=out.4
+    bSRCConverterVersion:=out.5
+    bKeepFilename:=out.6
+    bRenderRMD:=out.7
+    bRemoveHashTagFromTags:=out.8
 
     ; 3. 
     obsidianhtml_configfile:=script.config.config.obsidianhtml_configfile
     manuscriptpath_q:=quote(manuscriptpath)
     SplitPath, % manuscriptpath, OutFileName, manuscriptLocation,, manuscriptName
-    bVerboseCheckbox:=out.3
-    bFullLogCheckbox:=out.4
-    bSRCConverterVersion:=out.5
-    bKeepFilename:=out.6
     Verbose:=(bVerboseCheckbox?" -v ":" ")
     cmd =
     (Join%A_Space%
