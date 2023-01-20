@@ -238,6 +238,7 @@ main()
         NewContents:=ConvertSRC_SYNTAX_V2(rmd_Path)
     else
         NewContents:=ConvertSRC_SYNTAX_V3(rmd_Path)
+    NewContents:=ProcessTags(NewContents,bRemoveHashTagFromTags)
         FileDelete, % rmd_Path 
         FileAppend, % NewContents,% rmd_Path
     ttip("Creating R-BuildScript",5)
@@ -245,8 +246,13 @@ main()
         script_contents:=BuildRScriptContent(rmd_Path,output_type,manuscriptName)
     else
         script_contents:=BuildRScriptContent(rmd_Path,output_type)
+    if bRenderRMD
+    {
     ttip("Executing R-BuildScript",5)
     RunRScript(rmd_Path,output_type,script_contents,script.config.config.RScriptPath)
+    }
+    Else
+        run, % rmd_Path
     OpenFolder(rmd_Path)
     fRemoveTempDir(md_Path)
     script.save()
@@ -437,6 +443,32 @@ fRemoveTempDir(md_Path)
     return
 }
 
+ProcessTags(NewContents,bRemoveHashTagFromTags)
+{
+    if (FileExist(NewContents))
+        FileRead NewContents, % NewContents
+        AlreadyReplaced:=""
+    if Instr(NewContents,"_obsidian_pattern")
+    {
+        Tags:=Strsplit(NewContents,"tags:").2
+        Tags:=StrSplit(Tags, "`r`n---`r`n").1
+        Tags:=Strsplit(Tags,"`r`n")
+        for ind,Tag in Tags
+            Tags[ind]:=SubStr(Tag,3)
+        for ind, Tag in Tags
+        {
+            if (Tag="") && !Instr(AlreadyReplaced,Tag)
+                continue
+            Needle:="``{_obsidian_pattern_tag_" Tag "}``"
+            if bRemoveHashTagFromTags
+                NewContents:=Strreplace(NewContents,Needle,Tag)
+            else
+                NewContents:=Strreplace(NewContents,Needle,"#" Tag)
+            AlreadyReplaced.=Tag
+        }
+    }
+    return NewContents
+}
 
 guiCreate()
 {
@@ -475,6 +507,8 @@ guiCreate()
     gui, add, checkbox, vbFullLogCheckbox, Full Log on successful execution?
     gui, add, checkbox, vbSRCConverterVersion, Use V2 conversion?
     gui, add, checkbox, vbKeepFilename, Keep Filename?
+    gui, add, checkbox, vbRenderRMD, Render RMD to chosen outputs?
+    gui, add, checkbox, vbRemoveHashTagFromTags, % "Remove '#' from tags?"
     Gui, Font, s7 cWhite, Verdana
     gui, add, button, gGCSubmit, Submit
     Gui, Add, Text,x25,% "v." script.version " | Author: " script.author " | Obsidian-HTML: " script.config.version.ObsidianHTML_Version
@@ -488,6 +522,8 @@ guiCreate()
         guicontrol,, bFullLogCheckbox, % (script.config.LastRun.FullLog)
         guicontrol,, bSRCConverterVersion, % (script.config.LastRun.Conversion)
         guicontrol,, bKeepFilename, % (script.config.LastRun.KeepFileName)
+        guicontrol,, bRenderRMD, % (script.config.LastRun.RenderRMD)
+        guicontrol,, bRemoveHashTagFromTags, % (script.config.LastRun.RemoveHashTagFromTags)
         guicontrol,, ChosenFile, % manuscriptname "(" OutFileName ") - " script.config.lastrun.manuscriptpath
     }
     
@@ -505,7 +541,7 @@ guiShow()
     enableGuiDrag(1)
     WinWaitClose, % script.name " - Choose manuscript"
     if (manuscriptpath!="")
-        return [sel,manuscriptpath,bVerboseCheckbox + 0,bFullLogCheckbox + 0,bSRCConverterVersion + 0,bKeepFilename + 0]
+        return [sel,manuscriptpath,bVerboseCheckbox + 0,bFullLogCheckbox + 0,bSRCConverterVersion + 0,bKeepFilename + 0,bRenderRMD + 0,bRemoveHashTagFromTags + 0]
     Else
         ExitApp
 }
@@ -555,6 +591,8 @@ guiSubmit()
     script.config.LastRun.FullLog:=bFullLogCheckbox+0
     script.config.LastRun.Conversion:=bSRCConverterVersion+0
     script.config.LastRun.KeepFileName:=bKeepFilename+0
+    script.config.LastRun.RenderRMD:=bRenderRMD+0
+    script.config.LastRun.RemoveHashTagFromTags:=bRemoveHashTagFromTags+0
     
     for k,v in sel
     {
