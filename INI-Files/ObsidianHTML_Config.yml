@@ -4,3 +4,4 @@
 # 1 means only direct children are processed (and the entrypoint of course)
 # and so forth. NOTE: DOES NOT APPLY TO INCLUSIONS!
 max_note_depth: 15
+# preserve_inline_tags: False
