@@ -240,6 +240,7 @@ main()
     else
         NewContents:=ConvertSRC_SYNTAX_V3(rmd_Path)
     NewContents:=ProcessTags(NewContents,bRemoveHashTagFromTags)
+    NewContents:=ProcessAbstract(NewContents)
         FileDelete, % rmd_Path 
         FileAppend, % NewContents,% rmd_Path
     ttip("Creating R-BuildScript",5)
@@ -452,6 +453,26 @@ fRemoveTempDir(md_Path)
         Run, % "explorer " OutDir
     }
     return
+}
+ProcessAbstract(NewContents)
+{
+    if (FileExist(NewContents))
+        FileRead NewContents, % NewContents
+    Lines:=Strsplit(NewContents,"`r`n")
+    , Rebuild:=""
+    for index, Line in Lines
+    {
+        if (st_count(Rebuild,"`n")>1)
+        {
+            Clipboard:=Rebuild.="`n" Line
+            continue
+        }
+        if (!Instr(Rebuild,"abstract"))
+            Rebuild.=((Index=1)?Line:"`n" Line)
+        else
+            Rebuild.=((SubStr(Line,1,2)="  ")?A_Space LTrim(Line):"`n" Line)
+    }
+    return Rebuild
 }
 
 ProcessTags(NewContents,bRemoveHashTagFromTags)
