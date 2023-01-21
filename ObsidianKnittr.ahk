@@ -144,6 +144,10 @@ main()
     bKeepFilename:=out.6
     bRenderRMD:=out.7
     bRemoveHashTagFromTags:=out.8
+    ChosenTemplate:=out.9
+    bToc:=out.10
+    toc_depth:=out.11
+    bNumberSect:=out.12
 
     ; 3. 
     obsidianhtml_configfile:=script.config.config.obsidianhtml_configfile
@@ -239,22 +243,30 @@ main()
         NewContents:=ConvertSRC_SYNTAX_V2(rmd_Path)
     else
         NewContents:=ConvertSRC_SYNTAX_V3(rmd_Path)
+    ttip("Processing Tags",5)
     NewContents:=ProcessTags(NewContents,bRemoveHashTagFromTags)
+    ttip("Processing Abstract",5)
     NewContents:=ProcessAbstract(NewContents)
-        FileDelete, % rmd_Path 
-        FileAppend, % NewContents,% rmd_Path
+    ; NewContents:=ProcessHorizontalBreaks(NewContents)
+    FileDelete, % rmd_Path 
+    FileAppend, % NewContents,% rmd_Path
     ttip("Creating R-BuildScript",5)
     if bKeepFilename
-        script_contents:=BuildRScriptContent(rmd_Path,output_type,manuscriptName)
+        script_contents:=BuildRScriptContent(rmd_Path,output_type,manuscriptName,out)
     else
-        script_contents:=BuildRScriptContent(rmd_Path,output_type)
+        script_contents:=BuildRScriptContent(rmd_Path,output_type,,out)
     if bRenderRMD
     {
-    ttip("Executing R-BuildScript",5)
-    RunRScript(rmd_Path,output_type,script_contents,script.config.config.RScriptPath)
+        ttip("Executing R-BuildScript",5)
+        RunRScript(rmd_Path,output_type,script_contents,script.config.config.RScriptPath)
     }
     Else
+    {
+        SplitPath, % rmd_Path, OutFileName, OutDir
+        FileDelete, % OutDir "\build.R"
+        FileAppend, % script_contents, % OutDir "\build.R"
         run, % rmd_Path
+    }
     ttip("Building AHK-Starterscript",5)
     BuildAHKScriptContent(rmd_Path,script_contents,script.config.config.RScriptPath)
     OpenFolder(rmd_Path)
@@ -293,9 +305,8 @@ OpenFolder(Path)
     run, % OutDir
 }
 
-BuildRScriptContent(Path,output_type,output_filename="")
+BuildRScriptContent(Path,output_type,output_filename="",out="")
 {
-    ; Str:="setwd(""C:\Users\Claudius Main\Desktop\TempTemporal\TestPaper_apa"")`n"
     SplitPath, % Path, , Path2, , Name
     RScriptFilePath:=strreplace(Path2,"\","\\")
     RScriptFolder:=strreplace(Path2,"\","/")
@@ -311,6 +322,65 @@ BuildRScriptContent(Path,output_type,output_filename="")
 
     )
     Name:=(output_filename!=""?output_filename:"index")
+    if (out!="")
+    {
+        template:=strsplit(out.9,"(").2
+        if SubStr(template,0)=")"
+        {
+            tpl_Len:=StrLen(template)-1
+            template:=SubStr(template, 1, tpl_Len)
+        }
+        template:=StrReplace(template, "\", "/")
+        Clipboard:=template
+        bTOC:=(out.10?"TRUE":"FALSE")
+        toc_depth:=out.11
+        if (toc_depth=0) || (toc_depth="")
+            toc_depth:=10
+        bNumberSect:=(out.12?"TRUE":"FALSE")
+        if IsObject(output_type)
+        {
+            for k,format in output_type
+            {
+                if (format="word_document")
+                {
+                    Str3=
+                    (LTRIM
+                    rmarkdown::word_document(
+                    toc = %bTOC%,
+                    toc_depth = %toc_depth%,
+                    number_sections = %bNumberSect%,
+                    fig_caption = TRUE,
+                    df_print = "default",
+                    highlight = "default",
+                    reference_docx="%template%",
+                    keep_md = FALSE,
+                    md_extensions = NULL,
+                    pandoc_args = NULL
+                    `)
+                    )
+                    output_type[k]:=Clipboard:=Str3
+                }
+            }
+        }
+        else
+        {
+            output_type=
+            (LTRIM
+            rmarkdown::word_document(
+            toc = %bTOC%,
+            toc_depth = %toc_depth%,
+            number_sections = %bNumberSect%,
+            fig_caption = TRUE,
+            df_print = "default",
+            highlight = "default",
+            reference_docx="%template%",
+            keep_md = FALSE,
+            md_extensions = NULL,
+            pandoc_args = NULL
+            \)
+            )
+        }
+    }
     if IsObject(output_type)
     {
         bDoPDFLast:=false
@@ -321,11 +391,24 @@ BuildRScriptContent(Path,output_type,output_filename="")
                 bDoPDFLast:=true
                 continue
             }
-            Str2=
-            (LTRIM
-            
-            rmarkdown::render(`"index.rmd`",`"%format%`",`"%Name%"`)`n
-            )
+            if st_count(format,"`n")>0
+            {
+
+                Str2=
+                (LTRIM
+                
+                rmarkdown::render(`"index.rmd`",%format%,`"%Name%"`)`n
+                )
+            }
+            else
+            {
+
+                Str2=
+                (LTRIM
+                
+                rmarkdown::render(`"index.rmd`",`"%format%`",`"%Name%"`)`n
+                )
+            }
             Str.=Str2
         }
         if bDoPDFLast
@@ -342,11 +425,24 @@ BuildRScriptContent(Path,output_type,output_filename="")
     {
         if (output_type!="")
         {
-            Str2=
-            (LTRIM
+            if st_count(output_type,"`n")>0
+            {
 
-            rmarkdown::render(`"index.rmd`",`"%output_type%`",`"%Name%"`)`n
-            )
+                Str2=
+                (LTRIM
+                
+                rmarkdown::render(`"index.rmd`",format,`"%Name%"`)`n
+                )
+            }
+            else
+            {
+
+                Str2=
+                (LTRIM
+
+                rmarkdown::render(`"index.rmd`",`"%output_type%`",`"%Name%"`)`n
+                )
+            }
         }
         else
         {
@@ -363,7 +459,7 @@ BuildRScriptContent(Path,output_type,output_filename="")
 
 RunRScript(Path,output_type,script_contents,RScript_Path:="")
 {
-    SplitPath, % Path, OutFileName, OutDir, OutExtension, OutNameNoExt, OutDrive
+    SplitPath, % Path, OutFileName, OutDir
     FileDelete, % OutDir "\build.R"
     FileAppend, % script_contents, % OutDir "\build.R"
     if (RScript_Path="")
@@ -374,9 +470,9 @@ RunRScript(Path,output_type,script_contents,RScript_Path:="")
 }
 BuildAHKScriptContent(Path,script_contents,RScript_Path:="")
 {
-    SplitPath, % Path, OutFileName, OutDir, OutExtension, OutNameNoExt, OutDrive
-    FileDelete, % OutDir "\build.R"
-    FileAppend, % script_contents, % OutDir "\build.R"
+    SplitPath, % Path, OutFileName, OutDir
+    ;FileDelete, % OutDir "\build.R"
+    ;FileAppend, % script_contents, % OutDir "\build.R"
     if (RScript_Path="")
         RScript_Path:="C:\Program Files\R\R-4.2.0\bin\Rscript.exe"
     if script.config.config.bundleAHKStarter && (RScript_Path!="")
@@ -479,26 +575,26 @@ ProcessTags(NewContents,bRemoveHashTagFromTags)
 {
     if (FileExist(NewContents))
         FileRead NewContents, % NewContents
-        AlreadyReplaced:=""
+    AlreadyReplaced:=""
     if Instr(NewContents,"_obsidian_pattern")
     {
         Tags:=Strsplit(NewContents,"tags:").2
         Tags:=StrSplit(Tags, "`r`n---`r`n").1
-        Tags:=Strsplit(Tags,"`r`n")
-        for ind,Tag in Tags
-            Tags[ind]:=SubStr(Tag,3)
-        for ind, Tag in Tags
-        {
-            if (Tag="") && !Instr(AlreadyReplaced,Tag)
-                continue
-            Needle:="``{_obsidian_pattern_tag_" Tag "}``"
-            if bRemoveHashTagFromTags
-                NewContents:=Strreplace(NewContents,Needle,Tag)
-            else
-                NewContents:=Strreplace(NewContents,Needle,"#" Tag)
+            Tags:=Strsplit(Tags,"`r`n")
+            for ind,Tag in Tags
+                    Tags[ind]:=SubStr(Tag,3)
+            for ind, Tag in Tags
+            {
+                if (Tag="") && !Instr(AlreadyReplaced,Tag)
+                    continue
+                Needle:="``{_obsidian_pattern_tag_" Tag "}``"
+                if bRemoveHashTagFromTags
+                    NewContents:=Strreplace(NewContents,Needle,Tag)
+                else
+                    NewContents:=Strreplace(NewContents,Needle,"#" Tag)
             AlreadyReplaced.=Tag
+            }
         }
-    }
     return NewContents
 }
 
@@ -572,10 +668,49 @@ guiShow()
     gui,1: show,x%x% y%y%, % script.name " - Choose manuscript"
     enableGuiDrag(1)
     WinWaitClose, % script.name " - Choose manuscript"
+    if (HasVal(sel,"word_document") || sel="word_document")
+    {
+        str:=""
+        Loop, Files, % script.config.Config.word_document_referenceLibraryPath "\*.docx", F
+        {
+            SplitPath, % A_LoopFileFullPath, TemplateName, 
+            ttip(A_LoopFileFullPath)
+            str.=TemplateName "(" A_LoopFileFullPath ")" "|"
+        }
+        gui, 2: add, DropDownList, w330 vChosenTemplate, % str
+        gui, 2: add, Checkbox, vbTOC, Add TOC?
+        gui, 2: add, text,, Set toc_depth
+        gui, 2: add, edit, vtoc_depth number
+        gui, 2: add, checkbox, vbNumberSect, Number sections?
+        gui, 2: add, button, gSubmitTemplate, Submit Word-Template
+        if (script.config.LastRun.Chosentemplate!="")
+            guicontrol,, vChosenTemplate, % script.config.LastRun.Chosentemplate
+        if (script.config.LastRun.bTOC!="")
+            guicontrol,,bTOC, % script.config.LastRun.bTOC
+        if (script.config.LastRun.toc_depth!="")
+            guicontrol,,toc_depth, % script.config.LastRun.toc_depth
+        if (script.config.LastRun.bNumberSect!="")
+            guicontrol,,bNumberSect, % script.config.LastRun.bNumberSect
+        gui, 2: show,x%x% y%y%, % script.name " - Choose Template File"
+        WinWaitClose, % script.name " - Choose Template File"
+        if (toc_depth>6)
+            toc_depth:=6
+        script.config.LastRun.Chosentemplate:=ChosenTemplate
+        script.config.LastRun.bTOC:=bTOC
+        script.config.LastRun.toc_depth:=toc_depth
+        script.config.LastRun.bNumberSect:=bNumberSect
+    }
     if (manuscriptpath!="")
-        return [sel,manuscriptpath,bVerboseCheckbox + 0,bFullLogCheckbox + 0,bSRCConverterVersion + 0,bKeepFilename + 0,bRenderRMD + 0,bRemoveHashTagFromTags + 0]
+        return [sel,manuscriptpath,bVerboseCheckbox + 0,bFullLogCheckbox + 0,bSRCConverterVersion + 0,bKeepFilename + 0,bRenderRMD + 0,bRemoveHashTagFromTags + 0,ChosenTemplate,bTOC+0,toc_depth+0,bNumberSect+0]
     Else
         ExitApp
+}
+
+SubmitTemplate()
+{
+    gui, 2: submit
+    gui, 2: destroy
+    return
 }
 GCEscape()
 {
@@ -759,3 +894,59 @@ Base64PNG_to_HICON( B64, nBytes:="", W:="", H:="" ) {
 
 
 ; --uID:1547783079
+; --uID:2849897047
+ ; Metadata:
+  ; Snippet: st_count  ;  (v.2.6)
+  ; --------------------------------------------------------------
+  ; Author: tidbit et al
+  ; License: none
+  ; Source: https://www.autohotkey.com/boards/viewtopic.php?t=53
+  ; 
+  ; --------------------------------------------------------------
+  ; Library: Libs
+  ; Section: 05 - String/Array/Text
+  ; Dependencies: /
+  ; AHK_Version: v1
+  ; --------------------------------------------------------------
+  ; Keywords: string things,
+
+ ;; Description:
+  ;; 
+  ;; Count
+  ;;    Counts the number of times a tolken exists in the specified string.
+  ;; 
+  ;;    string    = The string which contains the content you want to count.
+  ;;    searchFor = What you want to search for and count.
+  ;; 
+  ;;    note: If you're counting lines, you may need to add 1 to the results.
+  ;; 
+  ;; 
+  ;; Name: String Things - Common String & Array Functions
+  ;; Version 2.6 (Fri May 30, 2014)
+  ;; Created: Sat March 02, 2013
+  ;; Author: tidbit
+  ;; Credit:
+  ;;    AfterLemon  --- st_insert(), st_overwrite() bug fix. st_strip(), and more.
+  ;;    Bon         --- word(), leftOf(), rightOf(), between() - These have been replaced
+  ;;    faqbot      --- jumble()
+  ;;    Lexikos     --- flip()
+  ;;    MasterFocus --- Optimizing LineWrap and WordWrap.
+  ;;    rbrtryn     --- group()
+  ;;    Rseding91   --- Optimizing LineWrap and WordWrap.
+  ;;    Verdlin     --- st_concat(), A couple nifty forum-only functions.
+  ;;    
+  ;; Description:
+  ;;    A compilation of commonly needed function for strings and arrays.
+
+ ;;; Example:
+  ;;; msgbox, % st_count("aaa`nbbb`nccc`nddd", "`n")+1 ; add one to count the last line
+  ;;; ;; output: 4
+
+ st_count(string, searchFor="`n")
+ {
+    StringReplace, string, string, %searchFor%, %searchFor%, UseErrorLevel
+    return ErrorLevel
+ }
+
+
+; --uID:2849897047
