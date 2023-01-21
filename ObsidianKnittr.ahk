@@ -579,22 +579,89 @@ ProcessTags(NewContents,bRemoveHashTagFromTags)
     if Instr(NewContents,"_obsidian_pattern")
     {
         Tags:=Strsplit(NewContents,"tags:").2
-        Tags:=StrSplit(Tags, "`r`n---`r`n").1
+
+        ;; eliminate duplicates
+        Lines:=strsplit(Tags,"`r`n")
+        Tags:=""
+        for ind, Line in Lines
+        {
+            if SubStr(Line,1,2)="- " && !Instr(Tags,Line)
+                Tags.=Line "`r`n"
+            if SubStr(Line,1,2)="- "
+                OrigTags.=Line "`r`n"
+            if SubStr(LIne,1,3)="---"
+                break
+        }
+        if (Tags="")
+        {
+            Tag:=Trim(Lines[1])
+            Needle:="``{_obsidian_pattern_tag_" Tag "}``"
+            if bRemoveHashTagFromTags
+            {
+                NewContents:=Strreplace(NewContents,Needle,Tag)
+                if Instr(NewContents,Tag) && !Instr(NewContents,Needle)
+                    Tags:=""
+            }
+            else
+            {
+                NewContents:=Strreplace(NewContents,Needle,"#" Tag)
+                if Instr(NewContents,"#" Tag)
+                    Tags:=""
+            }
+            AlreadyReplaced.=Tag "`n"
+        }
+        else
+        {
+            Tags:=Trim(Tags)
             Tags:=Strsplit(Tags,"`r`n")
             for ind,Tag in Tags
+            {
+                if (SubStr(Tag,1,1)="-")
                     Tags[ind]:=SubStr(Tag,3)
+                else
+                {
+                    Cap:=Tags.Remove(Ind)
+                    continue
+                }
+            }
             for ind, Tag in Tags
             {
                 if (Tag="") && !Instr(AlreadyReplaced,Tag)
                     continue
                 Needle:="``{_obsidian_pattern_tag_" Tag "}``"
                 if bRemoveHashTagFromTags
+                {
+                    if !Instr(NewContents,Needle)
+                        continue
                     NewContents:=Strreplace(NewContents,Needle,Tag)
+                    if Instr(NewContents,Tag) && !Instr(NewContents,Needle)
+                        Tags[Ind]:=""
+                }
                 else
+                {
+                    if !Instr(NewContents,Needle)
+                        continue
                     NewContents:=Strreplace(NewContents,Needle,"#" Tag)
-            AlreadyReplaced.=Tag
+                    if Instr(NewContents,"#" Tag)
+                        Tags[Ind]:=""
+                }
+                AlreadyReplaced.=Tag "`n"
             }
+            rebuild:="`r`n"
+            for ind, Tag in Tags
+            {
+                if (Tag="")
+                    continue
+                rebuild.="- " Tag "`r`n"
         }
+            ;rebuild.="---"
+            Clipboard:=NewContents:=strreplace(NewContents,OrigTags,rebuild)
+            Clipboard:=NewContents
+            Clipboard:=NewContents:=StrReplace(NewContents,"---`r`n---", "`r`n---`r`n",,1)
+            Clipboard:=NewContents:=StrReplace(NewContents,"`r`n`r`n", "`r`n",,1)
+        }
+    }
+    
     return NewContents
 }
 
