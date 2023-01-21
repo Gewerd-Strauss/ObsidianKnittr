@@ -1,7 +1,70 @@
 ; #Requires Autohotkey v1.1+
-ConvertSRC_SYNTAX_V3("C:\Users\Claudius Main\Desktop\TempTemporal\ObsidianHTML Special characters in Image titles\index.md")
+
+;ProcessTags("C:\Users\Claudius Main\Desktop\TempTemporal\Source for Word-formatting-Template\index.md")
+;ConvertSRC_SYNTAX_V4("C:\Users\Claudius Main\Desktop\TempTemporal\ObsidianHTML Special characters in Image titles\index.md")
 ;ConvertSRC_SYNTAX_V3("C:\Users\Claudius Main\Desktop\TempTemporal\BE22 Report Claudius Appel\index.md")
 ;ConvertSRC_SYNTAX_V2("C:\Users\Claudius Main\Desktop\TempTemporal\ObsidianHTML Special characters in Image titles\index.md")
+ConvertSRC_SYNTAX_V4(PathOrContent) {
+    if (FileExist(PathOrContent))
+        FileRead buffer, % PathOrContent
+    else
+        buffer := PathOrContent
+    p := 1
+    ;@ahk-neko-ignore 1 line
+    regex = <img src="(?<SRC>.+)"  width="(?<WIDTH>\d*)" alt="(?<ALT>.*)" title="(?<TITLE>.*)" \/>
+    while (p := RegExMatch(buffer, "iOU)" regex, match, p)) {
+        options := ""
+        src := DecodeUriComponent(match.src)
+        if (match.width)
+            options .= "out.width='" match.width "', "
+        if (match.alt)
+            options .= "fig.cap='" Clean(match.alt) "', "
+        if (match.title)
+            options .= "fig.title='" Clean(match.title) "', "
+        options := RTrim(options, ", ")
+        tpl =
+            (LTrim
+
+
+            ``````{r, echo=FALSE, %options%}
+            knitr::include_graphics("%src%")
+            ``````
+
+
+            )
+        buffer := StrReplace(buffer, match[0], tpl)
+        p += StrLen(tpl)
+    }
+    buffer:=Regexreplace(buffer, "``````\{r setup(|.|\n)*``````","") ;; get rid of all potential r setup chunks
+    tpl =
+        (LTrim
+        ---
+        ``````{r setup, include=FALSE}
+        knitr::opts_chunk$set(echo = FALSE)
+        ``````
+
+        )
+    buffer := RegExReplace(buffer, "\n---", "`n" tpl,,1,1)
+    Clipboard:=buffer
+    return buffer
+}
+
+Clean(sText) {
+    sText := _Decode(sText, 1)
+    sText := StrReplace(sText, "'", "\'")
+    return sText
+}
+
+; DecodeEntities(sText) {
+;     return _Decode(sText, 1)
+; }
+
+; DecodeUriComponent(sText) {
+;     return _Decode(sText, 2)
+; }
+
+
+
 
 ConvertSRC_SYNTAX_V3(PathOrContent) { ;; converts % propely, does not recognise and convert double quotes. Hard-fails on single quotes (not escaped)
     if (FileExist(PathOrContent))
@@ -933,3 +996,4 @@ ConvertSRC_SYNTAX_V1(md_Path)
   ; 
 
 ; --uID:1923497277
+

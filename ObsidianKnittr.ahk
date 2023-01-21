@@ -242,7 +242,7 @@ main()
     if bSRCConverterVersion
         NewContents:=ConvertSRC_SYNTAX_V2(rmd_Path)
     else
-        NewContents:=ConvertSRC_SYNTAX_V3(rmd_Path)
+        NewContents:=ConvertSRC_SYNTAX_V4(rmd_Path)
     ttip("Processing Tags",5)
     NewContents:=ProcessTags(NewContents,bRemoveHashTagFromTags)
     ttip("Processing Abstract",5)
