@@ -1,18 +1,44 @@
-Word_Document_Params:=new ot("word_document","D:\Dokumente neu\000 AAA Dokumente\000 AAA HSRW\General\AHK scripts\Projects\Finished\ObsidianScripts\Test\DynamicArguments.ini")
-; Word_Document_Params:=Word_Document_Params._Adjust()
-Word_Document_Params:=Word_Document_Params.GenerateGUI()
-m(Word_Document_Params.A_Toc,Word_Document_Params.a_reference_docx)
-; m(Word_Document_Params)
+html:=new ot("html_document","D:\Dokumente neu\000 AAA Dokumente\000 AAA HSRW\General\AHK scripts\Projects\Finished\ObsidianScripts\Test\DynamicArguments.ini")
+docx:=new ot("word_document","D:\Dokumente neu\000 AAA Dokumente\000 AAA HSRW\General\AHK scripts\Projects\Finished\ObsidianScripts\Test\DynamicArguments.ini")
+; docx:=docx._Adjust()
+; docx:=docx.GenerateGUI()
+docx:=docx.GenerateGUI()
+html:=html.GenerateGUI()
+; docx._Adjust()
+htmlstr:=html.AssembleFormatString() 
+ docstr:=docx.AssembleFormatString()
+ Clipboard:=htmlstr "`n" docstr
+; m(docx)
 return
 Class ot ;; output_type
 {
+    
     __New(Format:="",ConfigFile:="")
     {
-        FileRead, Text, % ConfigFile
         this.type:=Format
+        if FileExist(ConfigFile)
+            this.ConfigFile:=ConfigFile
+        else
+        {
+            ID:=-1
+            this.Error:=this.Errors[ID].String
+            MsgBox 0x40031,%  this.ClassName " > " A_ThisFunc "()" ,% (this.Errors.HasKey(ID)?this.Errors[ID].String:"Fatal: Undefined Error with ID '" ID "'") "'" ConfigFile "'" (this.Errors[ID].HasKey("EndString")?this.Errors[ID].EndString:"Fatal: Undefined Error with ID '" ID "'")
+            ExitApp
+            return
+        }
+
+        FileRead, Text, % ConfigFile
         Lines:=strsplit(Text,Format "`r`n").2
         Lines:=strsplit(Lines,"`r`n`r`n").1
         Lines:=strsplit(Lines,"`r`n")
+        if !Lines.Count()
+        {
+            this.Result:=this.type:=Format "()"
+            this.Error:="Error: +2 - " this.Errors[+2].String
+            ID:=strsplit(this.Error,A_Space).2
+            MsgBox 0x40031,%  this.ClassName " > " A_ThisFunc "()" ,% (this.Errors.HasKey(ID)?this.Errors[ID].String:"Fatal: Undefined Error with ID '" ID "'")
+            return this
+        }
         ;ttip(Lines)
         for each, Line in Lines
         {
@@ -24,15 +50,14 @@ Class ot ;; output_type
                 continue
             while (p := RegExMatch(Line, regex, match, p)) {
                 ; do stuff
-                matchKey:=SubStr(matchKey,1,StrLen(matchKey)-1)
-                if (Count<2)
+                matchKey:=SubStr(matchKey,1,StrLen(matchKey)-1) ;; remove the doublepoint.
+                if (Count<2) ;; initiate Parameter-Object
                 {
                     CurrentParam:=matchKey
                     ObjRawSet(This.Arguments,matchKey,{})
                     ObjRawSet(This.Arguments[CurrentParam],"Control",matchVal)
                 }
-                ObjRawSet(This.Arguments[CurrentParam],matchkey,matchVal)
-
+                ObjRawSet(This.Arguments[CurrentParam],matchkey,matchVal) ;; there ought to be a simpler method than ObjRawSet that I am utterly missing, or tested with bad data and assumed faulty...
                 ; This.Arguments.InsertAt([matchKey] matchKey:=matchVal
                 p+=StrLen(Match)
                 Count++
@@ -83,14 +108,21 @@ Class ot ;; output_type
                 ;This.Arguments[Trim(Parameter),"Control"]:=Details.1
             */
         }
-        this._Adjust()
         this.AssumeDefaults()
+        this._Adjust()
     }
     __Init()
     {
+        this.Errors:={ ;; negative errors are hard failures, which will not let the program continue. positive errors are positive, and allow limited continuation. Functionality may be limited 
+             -1:{String:"Provided Configfile does not exist:`n`n",EndString:"`n`n---`nExiting Script",Criticality:-100}
+             ,+2:{String:"Format not defined.`nCheck your configfile.`n`nReturning default 'outputformat()'",Criticality:20}}
+        this.ClassName:="ot - output_type"
+        this.GUITitle:="Define output format - "
+        this.Version:="0.1.a"
+        this.type:=""
+        this.ConfigFile:=""
         ObjRawSet(this,"type","")
         ObjRawSet(this,"Arguments",{})
-        
     }
     __Get(Param*)
     {
@@ -104,8 +136,9 @@ Class ot ;; output_type
     }
     _Adjust()
     {
-        This.AdjustBools()
         This.AdjustMinMax()
+        This.AdjustDDLs()
+        This.AdjustBools()
         return This
     }
 
@@ -129,6 +162,47 @@ Class ot ;; output_type
                     )
                     output_type[k]:=Clipboard:=Str3
         */
+
+        Str:="rmarkdown::" this.type "(`n" ;; start string
+        this._Adjust()
+        for Parameter, Value in this.Arguments
+        {
+            if (Parameter="toc_depth" && !this.Arguments["toc"]Value) ;|| (Parameter="toc" && !this.Arguments["toc"]Value)
+                continue
+            if (Value.Type="String") && (Value.Value!="") ;&& (Value.Control!="File")
+                Value.Value:=DA_Quote(Value.Value)
+            if (Value.Default="NULL") && (Value.Value="")
+                Value.Value:="NULL"
+            if (Parameter="reference_docx")
+            {
+                ParamString:=strsplit(Value.Value,"(").2
+                ParamString:=Trim(ParamString,"""")
+                if SubStr(ParamString,0)=")"
+                {
+                    tpl_Len:=StrLen(ParamString)-1
+                    ParamString:=SubStr(ParamString, 1, tpl_Len)
+                }
+                ParamString:=StrReplace(ParamString, "\", "/")
+                Tail:=SubStr(ParamString,-1)
+                Tail2:=SubStr(ParamString,-2)
+                Value.Value:=DA_Quote(ParamString)
+            }
+            Str.= Parameter " = " Value.Value ",`n"
+        }
+        Tail:=SubStr(Str,-2)
+        Str:=SubStr(Str,1,StrLen(Str)-2)
+        Str.=(Instr(Str,"`n")?"`n)":"")
+        this.AssembledFormatString:=Str
+        return Str
+    }
+    AdjustDDLs()
+    {
+        for each, V in this.Arguments
+        {
+            if (V.Control!="DDL") && (V.Control!="DropDownList")
+                continue
+            
+        }
     }
     AdjustBools()
     {
@@ -138,6 +212,7 @@ Class ot ;; output_type
                 V.Value:=V.Value+0
             if (V.Type="boolean")
                 V.Value:=(V.Value?"TRUE":"FALSE")
+            
         }
     }
     AdjustMinMax()
@@ -158,33 +233,51 @@ Class ot ;; output_type
     {
         for each, V in this.Arguments
         {
+            V.SearchPath:=strreplace(V.SearchPath,"""","")
+            V.String:=strreplace(V.String,"""","")
+            if (V.Type="String")
+                V.Default:=strreplace(V.Default,"""","")
             if (V.Value="")
             {
                 if  (V.Control="File")
                 {
-                    V.SearchPath:=strreplace(V.SearchPath,"""","")
                     if !FileExist(V.SearchPath V.Default)
-                        MsgBox 0x40040, % "output_type: " this.type, % "The default File`n'" V.SearchPath V.Default "'`ndoes not exist. No default set."
+                        MsgBox 0x40031, % "output_type: " this.type, % "The default File`n'" V.SearchPath V.Default "'`ndoes not exist. No default set."
                     else
                         V.Value:=V.SearchPath V.Default
                 }
                 else
                     V.Value:=V.Default
             }
-            V.String:=strreplace(V.String,"""","")
         }
     }
+
     FileSelect(VarName)
     {
-        
         FileSelectFile, Chosen, 3,% this.Arguments[VarName].SearchPath,% this.Arguments[VarName].String
         this.Arguments[VarName].Value:=Chosen
+        gui, ParamsGUI:default
+        SplitPath, % Chosen,,,,ChosenName
+        guicontrol,% "ParamsGUI:",v%VarName%, % ChosenName "(" Chosen ")"
     }
     
     GenerateGUI()
     {
-        static
-        gui, ParamsGUI: new,
+        ;static
+        global
+        ; if this.Has
+        gui, ParamsGUI: destroy
+        if this.HasKey("Error") 
+        {
+            ID:=strsplit(this.Error,A_Space).2
+            if !(SubStr(ID,1,1)="-")
+                return this
+            MsgBox 0x40031,%  this.ClassName " > " A_ThisFunc "()" ,% (this.Errors.HasKey(ID)?this.Errors[ID].String:"Fatal: Undefined Error with ID '" ID "'")
+            return this
+        }
+            
+        gui, ParamsGUI: new, +AlwaysOnTop -SysMenu -ToolWindow +caption +Border
+        gui, font, s8
 
         for each,V in this.Arguments
         {
@@ -195,45 +288,105 @@ Class ot ;; output_type
             {
                 gui, ParamsGUI: add, text,, % tmp:=V.String
                 ; V.String:=""
+                if (V.ctrlOptions="Number") 
+                {
+                    if (v.Max!="") && (v.Min!="") ;&& (v.HasKey(Max) || v.HasKey(Min))
+                    {
+                        V.ctrlOptions.= A_Space 
+                        Gui, ParamsGUI:Add, Edit
+                        gui, ParamsGUI:add, UpDown, %  "h25 w80 Range" v.Min "-" v.Max " vv" each, % v.Default + 0
+                        continue
+                    }
+                }
                 gui, ParamsGUI: add, % V.Control, % V.ctrlOptions " vv" each
             }
             else if (V.Control="File")
             {
                 gui, ParamsGUI:Add, Text,, % V.String
+                gui, ParamsGUI:Add, edit,  % V.ctrlOptions " vv" each " disabled w200", % V.Value
                 ; Func:=ObjBindMethod(this, "FileSelect")
-                Gui, ParamsGUI:Add, button, hwndbutton, % "Select File"
+                Gui, ParamsGUI:Add, button, hwndbutton, % "Select &File"
                 onButton := ObjBindMethod(this, "FileSelect",each)
                 GuiControl, ParamsGUI:+g, %button%, % onButton
             }
+            else if (V.Control="DDL")
+            {
+                gui, ParamsGUI:Add, Text,, % V.String
+                if Instr(V.ctrlOptions,",") && !Instr(V.ctrlOptions,"|")
+                    V.ctrlOptions:=strreplace(V.ctrlOptions,",","|")
+                if !Instr(V.ctrlOptions,v.Default)
+                    v.ctrlOptions.=((SubStr(v.ctrlOptions,-1)="|")?"":"|") v.Default
+                if !Instr(V.ctrlOptions,v.Default "|")
+                    v.ctrlOptions:=strreplace(v.ctrlOptions,v.Default,v.Default "|")
+                if !Instr(V.ctrlOptions,v.Default "||")
+                    v.ctrlOptions:=strreplace(v.ctrlOptions,v.Default,v.Default "|")
+                if !Instr(V.ctrlOptions,v.Default "||")
+                    v.ctrlOptions:=strreplace(v.ctrlOptions,v.ctrlOptions "|")
+                gui, ParamsGUI:add, % V.Control, %  " vv" each, % V.ctrlOptions
+            }
             else
                 gui, ParamsGUI:add, % V.Control, % V.ctrlOptions " vv" each, % V.String
-                ; gui, ParamsGUI:add, % Control, % Options " vv" each, % V.String
+            if (V.Control="Checkbox")
+                guicontrol,% "ParamsGUI:",v%each%, % V.Default
 
             if (Control="Edit")
             {
                 ; V.String:=tmp
             }
         }
-        gui, add, button,hwndSubmitButton,Submit
+        gui, add, button,hwndSubmitButton,&Submit
         onSubmit:=ObjBindMethod(this, "SubmitDynamicArguments")
         GuiControl, ParamsGUI:+g,%SubmitButton%, % onSubmit
-        gui, ParamsGUI:Show,, Dynamic Arguments
-        WinWait, Dynamic Arguments
-        WinWaitClose, Dynamic Arguments
-        ; for each, V in this.Arguments
-        ; {
-        ;     value:=v%each%
-        ;     this.Arguments[each,"Value"]:=v%each%
-        ; }
+        gui, ParamsGUI:Show,,% GUIName:=this.GUITitle this.type
+        WinWait, % GUIName
+        WinWaitClose, % GUIName
         return this
     }
     SubmitDynamicArguments()
     {
+        static ; global
         gui, ParamsGui: Submit
+        gui, ParamsGui: destroy
+        for each,V in this.Arguments
+        {
+            k=v%each%
+            a:=%k%
+            this["Arguments",each].Value:= a
+        }
         return this
     }
 }
 
+; --uID:4179423054
+ ; Metadata:
+  ; Snippet: DA_Quote  ;  (v.1)
+  ; --------------------------------------------------------------
+  ; Author: u/anonymous1184
+  ; Source: https://www.reddit.com/r/AutoHotkey/comments/p2z9co/comment/h8oq1av/?utm_source=share&utm_medium=web2x&context=3
+  ; 
+  ; --------------------------------------------------------------
+  ; Library: AHK-Rare
+  ; Section: 05 - String/Array/Text
+  ; Dependencies: /
+  ; AHK_Version: v1
+  ; --------------------------------------------------------------
+  ; Keywords: apostrophe
+
+ ;; Description:
+  ;; DA_Quotes a string
+
+ ;;; Example:
+  ;;; Var:="Hello World"
+  ;;; msgbox, % DA_Quote(Var . " Test")
+  ;;; 
+
+ DA_Quote(String)
+ 	{ ; u/anonymous1184 https://www.reddit.com/r/AutoHotkey/comments/p2z9co/comment/h8oq1av/?utm_source=share&utm_medium=web2x&context=3
+ 		return """" String """"
+ 	}
+
+
+; --uID:4179423054
 
 m1 := new GMem(0, 20)
 m2 := {base: GMem}.__New(0, 30)
