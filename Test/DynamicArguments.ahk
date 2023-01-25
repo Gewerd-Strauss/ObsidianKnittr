@@ -1,7 +1,7 @@
 Word_Document_Params:=new ot("word_document","D:\Dokumente neu\000 AAA Dokumente\000 AAA HSRW\General\AHK scripts\Projects\Finished\ObsidianScripts\Test\DynamicArguments.ini")
 ; Word_Document_Params:=Word_Document_Params._Adjust()
 Word_Document_Params:=Word_Document_Params.GenerateGUI()
-m(Word_Document_Params.A_Toc)
+m(Word_Document_Params.A_Toc,Word_Document_Params.a_reference_docx)
 ; m(Word_Document_Params)
 return
 Class ot ;; output_type
@@ -16,46 +16,72 @@ Class ot ;; output_type
         ;ttip(Lines)
         for each, Line in Lines
         {
+            Count:=1
+            p := 1
+            regex:="(?<Key>\w+\:)(?<Val>[^|]+)"
+            
             if (SubStr(Trim(Line),1,1)=";")
                 continue
-            Details:=Parameter:=Control:=Options:="" ;; clear if assigned in previous pass
-            Details:=strsplit(Line,"|")
-            Parameter:=strsplit(Details.1,":").1
-            Control:=strsplit(Details.1,":").2
-            if Instr(Control, ",")
-            {
-                Options:=Strsplit(Control,",").2
-                Control:=Strsplit(Control,",").1
-                if Instr(Control,":")
-                    Control:=Strsplit(Control,":").2
-                This.Arguments[Trim(Parameter)]:={Trim(Parameter):Trim(Parameter),Type:Details.2,Default:Details.3,String:Details.4,Control:Control,Value:"",Options:Options,Other:Details.6}
-            }
-            else
-            {
-                if Instr(Control,":")
-                    Control:=Strsplit(Control,":").2
-                This.Arguments[Trim(Parameter)]:={Trim(Parameter):Trim(Parameter),Type:Details.2,Default:Details.3,String:Details.4,Control:Control,Value:"",Other:Details.6}
-            }
-            if Instr("boolean,integer,number",Details.2) ;(Details.2="boolean" || Details.2="number") || (Instr(Details.2,"boolean") || InStr(Details.2,"number"))
-            {
-                DefVal:=This.Arguments[Trim(Parameter),"Default"]+0
-                This.Arguments[Trim(Parameter),"Default"]:=This.Arguments[Trim(Parameter),"Default"]+0
-                ;This.Arguments[Trim(Parameter),"Value"]:=This.Arguments[Trim(Parameter),"Default"]+0
-            }
-            else if (Details.2="float")
-            {
+            while (p := RegExMatch(Line, regex, match, p)) {
+                ; do stuff
+                matchKey:=SubStr(matchKey,1,StrLen(matchKey)-1)
+                if (Count<2)
+                {
+                    CurrentParam:=matchKey
+                    ObjRawSet(This.Arguments,matchKey,{})
+                    ObjRawSet(This.Arguments[CurrentParam],"Control",matchVal)
+                }
+                ObjRawSet(This.Arguments[CurrentParam],matchkey,matchVal)
 
+                ; This.Arguments.InsertAt([matchKey] matchKey:=matchVal
+                p+=StrLen(Match)
+                Count++
             }
-            else if (Details.2="string")
-            {
+            /*
+                ; if RegExMatch(Line, "(?<Key>\w*)\:(?<Val>[^|:]+)", v)
+                ; {
+                    
+                ; }
 
-            }
-            else if (Details.2="valid_path")
-            {
-                this.Arguments[Trim(Parameter)].SearchPath:=strsplit(this.Arguments[Trim(Parameter)].Other,"=").2
-                ; This.Arguments[Trim(Parameter),"Value"]:=
-            }
-            ;This.Arguments[Trim(Parameter),"Control"]:=Details.1
+                ; Details:=Parameter:=Control:=Options:="" ;; clear if assigned in previous pass
+                ; Details:=strsplit(Line,"|")
+                ; Parameter:=strsplit(Details.1,":").1
+                ; Control:=strsplit(Details.1,":").2
+                ; if Instr(Control, ",")
+                ; {
+                ;     Options:=Strsplit(Control,",").2
+                ;     Control:=Strsplit(Control,",").1
+                ;     if Instr(Control,":")
+                ;         Control:=Strsplit(Control,":").2
+                ;     This.Arguments[Trim(Parameter)]:={Trim(Parameter):Trim(Parameter),Type:Details.2,Default:Details.3,String:Details.4,Control:Control,Value:"",Options:Options,Other:Details.6}
+                ; }
+                ; else
+                ; {
+                ;     if Instr(Control,":")
+                ;         Control:=Strsplit(Control,":").2
+                ;     This.Arguments[Trim(Parameter)]:={Trim(Parameter):Trim(Parameter),Type:Details.2,Default:Details.3,String:Details.4,Control:Control,Value:"",Other:Details.6}
+                ; }
+                ; if Instr("boolean,integer,number",Details.2) ;(Details.2="boolean" || Details.2="number") || (Instr(Details.2,"boolean") || InStr(Details.2,"number"))
+                ; {
+                ;     DefVal:=This.Arguments[Trim(Parameter),"Default"]+0
+                ;     This.Arguments[Trim(Parameter),"Default"]:=This.Arguments[Trim(Parameter),"Default"]+0
+                ;     ;This.Arguments[Trim(Parameter),"Value"]:=This.Arguments[Trim(Parameter),"Default"]+0
+                ; }
+                ; else if (Details.2="float")
+                ; {
+
+                ; }
+                ; else if (Details.2="string")
+                ; {
+
+                ; }
+                ; else if (Details.2="valid_path")
+                ; {
+                ;     this.Arguments[Trim(Parameter)].SearchPath:=strsplit(this.Arguments[Trim(Parameter)].Other,"=").2
+                ;     ; This.Arguments[Trim(Parameter),"Value"]:=
+                ; }
+                ;This.Arguments[Trim(Parameter),"Control"]:=Details.1
+            */
         }
         this._Adjust()
         this.AssumeDefaults()
@@ -63,7 +89,7 @@ Class ot ;; output_type
     __Init()
     {
         ObjRawSet(this,"type","")
-        ObjRawSet(this,"Arguments",[])
+        ObjRawSet(this,"Arguments",{})
         
     }
     __Get(Param*)
@@ -136,6 +162,7 @@ Class ot ;; output_type
             {
                 if  (V.Control="File")
                 {
+                    V.SearchPath:=strreplace(V.SearchPath,"""","")
                     if !FileExist(V.SearchPath V.Default)
                         MsgBox 0x40040, % "output_type: " this.type, % "The default File`n'" V.SearchPath V.Default "'`ndoes not exist. No default set."
                     else
@@ -144,6 +171,7 @@ Class ot ;; output_type
                 else
                     V.Value:=V.Default
             }
+            V.String:=strreplace(V.String,"""","")
         }
     }
     FileSelect(VarName)
@@ -163,23 +191,23 @@ Class ot ;; output_type
             Control:=V.Control
             if (Options="")
                 Options:=""
-            if (Control="Edit")
+            if (V.Control="Edit")
             {
                 gui, ParamsGUI: add, text,, % tmp:=V.String
                 ; V.String:=""
-                gui, ParamsGUI: add, % V.Control, % V.Options " vv" each
+                gui, ParamsGUI: add, % V.Control, % V.ctrlOptions " vv" each
             }
-            else if (Control="File")
+            else if (V.Control="File")
             {
                 gui, ParamsGUI:Add, Text,, % V.String
                 ; Func:=ObjBindMethod(this, "FileSelect")
                 Gui, ParamsGUI:Add, button, hwndbutton, % "Select File"
                 onButton := ObjBindMethod(this, "FileSelect",each)
                 GuiControl, ParamsGUI:+g, %button%, % onButton
-                ; gui, ParamsGUI:Add, Button,% "g" Func , % "Select File"
             }
             else
-                gui, ParamsGUI:add, % Control, % Options " vv" each, % V.String
+                gui, ParamsGUI:add, % V.Control, % V.ctrlOptions " vv" each, % V.String
+                ; gui, ParamsGUI:add, % Control, % Options " vv" each, % V.String
 
             if (Control="Edit")
             {
