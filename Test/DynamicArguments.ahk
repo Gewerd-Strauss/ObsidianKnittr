@@ -1,9 +1,10 @@
 Word_Document_Params:=new ot("word_document","D:\Dokumente neu\000 AAA Dokumente\000 AAA HSRW\General\AHK scripts\Projects\Finished\ObsidianScripts\Test\DynamicArguments.ini")
-Word_Document_Params:=GenerateGUI(Word_Document_Params)
-Word_Document_Params:=Word_Document_Params.Adjust()
+; Word_Document_Params:=Word_Document_Params._Adjust()
+Word_Document_Params:=Word_Document_Params.GenerateGUI()
+m(Word_Document_Params.A_Toc)
 ; m(Word_Document_Params)
 return
-Class ot
+Class ot ;; output_type
 {
     __New(Format:="",ConfigFile:="")
     {
@@ -17,6 +18,7 @@ Class ot
         {
             if (SubStr(Trim(Line),1,1)=";")
                 continue
+            Details:=Parameter:=Control:=Options:="" ;; clear if assigned in previous pass
             Details:=strsplit(Line,"|")
             Parameter:=strsplit(Details.1,":").1
             Control:=strsplit(Details.1,":").2
@@ -38,7 +40,7 @@ Class ot
             {
                 DefVal:=This.Arguments[Trim(Parameter),"Default"]+0
                 This.Arguments[Trim(Parameter),"Default"]:=This.Arguments[Trim(Parameter),"Default"]+0
-                This.Arguments[Trim(Parameter),"Value"]:=This.Arguments[Trim(Parameter),"Default"]+0
+                ;This.Arguments[Trim(Parameter),"Value"]:=This.Arguments[Trim(Parameter),"Default"]+0
             }
             else if (Details.2="float")
             {
@@ -48,9 +50,59 @@ Class ot
             {
 
             }
+            else if (Details.2="valid_path")
+            {
+                this.Arguments[Trim(Parameter)].SearchPath:=strsplit(this.Arguments[Trim(Parameter)].Other,"=").2
+                ; This.Arguments[Trim(Parameter),"Value"]:=
+            }
             ;This.Arguments[Trim(Parameter),"Control"]:=Details.1
         }
+        this._Adjust()
+        this.AssumeDefaults()
+    }
+    __Init()
+    {
+        ObjRawSet(this,"type","")
+        ObjRawSet(this,"Arguments",[])
         
+    }
+    __Get(Param*)
+    {
+        instance:=this
+        ret:={}
+        for _,key in Param
+        {
+         ret[key]:=this.Arguments[key].Value
+        }
+        return ret
+    }
+    _Adjust()
+    {
+        This.AdjustBools()
+        This.AdjustMinMax()
+        return This
+    }
+
+    AssembleFormatString()
+    {
+        /* TODO: method to generate the equivalence of this (exact this format), so I can simply BuildRScriptContents properly.
+        Str3=
+                    (LTRIM
+                    rmarkdown::word_document(
+                    toc = %bTOC%,
+                    toc_depth = %toc_depth%,
+                    number_sections = %bNumberSect%,
+                    fig_caption = TRUE,
+                    df_print = "default",
+                    highlight = "default",
+                    reference_docx="%template%",
+                    keep_md = FALSE,
+                    md_extensions = NULL,
+                    pandoc_args = NULL
+                    `)
+                    )
+                    output_type[k]:=Clipboard:=Str3
+        */
     }
     AdjustBools()
     {
@@ -60,14 +112,7 @@ Class ot
                 V.Value:=V.Value+0
             if (V.Type="boolean")
                 V.Value:=(V.Value?"TRUE":"FALSE")
-            
         }
-    }
-    Adjust()
-    {
-        This.AdjustBools()
-        This.AdjustMinMax()
-        return This
     }
     AdjustMinMax()
     {
@@ -83,52 +128,84 @@ Class ot
                 V.Value:=V.Min+0
         }
     }
-    __Init()
+    AssumeDefaults()
     {
-        ObjRawSet(this,"type","")
-        ObjRawSet(this,"Arguments",[])
+        for each, V in this.Arguments
+        {
+            if (V.Value="")
+            {
+                if  (V.Control="File")
+                {
+                    if !FileExist(V.SearchPath V.Default)
+                        MsgBox 0x40040, % "output_type: " this.type, % "The default File`n'" V.SearchPath V.Default "'`ndoes not exist. No default set."
+                    else
+                        V.Value:=V.SearchPath V.Default
+                }
+                else
+                    V.Value:=V.Default
+            }
+        }
+    }
+    FileSelect(VarName)
+    {
         
+        FileSelectFile, Chosen, 3,% this.Arguments[VarName].SearchPath,% this.Arguments[VarName].String
+        this.Arguments[VarName].Value:=Chosen
     }
-}
-GenerateGUI(Format)
-{
-    static
-    gui, ParamsGUI: new,
-
-    for each,V in Format.Arguments
-    {
-        Control:=V.Control
-        if (Options="")
-            Options:=""
-        if (Control="Edit")
-        {
-            gui, ParamsGUI: add, text,, % tmp:=V.String
-            V.String:=""
-        }
-        gui, ParamsGUI:add, % Control, % Options " vv" each, % V.String
-        if (Control="Edit")
-        {
-            V.String:=tmp
-        }
-    }
-    gui, add, button, gSubmitDynamicArguments,Submit
-    gui, ParamsGUI:Show,, Dynamic Arguments
-    WinWait, Dynamic Arguments
-    WinWaitClose, Dynamic Arguments
-    for each, V in Format.Arguments
-    {
-        value:=v%each%
-        Format.Arguments[each,"Value"]:=v%each%
-    }
-    return Format
     
+    GenerateGUI()
+    {
+        static
+        gui, ParamsGUI: new,
+
+        for each,V in this.Arguments
+        {
+            Control:=V.Control
+            if (Options="")
+                Options:=""
+            if (Control="Edit")
+            {
+                gui, ParamsGUI: add, text,, % tmp:=V.String
+                ; V.String:=""
+                gui, ParamsGUI: add, % V.Control, % V.Options " vv" each
+            }
+            else if (Control="File")
+            {
+                gui, ParamsGUI:Add, Text,, % V.String
+                ; Func:=ObjBindMethod(this, "FileSelect")
+                Gui, ParamsGUI:Add, button, hwndbutton, % "Select File"
+                onButton := ObjBindMethod(this, "FileSelect",each)
+                GuiControl, ParamsGUI:+g, %button%, % onButton
+                ; gui, ParamsGUI:Add, Button,% "g" Func , % "Select File"
+            }
+            else
+                gui, ParamsGUI:add, % Control, % Options " vv" each, % V.String
+
+            if (Control="Edit")
+            {
+                ; V.String:=tmp
+            }
+        }
+        gui, add, button,hwndSubmitButton,Submit
+        onSubmit:=ObjBindMethod(this, "SubmitDynamicArguments")
+        GuiControl, ParamsGUI:+g,%SubmitButton%, % onSubmit
+        gui, ParamsGUI:Show,, Dynamic Arguments
+        WinWait, Dynamic Arguments
+        WinWaitClose, Dynamic Arguments
+        ; for each, V in this.Arguments
+        ; {
+        ;     value:=v%each%
+        ;     this.Arguments[each,"Value"]:=v%each%
+        ; }
+        return this
+    }
+    SubmitDynamicArguments()
+    {
+        gui, ParamsGui: Submit
+        return this
+    }
 }
 
-SubmitDynamicArguments()
-{
-    gui, ParamsGui: Submit
-    return
-}
 
 m1 := new GMem(0, 20)
 m2 := {base: GMem}.__New(0, 30)
