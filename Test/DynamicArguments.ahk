@@ -185,7 +185,7 @@ Class ot ;; output_type
                 Tail2:=SubStr(ParamString,-2)
                 Value.Value:=DA_Quote(ParamString)
                 if (ParamString="")
-                Value.Value:=DA_Quote(strreplace(ParamBackup,"\","/"))
+                    Value.Value:=DA_Quote(strreplace(Trim(ParamBackup,""""),"\","/"))
             }
             Str.= Parameter " = " Value.Value ",`n"
         }
