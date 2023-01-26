@@ -337,10 +337,32 @@ Class ot ;; output_type
         gui, add, button,hwndSubmitButton,&Submit
         onSubmit:=ObjBindMethod(this, "SubmitDynamicArguments")
         GuiControl, ParamsGUI:+g,%SubmitButton%, % onSubmit
+        gui, add, button, yp xp+60 hwndEditConfig, Edit Configuration
+        onEditConfig:=ObjBindMethod(this, "EditConfig")
+        GuiControl, ParamsGUI:+g,%EditConfig%, % onEditConfig
         gui, ParamsGUI:Show,,% GUIName:=this.GUITitle this.type
         WinWait, % GUIName
         WinWaitClose, % GUIName
         return this
+    }
+    EditConfig()
+    {
+        static
+        gui, ParamsGUI: Submit, NoHide
+        RunWait, % this.ConfigFile,,,PID
+        WinWaitClose, % "ahk_PID" PID
+        Gui +OwnDialogs
+        OnMessage(0x44, "OnMsgBox")
+        MsgBox 0x40044, %  this.ClassName " > " A_ThisFunc "()", You modified the configuration for this class.`nReload?
+        OnMessage(0x44, "")
+
+        IfMsgBox Yes, {
+            reload
+        } Else IfMsgBox No, {
+            
+        }
+
+
     }
     SubmitDynamicArguments()
     {
@@ -387,6 +409,20 @@ Class ot ;; output_type
 
 
 ; --uID:4179423054
+
+DA_OnMsgBox() {
+    DetectHiddenWindows, On
+    Process, Exist
+    If (WinExist("ahk_class #32770 ahk_pid " . ErrorLevel)) {
+        ControlSetText Button1, Reload
+        ControlSetText Button2, Continue with old
+    }
+}
+
+
+
+
+
 
 m1 := new GMem(0, 20)
 m2 := {base: GMem}.__New(0, 30)
