@@ -12,6 +12,7 @@ Class ot ;; output_type
     __New(Format:="",ConfigFile:="")
     {
         this.type:=Format
+        this.ClassName.= Format ")"
         if FileExist(ConfigFile)
             this.ConfigFile:=ConfigFile
         else
@@ -112,7 +113,7 @@ Class ot ;; output_type
         this.Errors:={ ;; negative errors are hard failures, which will not let the program continue. positive errors are positive, and allow limited continuation. Functionality may be limited 
              -1:{String:"Provided Configfile does not exist:`n`n",EndString:"`n`n---`nExiting Script",Criticality:-100}
              ,+2:{String:"Format not defined.`nCheck your configfile.`n`nReturning default 'outputformat()'",Criticality:20}}
-        this.ClassName:="ot - output_type"
+        this.ClassName:="ot ("
         this.GUITitle:="Define output format - "
         this.Version:="0.1.a"
         this.type:=""
