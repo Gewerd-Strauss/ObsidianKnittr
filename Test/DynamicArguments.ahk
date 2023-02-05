@@ -174,8 +174,6 @@ Class ot ;; output_type
                 continue
             if (Value.Type="String") && (Value.Value!="") && (Value.Default!="NULL")
                 Value.Value:=DA_Quote(Value.Value)
-            if (Value.Default="NULL") && (Value.Value="")
-                Value.Value:="NULL"
             if (Parameter="reference_docx")
             {
                 ParamBackup:=Value.Value
@@ -188,15 +186,12 @@ Class ot ;; output_type
                     ParamString:=SubStr(ParamString, 1, tpl_Len)
                 }
                 ParamString:=StrReplace(ParamString, "\", "/")
-                Tail:=SubStr(ParamString,-1)
-                Tail2:=SubStr(ParamString,-2)
                 Value.Value:=DA_Quote(ParamString)
                 if (ParamString="")
                     Value.Value:=DA_Quote(strreplace(Trim(ParamBackup,""""),"\","/"))
             }
             Str.= Parameter " = " Value.Value ",`n"
         }
-        Tail:=SubStr(Str,-2)
         Str:=SubStr(Str,1,StrLen(Str)-2)
         Str.=(Instr(Str,"`n")?"`n)":"")
         this.AssembledFormatString:=Str
@@ -208,18 +203,16 @@ Class ot ;; output_type
         {
             if (V.Control!="DDL") && (V.Control!="DropDownList")
                 continue
-            
         }
     }
     AdjustBools()
     {
         for each, V in this.Arguments
         {
-            if V.Type="Integer" || V.Type="Number" || V.Type="Boolean"
+            if (V.Type="Integer" || V.Type="Number" || V.Type="Boolean")
                 V.Value:=V.Value+0
             if (V.Type="boolean")
                 V.Value:=(V.Value?"TRUE":"FALSE")
-            
         }
     }
     AdjustIntegers()
@@ -256,7 +249,8 @@ Class ot ;; output_type
     {
         for each, V in this.Arguments
         {
-            V.SearchPath:=strreplace(V.SearchPath,"""","")
+            if V.HasKey("SearchPath")
+                V.SearchPath:=strreplace(V.SearchPath,"""","")
             V.String:=strreplace(V.String,"""","")
             if (V.Type="String")
                 V.Default:=strreplace(V.Default,"""","")
