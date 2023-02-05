@@ -105,7 +105,7 @@ main()
         InitialSettings=
         (LTrim
         [Config]
-        bundleAHKRecompileStarter
+        bundleAHKRecompileStarter=0
         Destination=0
         FullLogOnSuccess=0
         obsidianhtml_configfile=%given_obsidianhtml_configfile%
