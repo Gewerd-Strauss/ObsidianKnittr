@@ -138,6 +138,7 @@ Class ot ;; output_type
         This.AdjustMinMax()
         This.AdjustDDLs()
         This.AdjustBools()
+        This.AdjustIntegers()
         return This
     }
 
@@ -216,6 +217,14 @@ Class ot ;; output_type
             if (V.Type="boolean")
                 V.Value:=(V.Value?"TRUE":"FALSE")
             
+        }
+    }
+    AdjustIntegers()
+    {
+        for each, V in this.Arguments
+        {
+            if (V.Type="Integer")
+                V.Value:=Floor(V.Value)
         }
     }
     AdjustMinMax()
