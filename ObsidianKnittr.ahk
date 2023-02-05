@@ -894,7 +894,13 @@ ChooseFile()
         manuscriptpath:=(CF_bool?Clipboard:script.config.searchroot)
     else
     {
-        FileSelectFile, manuscriptpath, 3, % (FileExist(Clipboard)?Clipboard:script.config.config.searchroot)  , % "Choose manuscript file", *.md
+        if script.config.config.SetSearchRootToLastRunManuscriptFolder
+        {
+            SplitPath, % script.config.Lastrun.manuscriptpath,, LastRunDir
+            FileSelectFile, manuscriptpath, 3, % (FileExist(Clipboard)?Clipboard:LastRunDir)  , % "Choose &manuscript file", *.md
+        }
+        else
+            FileSelectFile, manuscriptpath, 3, % (FileExist(Clipboard)?Clipboard:script.config.config.searchroot)  , % "Choose &manuscript file", *.md
         if (manuscriptpath="")
             return
     }
