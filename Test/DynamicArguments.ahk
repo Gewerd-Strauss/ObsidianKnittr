@@ -313,7 +313,9 @@ Class ot ;; output_type
                         continue
                     }
                 }
-                gui, ParamsGUI: add, % V.Control, % V.ctrlOptions " vv" each
+                if !RegexMatch(v.ctrlOptions,"w\d*")
+                    v.ctrlOptions.= " w120"
+                gui, ParamsGUI: add, % V.Control, % V.ctrlOptions " vv" each, % v.Value
             }
             else if (V.Control="File")
             {
