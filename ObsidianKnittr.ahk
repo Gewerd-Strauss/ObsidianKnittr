@@ -575,7 +575,26 @@ ProcessAbstract(NewContents)
     }
     return Rebuild
 }
-
+; ProcessHorizontalBreaks(NewContents)
+; {
+;     Rebuild:=""
+;     Clipboard:=NewContents
+;     Lines:=strsplit(NewContents,"`n")
+;     YAMLCount:=0
+;     for Index,Line in Lines
+;     {
+;         if (Line="---")
+;             YAMLCount++
+;         ; Len:=Len+StrLen(Line)
+;         if Lines[1]="---" && YAMLCount<2
+;         {
+;             Rebuild.=Line "`n"
+;             continue
+;         }
+;         Rebuild.=RegExReplace(Line,"^[-]{3,}","`n---`n") "`n"
+;     }
+;     return Rebuild
+; }
 ProcessTags(NewContents,bRemoveHashTagFromTags)
 {
     if (FileExist(NewContents))
@@ -865,7 +884,7 @@ f_GetSelectedLVEntries()
 ChooseFile()
 {
     global
-    ttip(Clipboard)
+    ;ttip(Clipboard)
     SplitPath, % Clipboard, , , Ext
     if CF_bool:=FileExist(Clipboard) && (Ext="md") && !GetKeyState("LShift","P")
         manuscriptpath:=(CF_bool?Clipboard:script.config.searchroot)
