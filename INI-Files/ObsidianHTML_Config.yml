@@ -5,3 +5,6 @@
 # and so forth. NOTE: DOES NOT APPLY TO INCLUSIONS!
 max_note_depth: 15
 # preserve_inline_tags: False
+toggles:
+  # When true, Obsidianhtml will not add three spaces at the end of every line
+  strict_line_breaks: True
