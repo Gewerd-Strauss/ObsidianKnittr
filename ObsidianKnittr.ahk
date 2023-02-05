@@ -306,8 +306,12 @@ ReadObsidianHTML_Config(configpath)
 
 OpenFolder(Path)
 {
-    SplitPath, % Path,, OutDir
-    run, % OutDir
+    SplitPath, % Path, OutFileName, OutDir
+    SplitPath, % OutDir, OutFileName, OutDir2
+    if script.config.config.OpenParentfolderInstead
+        run, % OutDir2
+    Else
+        run, % OutDir
 }
 
 BuildRScriptContent(Path,output_type,output_filename="",out="")
