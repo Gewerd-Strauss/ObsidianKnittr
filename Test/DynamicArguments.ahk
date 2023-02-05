@@ -141,6 +141,7 @@ Class ot ;; output_type
         This.AdjustDDLs()
         This.AdjustBools()
         This.AdjustIntegers()
+        This.AdjustNulls()
         return This
     }
 
@@ -171,7 +172,7 @@ Class ot ;; output_type
         {
             if (Parameter="toc_depth" && !this.Arguments["toc"].Value) ;|| (Parameter="toc" && !this.Arguments["toc"]Value)
                 continue
-            if (Value.Type="String") && (Value.Value!="") ;&& (Value.Control!="File")
+            if (Value.Type="String") && (Value.Value!="") && (Value.Default!="NULL")
                 Value.Value:=DA_Quote(Value.Value)
             if (Value.Default="NULL") && (Value.Value="")
                 Value.Value:="NULL"
@@ -241,6 +242,14 @@ Class ot ;; output_type
                     V.Value:=V.Max+0
             if V.HasKey(Min) && V.Min>V.Value
                 V.Value:=V.Min+0
+        }
+    }
+    AdjustNulls()
+    {
+        for each, V in this.Arguments
+        {
+            if V.Value="NULL"
+                V.Value:=strreplace(V.Value,"""")
         }
     }
     AssumeDefaults()
