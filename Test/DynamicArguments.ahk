@@ -120,6 +120,7 @@ Class ot ;; output_type
         this.Version:="0.1.a"
         this.type:=""
         this.ConfigFile:=""
+        this.bClosedNoSubmit:=false
         ObjRawSet(this,"type","")
         ObjRawSet(this,"Arguments",{})
     }
@@ -291,7 +292,7 @@ Class ot ;; output_type
             return this
         }
             
-        gui, ParamsGUI: new, +AlwaysOnTop -SysMenu -ToolWindow +caption +Border
+        gui, ParamsGUI: new, +AlwaysOnTop -SysMenu -ToolWindow +caption +Border +LabelotGUI_ +hwndotGUI_
         gui, font, s8
 
         for each,V in this.Arguments
@@ -302,10 +303,9 @@ Class ot ;; output_type
             if (V.Control="Edit")
             {
                 gui, ParamsGUI: add, text,, % tmp:=V.String
-                ; V.String:=""
                 if (V.ctrlOptions="Number") 
                 {
-                    if (v.Max!="") && (v.Min!="") ;&& (v.HasKey(Max) || v.HasKey(Min))
+                    if (v.Max!="") && (v.Min!="")
                     {
                         V.ctrlOptions.= A_Space 
                         Gui, ParamsGUI:Add, Edit
@@ -321,7 +321,6 @@ Class ot ;; output_type
             {
                 gui, ParamsGUI:Add, Text,, % V.String
                 gui, ParamsGUI:Add, edit,  % V.ctrlOptions " vv" each " disabled w200", % V.Value
-                ; Func:=ObjBindMethod(this, "FileSelect")
                 Gui, ParamsGUI:Add, button, hwndbutton, % "Select &File"
                 onButton := ObjBindMethod(this, "FileSelect",each)
                 GuiControl, ParamsGUI:+g, %button%, % onButton
@@ -357,7 +356,13 @@ Class ot ;; output_type
         gui, add, button, yp xp+60 hwndEditConfig, Edit Configuration
         onEditConfig:=ObjBindMethod(this, "EditConfig")
         GuiControl, ParamsGUI:+g,%EditConfig%, % onEditConfig
-        gui, ParamsGUI:Show,,% GUIName:=this.GUITitle this.type
+        onEscape:=ObjBindMethod(this,"otGUI_Escape2")
+        Hotkey, IfWinActive, % "ahk_id " otGUI_
+        Hotkey, Escape,% onEscape
+        if (x!="") && (y!="")
+            gui, ParamsGUI:Show,x%x% y%y%,% GUIName:=this.GUITitle this.type
+        else
+            gui, ParamsGUI:Show,,% GUIName:=this.GUITitle this.type
         WinWait, % GUIName
         WinWaitClose, % GUIName
         return this
@@ -394,7 +399,18 @@ Class ot ;; output_type
         }
         return this
     }
+    otGUI_Escape2()
+    {
+        static
+        gui, ParamsGUI: Submit
+        gui, ParamsGui: destroy
+        ID:=0
+        this.Error:=this.Errors[ID]
+        return this
+    }
 }
+
+
 
 ; --uID:4179423054
  ; Metadata:
