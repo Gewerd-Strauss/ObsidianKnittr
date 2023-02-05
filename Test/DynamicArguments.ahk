@@ -20,7 +20,7 @@ Class ot ;; output_type
         else
         {
             ID:=-1
-            this.Error:=this.Errors[ID].String
+            this.Error:=this.Errors[ID] ;.String
             MsgBox 0x40031,%  this.ClassName " > " A_ThisFunc "()" ,% (this.Errors.HasKey(ID)?this.Errors[ID].String:"Fatal: Undefined Error with ID '" ID "'") "'" ConfigFile "'" (this.Errors[ID].HasKey("EndString")?this.Errors[ID].EndString:"Fatal: Undefined Error with ID '" ID "'")
             ExitApp
             return
@@ -34,7 +34,7 @@ Class ot ;; output_type
         {
             this.Result:=this.type:=Format "()"
             ID:=+2
-            this.Error:=this.Errors[ID].String
+            this.Error:=this.Errors[ID] ;.String
             MsgBox 0x40031,%  this.ClassName " > " A_ThisFunc "()" ,% (this.Errors.HasKey(ID)?this.Errors[ID].String:"Fatal: Undefined Error with ID '" ID "'")
             return this
         }
@@ -113,8 +113,10 @@ Class ot ;; output_type
     __Init()
     {
         this.Errors:={ ;; negative errors are hard failures, which will not let the program continue. positive errors are positive, and allow limited continuation. Functionality may be limited 
-             -1:{String:"Provided Configfile does not exist:`n`n",EndString:"`n`n---`nExiting Script",Criticality:-100}
-             ,+2:{String:"Format not defined.`nCheck your configfile.`n`nReturning default 'outputformat()'",Criticality:20}}
+            
+             -1:{String:"Provided Configfile does not exist:`n`n",EndString:"`n`n---`nExiting Script",Criticality:-100,ID:-1}
+             ,0:{String:"Gui got cancelled",EndString:"`n`n---`nReturning to General Selection",Criticality:0,ID:0}
+             ,+2:{String:"Format not defined.`nCheck your configfile.`n`nReturning default 'outputformat()'",Criticality:20,ID:+2}}
         this.ClassName:="ot ("
         this.GUITitle:="Define output format - "
         this.Version:="0.1.a"

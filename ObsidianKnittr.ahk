@@ -131,6 +131,12 @@ main()
 
     ; 2.2
     out:=guiShow()
+    for each_format,format in out.9
+        if format.HasKey("Error") && (format.Error.ID=0)
+        {
+            Reload
+            ExitApp ;; fucking weird bug. DO NOT remove this exitapp below the reload-command. for some reason, removing it results in the script just ignoring the reload and continuing on as normal under certain situations
+        }
     output_type:=out.1
 
     if (output_type="All") || HasVal(output_type,"All")
@@ -653,7 +659,7 @@ ProcessTags(NewContents,bRemoveHashTagFromTags)
                 if (Tag="")
                     continue
                 rebuild.="- " Tag "`r`n"
-        }
+            }
             ;rebuild.="---"
             Clipboard:=NewContents:=strreplace(NewContents,OrigTags,rebuild)
             Clipboard:=NewContents
@@ -769,6 +775,10 @@ guiShow()
     }
     if (manuscriptpath!="")
         return [sel,manuscriptpath,bVerboseCheckbox + 0,bFullLogCheckbox + 0,bSRCConverterVersion + 0,bKeepFilename + 0,bRenderRMD + 0,bRemoveHashTagFromTags + 0,ChosenTemplate,bTOC+0,toc_depth+0,bNumberSect+0]
+    if IsObject(ot.Errors) && ot.Errors.HasKey(-1)
+    {
+
+    }
     Else
         ExitApp
 }
