@@ -277,7 +277,7 @@ Class ot ;; output_type
         guicontrol,% "ParamsGUI:",v%VarName%, % ChosenName "(" Chosen ")"
     }
     
-    GenerateGUI()
+    GenerateGUI(x:="",y:="")
     {
         ;static
         global

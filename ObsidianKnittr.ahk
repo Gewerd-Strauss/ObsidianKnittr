@@ -257,9 +257,24 @@ main()
     FileAppend, % NewContents,% rmd_Path
     ttip("Creating R-BuildScript",5)
     if bKeepFilename
-        script_contents:=BuildRScriptContent(rmd_Path,output_type,manuscriptName,out)
+        tmp:=BuildRScriptContent(rmd_Path,output_type,manuscriptName,out)
     else
-        script_contents:=BuildRScriptContent(rmd_Path,output_type,,out)
+        tmp:=BuildRScriptContent(rmd_Path,output_type,,out)
+    script_contents:=tmp.1
+    format:=tmp.2
+    if (format!="")
+    {
+        ExecutionLog_Path:=MD_ModTime:=SD_ModTime:=""
+        format:=tmp.2
+		SplitPath, % rmd_Path,, OutDir
+		if FileExist(ExecutionLog_Path:=OutDir "\ExecutionLog.txt")
+		{
+			FileRead,ExecutionLog, % ExecutionLog_Path
+            FileDelete, % ExecutionLog_Path
+            Clipboard:=ExecutionLog:=OK_TF_Replace(ExecutionLog,"Document Settings","Document Settings`n" A_Tab strreplace(format,"`n","`n" A_Tab A_Tab))
+            FileAppend, % ExecutionLog,  %  ExecutionLog_Path
+        }
+    }
     if bRenderRMD
     {
         ttip("Executing R-BuildScript",5)
@@ -318,7 +333,7 @@ BuildRScriptContent(Path,output_type,output_filename="",out="")
 {
     SplitPath, % Path, , Path2, , Name
     RScriptFilePath:=strreplace(Path2,"\","\\")
-    RScriptFolder:=strreplace(Path2,"\","/")
+    , RScriptFolder:=strreplace(Path2,"\","/")
     Str=
     (LTRIM
     getwd()
@@ -331,139 +346,50 @@ BuildRScriptContent(Path,output_type,output_filename="",out="")
 
     )
     Name:=(output_filename!=""?output_filename:"index")
-    if (out!="")
-    {
-        template:=strsplit(out.9,"(").2
-        if SubStr(template,0)=")"
-        {
-            tpl_Len:=StrLen(template)-1
-            template:=SubStr(template, 1, tpl_Len)
-        }
-        template:=StrReplace(template, "\", "/")
-        Clipboard:=template
-        bTOC:=(out.10?"TRUE":"FALSE")
-        toc_depth:=out.11
-        if (toc_depth=0) || (toc_depth="")
-            toc_depth:=10
-        bNumberSect:=(out.12?"TRUE":"FALSE")
-        if IsObject(output_type)
-        {
-            for k,format in output_type
-            {
-                if (format="word_document")
-                {
-                    Str3=
-                    (LTRIM
-                    rmarkdown::word_document(
-                    toc = %bTOC%,
-                    toc_depth = %toc_depth%,
-                    number_sections = %bNumberSect%,
-                    fig_caption = TRUE,
-                    df_print = "default",
-                    highlight = "default",
-                    reference_docx="%template%",
-                    keep_md = FALSE,
-                    md_extensions = NULL,
-                    pandoc_args = NULL
-                    `)
-                    )
-                    output_type[k]:=Clipboard:=Str3
-                }
-            }
-        }
-        else
-        {
-            output_type=
-            (LTRIM
-            rmarkdown::word_document(
-            toc = %bTOC%,
-            toc_depth = %toc_depth%,
-            number_sections = %bNumberSect%,
-            fig_caption = TRUE,
-            df_print = "default",
-            highlight = "default",
-            reference_docx="%template%",
-            keep_md = FALSE,
-            md_extensions = NULL,
-            pandoc_args = NULL
-            \)
-            )
-        }
-    }
-    if IsObject(output_type)
+    , FormatOptions:=""
+    for type,Class in out[9]
     {
         bDoPDFLast:=false
-        for k,format in output_type
+        format:=Class.AssembledFormatString
+        if Instr(format,"pdf_document")
         {
-            if (format="pdf_document")
-            {
-                bDoPDFLast:=true
-                continue
-            }
-            if st_count(format,"`n")>0
-            {
-
-                Str2=
-                (LTRIM
-                
-                rmarkdown::render(`"index.rmd`",%format%,`"%Name%"`)`n
-                )
-            }
-            else
-            {
-
-                Str2=
-                (LTRIM
-                
-                rmarkdown::render(`"index.rmd`",`"%format%`",`"%Name%"`)`n
-                )
-            }
-            Str.=Str2
+            bDoPDFLast:=true
+            continue
         }
-        if bDoPDFLast
-        {
-            Str2=
-            (LTrim
-            
-            rmarkdown::render(`"index.rmd`",`"pdf_document`",`"%Name%"`)`n
-            )
-            Str.=Str2
-        }
-    }
-    else
-    {
-        if (output_type!="")
-        {
-            if st_count(output_type,"`n")>0
-            {
-
-                Str2=
-                (LTRIM
-                
-                rmarkdown::render(`"index.rmd`",format,`"%Name%"`)`n
-                )
-            }
-            else
-            {
-
-                Str2=
-                (LTRIM
-
-                rmarkdown::render(`"index.rmd`",`"%output_type%`",`"%Name%"`)`n
-                )
-            }
-        }
-        else
+        if (format="")
         {
             Str2=
             (LTRIM
-
+            
             rmarkdown::render(`"index.rmd`",NULL,`"%Name%"`)`n
             )
         }
+        else
+        {
+            Str2=
+            (LTRIM
+            
+            rmarkdown::render(`"index.rmd`",%format%,`"%Name%"`)`n
+            )
+        }
+        Str.=Str2
+        FormatOptions.= A_Tab strreplace(format,"`n",A_Tab "`n") "`n`n"
+    }
+    for type, Class in Out[9]
+    {
+        format:=Class.AssembledFormatString
+        if !Instr(format,"pdf_document")
+            continue
+        Str2=
+        (LTrim
+        
+        rmarkdown::render(`"index.rmd`",%format%,`"%Name%"`)`n
+        )
         Str.=Str2
     }
-    return Str
+    Clipboard:=Str
+    return [Str,FormatOptions]
+	
 }
 
 RunRScript(Path,output_type,script_contents,RScript_Path:="")
@@ -762,54 +688,24 @@ guiShow()
     gui,1: show,x%x% y%y%, % script.name " - Choose manuscript"
     enableGuiDrag(1)
     WinWaitClose, % script.name " - Choose manuscript"
-    if (HasVal(sel,"word_document") || sel="word_document")
+    Outputformats:={}
+    for each, format in sel
     {
-        str:=""
-        Loop, Files, % script.config.Config.word_document_referenceLibraryPath "\*.docx", F
-        {
-            SplitPath, % A_LoopFileFullPath, TemplateName, 
-            ttip(A_LoopFileFullPath)
-            str.=TemplateName "(" A_LoopFileFullPath ")" "|"
-        }
-        gui, 2: add, DropDownList, w330 vChosenTemplate, % str
-        gui, 2: add, Checkbox, vbTOC, Add TOC?
-        gui, 2: add, text,, Set toc_depth
-        gui, 2: add, edit, vtoc_depth number
-        gui, 2: add, checkbox, vbNumberSect, Number sections?
-        gui, 2: add, button, gSubmitTemplate, Submit Word-Template
-        if (script.config.LastRun.Chosentemplate!="")
-            guicontrol,, vChosenTemplate, % script.config.LastRun.Chosentemplate
-        if (script.config.LastRun.bTOC!="")
-            guicontrol,,bTOC, % script.config.LastRun.bTOC
-        if (script.config.LastRun.toc_depth!="")
-            guicontrol,,toc_depth, % script.config.LastRun.toc_depth
-        if (script.config.LastRun.bNumberSect!="")
-            guicontrol,,bNumberSect, % script.config.LastRun.bNumberSect
-        gui, 2: show,x%x% y%y%, % script.name " - Choose Template File"
-        WinWaitClose, % script.name " - Choose Template File"
-        if (toc_depth>6)
-            toc_depth:=6
-        script.config.LastRun.Chosentemplate:=ChosenTemplate
-        script.config.LastRun.bTOC:=bTOC
-        script.config.LastRun.toc_depth:=toc_depth
-        script.config.LastRun.bNumberSect:=bNumberSect
+        ot:=new ot(format,A_ScriptDir "\INI-Files\DynamicArguments.ini")
+        ot.GenerateGUI(x,y)
+        ot.AssembleFormatString()
+        Outputformats[format]:=ot
     }
-    if (manuscriptpath!="")
-        return [sel,manuscriptpath,bVerboseCheckbox + 0,bFullLogCheckbox + 0,bSRCConverterVersion + 0,bKeepFilename + 0,bRenderRMD + 0,bRemoveHashTagFromTags + 0,ChosenTemplate,bTOC+0,toc_depth+0,bNumberSect+0]
     if IsObject(ot.Errors) && ot.Errors.HasKey(-1)
     {
 
     }
+    if (manuscriptpath!="") && !ot.bClosedNoSubmit
+        return [sel,manuscriptpath,bVerboseCheckbox + 0,bFullLogCheckbox + 0,bSRCConverterVersion + 0,bKeepFilename + 0,bRenderRMD + 0,bRemoveHashTagFromTags + 0,Outputformats]
     Else
         ExitApp
 }
 
-SubmitTemplate()
-{
-    gui, 2: submit
-    gui, 2: destroy
-    return
-}
 GCEscape()
 {
     guiEscape()
