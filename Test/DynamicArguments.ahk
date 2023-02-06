@@ -188,6 +188,17 @@ Class ot ;; output_type
                 Value.Value:=DA_Quote(ParamString)
                 if (ParamString="")
                     Value.Value:=DA_Quote(strreplace(Trim(ParamBackup,""""),"\","/"))
+                if Instr(ParamBackup,"-||-")
+                    ParamBackup:=Trim(StrSplit(ParamBackup, "-||-").2)
+                if !FileExist(Value.Value) && !FileExist(strreplace(ParamBackup,"\","/"))
+                    Value.Value:=DA_Quote(strreplace(Trim(ParamBackup,""""),"\","/"))
+                if !FileExist(Trim(Value.Value,"""")) && !FileExist(strreplace(ParamBackup,"\","/"))
+                {
+                    MsgBox 0x40031, % "output_type: " this.type " - faulty reference_docx", % "The given path to the reference docx-file`n'" Value.Value  "'`ndoes not exist. Returning."
+                    return
+                }
+
+
             }
             Str.= Parameter " = " Value.Value ",`n"
         }
@@ -274,8 +285,10 @@ Class ot ;; output_type
         this.Arguments[VarName].Value:=Chosen
         gui, ParamsGUI:default
         SplitPath, % Chosen,,,,ChosenName
-        guicontrol,% "ParamsGUI:",v%VarName%, % ChosenName "(" Chosen ")"
+        if (Chosen!="")
+            guicontrol,% "ParamsGUI:",v%VarName%, % ChosenName " -||- " Chosen
     }
+
     OpenFileSelectionFolder(Path)
     {
         SplitPath, % Path, OutFileName, OutDir
