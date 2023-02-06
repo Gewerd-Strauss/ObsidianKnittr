@@ -276,7 +276,12 @@ Class ot ;; output_type
         SplitPath, % Chosen,,,,ChosenName
         guicontrol,% "ParamsGUI:",v%VarName%, % ChosenName "(" Chosen ")"
     }
-    
+    OpenFileSelectionFolder(Path)
+    {
+        SplitPath, % Path, OutFileName, OutDir
+        run, % OutDir
+    }
+
     GenerateGUI(x:="",y:="")
     {
         ;static
@@ -321,9 +326,13 @@ Class ot ;; output_type
             {
                 gui, ParamsGUI:Add, Text,, % V.String
                 gui, ParamsGUI:Add, edit,  % V.ctrlOptions " vv" each " disabled w200", % V.Value
-                Gui, ParamsGUI:Add, button, hwndbutton, % "Select &File"
-                onButton := ObjBindMethod(this, "FileSelect",each)
-                GuiControl, ParamsGUI:+g, %button%, % onButton
+                Gui, ParamsGUI:Add, button, hwndSelectFile, % "Select &File"
+                gui, ParamsGUI:add, button, yp xp+77 hwndOpenFileSelectionFolder, % "Open File Selection Folder"
+                onOpenFileSelectionFolder:=ObjBindMethod(this, "OpenFileSelectionFolder", V.SearchPath)
+                onSelectFile := ObjBindMethod(this, "FileSelect",each)
+                GuiControl, ParamsGUI:+g, %SelectFile%, % onSelectFile
+                GuiControl, ParamsGUI:+g, %OpenFileSelectionFolder%, % onOpenFileSelectionFolder
+                gui, ParamsGUI:add,text, w0 h0 yp+20 xp-77
             }
             else if (V.Control="DDL")
             {
