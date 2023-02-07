@@ -386,6 +386,7 @@ BuildRScriptContent(Path,output_type,output_filename="",out="")
         rmarkdown::render(`"index.rmd`",%format%,`"%Name%"`)`n
         )
         Str.=Str2
+        FormatOptions.= A_Tab strreplace(format,"`n",A_Tab "`n") "`n`n"
     }
     Clipboard:=Str
     return [Str,FormatOptions]
