@@ -382,7 +382,17 @@ BuildRScriptContent(Path,output_type,output_filename="",out="")
             continue
         Str2=
         (LTrim
-        
+        files <- list.files(pattern="*.PNG",recursive = TRUE)
+        files2 <- list.files(pattern="*.png",recursive = TRUE)
+        filesF <- c(files,files2)
+        lapply(filesF,ImgFix  <- function(Path="")
+        {
+        png_image  <- magick::image_read(Path)
+        jpeg_image <- magick::image_convert(png_image,"JPEG")
+        png_image  <- magick::image_convert(jpeg_image,"PNG")
+        magick::image_write(png_image,Path)
+        sprintf( "Fixed Path '`%s'", Path)
+        })
         rmarkdown::render(`"index.rmd`",%format%,`"%Name%"`)`n
         )
         Str.=Str2
