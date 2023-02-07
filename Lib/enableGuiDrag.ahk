@@ -90,10 +90,10 @@
     script.config.GuiPositioning.H:=Height
     Settimer, lSavePos, -800
  	return
-    lSavePos:
-    script.Save()
-    return
- }
+   lSavePos:
+   script.Save()
+   return
+}
 
 
 ; --uID:87004804
