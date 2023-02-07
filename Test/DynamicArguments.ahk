@@ -473,31 +473,3 @@ DA_OnMsgBox() {
         ControlSetText Button2, Continue with old
     }
 }
-
-
-
-
-
-
-m1 := new GMem(0, 20)
-m2 := {base: GMem}.__New(0, 30)
-
-
-
-class GMem
-{
-    __New(aFlags, aSize)
-    {
-        this.ptr := DllCall("GlobalAlloc", "UInt", aFlags, "Ptr", aSize, "Ptr")
-        if !this.ptr
-            return ""
-        MsgBox % "New GMem of " aSize " bytes at address " this.ptr "."
-        return this  ; This line can be omitted when using the 'new' operator.
-    }
-
-    __Delete()
-    {
-        MsgBox % "Delete GMem at address " this.ptr "."
-        DllCall("GlobalFree", "Ptr", this.ptr)
-    }
-}
