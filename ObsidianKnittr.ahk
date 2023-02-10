@@ -154,7 +154,6 @@ main()
             ExitApp ;; fucking weird bug. DO NOT remove this exitapp below the reload-command. for some reason, removing it results in the script just ignoring the reload and continuing on as normal under certain situations
         }
     output_type:=out.1
-    ;m(out[9].word_document)
     if (output_type="All") || HasVal(output_type,"All")
         output_type:=["html_document" , "pdf_document" , "word_document" , "odt_document" , "rtf_document" , "md_document" , "powerpoint_presentation" , "ioslides_presentation" , "tufte::tufte_html" , "github_document"] ;; todo:: add bookdown format support
     if (HasVal(output_type,"First in YAML"))
@@ -444,16 +443,16 @@ BuildAHKScriptContent(Path,script_contents,RScript_Path:="")
         RSCRIPT_PATH:=RScript_Path
         BUILD_RPATH:=strreplace(OutDir "\build.R","\","\\")
         OUTDIR_PATH:=OutDir
-        Ahk_build=
+        AHK_Build=
         (Join`s LTRIM
 
             `nrun, `% `"`"`"%RSCRIPT_PATH%"""
             A_Space """%BUILD_RPATH%"""
             , `% "%OUTDIR_PATH%"
         )
-        if FileExist(OutDir "\AHK_build.ahk")
-            FileDelete, % OutDir "\AHK_build.ahk"
-        FileAppend, % Ahk_build, % OutDir "\AHK_build.ahk"
+        if FileExist(OutDir "\build.ahk")
+            FileDelete, % OutDir "\build.ahk"
+        FileAppend, % AHK_Build, % OutDir "\build.ahk"
     }
     return
 }
@@ -701,7 +700,7 @@ guiCreate()
         guicontrol,, bKeepFilename, % (script.config.LastRun.KeepFileName)
         guicontrol,, bRenderRMD, % (script.config.LastRun.RenderRMD)
         guicontrol,, bRemoveHashTagFromTags, % (script.config.LastRun.RemoveHashTagFromTags)
-        guicontrol,, ChosenFile, % manuscriptname "(" OutFileName ") - " script.config.lastrun.manuscriptpath
+        guicontrol,, ChosenFile, % manuscriptname "(" OutFileName ") -||- " script.config.lastrun.manuscriptpath
     }
     
     return
