@@ -323,6 +323,11 @@ OpenFolder(Path)
 {
     SplitPath, % Path, OutFileName, OutDir
     SplitPath, % OutDir, OutFileName, OutDir2
+    if (WinExist(OutFileName))
+    {
+        WinActivate
+        return
+    }
     if script.config.config.OpenParentfolderInstead
         run, % OutDir2
     Else
