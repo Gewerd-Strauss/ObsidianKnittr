@@ -131,7 +131,23 @@ main()
 
     ; 2.2
     out:=guiShow()
-    for each_format,format in out.9
+    /*
+1 sel
+2 manuscriptpath
+3 Toggles
+    .1 Verbose
+    .2 FullLog
+    .3 SRCConverterVersion
+    .4 KeepFilename
+    .5 RenderRMD
+    .6 RemoveHashTagFromTags
+    .7 UseCustomTOC
+    .8 
+4 Outputformats
+*/
+    ; [sel,manuscriptpath,[bVerboseCheckbox + 0,bFullLogCheckbox + 0,bSRCConverterVersion + 0,bKeepFilename + 0,bRenderRMD + 0,bRemoveHashTagFromTags + 0,bUseCustomTOC + 0],Outputformats]
+
+    for each,format in out.4
         if format.HasKey("Error") && (format.Error.ID=0)
         {
             Reload
@@ -144,17 +160,14 @@ main()
     if (HasVal(output_type,"First in YAML"))
         output_type:=""
     manuscriptpath:=out.2
-    bVerboseCheckbox:=out.3
-    bFullLogCheckbox:=out.4
-    bSRCConverterVersion:=out.5
-    bKeepFilename:=out.6
-    bRenderRMD:=out.7
-    bRemoveHashTagFromTags:=out.8
-    ChosenTemplate:=out.9
-    bToc:=out.10
-    toc_depth:=out.11
-    bNumberSect:=out.12
-    ; 3. 
+    bVerboseCheckbox:=out.3.1
+    bFullLogCheckbox:=out.3.2
+    bSRCConverterVersion:=out.3.3
+    bKeepFilename:=out.3.4
+    bRenderRMD:=out.3.5
+    bRemoveHashTagFromTags:=out.3.6
+    bUseCustomTOC:=out.3.7
+        ; 3. 
     obsidianhtml_configfile:=script.config.config.obsidianhtml_configfile
     manuscriptpath_q:=quote(manuscriptpath)
     SplitPath, % manuscriptpath, OutFileName, manuscriptLocation,, manuscriptName
@@ -352,7 +365,7 @@ BuildRScriptContent(Path,output_type,output_filename="",out="")
     )
     Name:=(output_filename!=""?output_filename:"index")
     , FormatOptions:=""
-    for type,Class in out[9]
+    for type,Class in out[4]
     {
         bDoPDFLast:=false
         format:=Class.AssembledFormatString
@@ -380,7 +393,7 @@ BuildRScriptContent(Path,output_type,output_filename="",out="")
         Str.=Str2
         FormatOptions.= A_Tab strreplace(format,"`n",A_Tab "`n") "`n`n"
     }
-    for type, Class in Out[9]
+    for type, Class in Out[4]
     {
         format:=Class.AssembledFormatString
         if !Instr(format,"pdf_document")
@@ -717,7 +730,7 @@ guiShow()
 
     }
     if (manuscriptpath!="") && !ot.bClosedNoSubmit
-        return [sel,manuscriptpath,bVerboseCheckbox + 0,bFullLogCheckbox + 0,bSRCConverterVersion + 0,bKeepFilename + 0,bRenderRMD + 0,bRemoveHashTagFromTags + 0,Outputformats]
+        return [sel,manuscriptpath,[bVerboseCheckbox + 0,bFullLogCheckbox + 0,bSRCConverterVersion + 0,bKeepFilename + 0,bRenderRMD + 0,bRemoveHashTagFromTags + 0,bUseCustomTOC + 0],Outputformats]
     Else
         ExitApp
 }
