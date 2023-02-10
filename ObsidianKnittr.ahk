@@ -606,6 +606,14 @@ ProcessTags(NewContents,bRemoveHashTagFromTags)
                     continue
                 }
             }
+
+            for ind, Tag in Tags
+            {
+                loop, Parse, % script.config.Config.obsidianTagEndChars
+                {
+                    Tags[ind]:=(InStr(Tags[ind],A_LoopField)?StrSplit(Tags[ind],A_LoopField).1:Tags[ind])
+                }
+            }
             for ind, Tag in Tags
             {
                 if (Tag="") && !Instr(AlreadyReplaced,Tag)
@@ -637,9 +645,8 @@ ProcessTags(NewContents,bRemoveHashTagFromTags)
                 rebuild.="- " Tag "`r`n"
             }
             ;rebuild.="---"
-            Clipboard:=NewContents:=strreplace(NewContents,OrigTags,rebuild)
-            Clipboard:=NewContents
-            Clipboard:=NewContents:=StrReplace(NewContents,"---`r`n---", "`r`n---`r`n",,1)
+            NewContents:=strreplace(NewContents,OrigTags,rebuild)
+            NewContents:=StrReplace(NewContents,"---`r`n---", "`r`n---`r`n",,1)
             Clipboard:=NewContents:=StrReplace(NewContents,"`r`n`r`n", "`r`n",,1)
         }
     }
