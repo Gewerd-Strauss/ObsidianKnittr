@@ -1,9 +1,3 @@
-; #Requires Autohotkey v1.1+
-
-;ProcessTags("C:\Users\Claudius Main\Desktop\TempTemporal\Source for Word-formatting-Template\index.md")
-;ConvertSRC_SYNTAX_V4("C:\Users\Claudius Main\Desktop\TempTemporal\ObsidianHTML Special characters in Image titles\index.md")
-;ConvertSRC_SYNTAX_V3("C:\Users\Claudius Main\Desktop\TempTemporal\BE22 Report Author1\index.md")
-;ConvertSRC_SYNTAX_V2("C:\Users\Claudius Main\Desktop\TempTemporal\ObsidianHTML Special characters in Image titles\index.md")
 ConvertSRC_SYNTAX_V4(PathOrContent) {
     if (FileExist(PathOrContent))
         FileRead buffer, % PathOrContent
