@@ -428,8 +428,10 @@ RunRScript(Path,output_type,script_contents,RScript_Path:="")
     if (RScript_Path="")
         RScript_Path:="C:\Program Files\R\R-4.2.0\bin\Rscript.exe"
     CMD:=quote(RScript_Path) A_Space quote(strreplace(OutDir "\build.R","\","\\"))
-    run, % CMD, % OutDir
-    
+    Run, % CMD, % OutDir, Min, PID
+    WinWait, % "ahk_pid " PID
+    WinWaitClose, % "ahk_pid " PID
+    return
 }
 BuildAHKScriptContent(Path,script_contents,RScript_Path:="")
 {
