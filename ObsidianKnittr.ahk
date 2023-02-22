@@ -331,7 +331,7 @@ OpenFolder(Path)
 {
     SplitPath, % Path, OutFileName, OutDir
     SplitPath, % OutDir, OutFileName, OutDir2
-    if (WinExist(OutFileName))
+    if (WinExist(OutFileName " ahk_exe explorer.exe"))
     {
         WinActivate
         return
@@ -340,6 +340,7 @@ OpenFolder(Path)
         run, % OutDir2
     Else
         run, % OutDir
+    return
 }
 
 BuildRScriptContent(Path,output_type,output_filename="",out="")
