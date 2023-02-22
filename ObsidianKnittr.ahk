@@ -686,9 +686,9 @@ guiCreate()
     ; gui, add, ddl, vDDLval, All||html_document|word_document|odt_document|rtf_document|md_document|
     Gui, add, button, gChooseFile, &Choose Manuscript
     gui, add, edit, w330 vChosenFile hwndChsnFile disabled
-    gui, add, checkbox, vbVerboseCheckbox, Verbose?
+    gui, add, checkbox, vbVerboseCheckbox, Set OHTML's Verbose-Flag?
     gui, add, checkbox, vbFullLogCheckbox, Full Log on successful execution?
-    gui, add, checkbox, vbSRCConverterVersion, Use V2 conversion?
+    ; gui, add, checkbox, vbSRCConverterVersion, Use V2 conversion?
     gui, add, checkbox, vbKeepFilename, Keep Filename?
     gui, add, checkbox, vbRenderRMD, Render RMD to chosen outputs?
     gui, add, checkbox, vbRemoveHashTagFromTags, % "Remove '#' from tags?"
