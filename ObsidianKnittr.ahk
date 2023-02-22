@@ -254,10 +254,7 @@ main()
     rmd_Path:=CopyBack(rmd_Path,script.config.Destination,manuscriptpath)
     ; 7
     ttip("Converting Image SRC's")
-    if bSRCConverterVersion
-        NewContents:=ConvertSRC_SYNTAX_V2(rmd_Path)
-    else
-        NewContents:=ConvertSRC_SYNTAX_V4(rmd_Path)
+    NewContents:=ConvertSRC_SYNTAX_V4(rmd_Path)
     ttip("Processing Tags",5)
     NewContents:=ProcessTags(NewContents,bRemoveHashTagFromTags)
     ttip("Processing Abstract",5)
