@@ -146,24 +146,6 @@ Class ot ;; output_type
 
     AssembleFormatString()
     {
-        /* TODO: method to generate the equivalence of this (exact this format), so I can simply BuildRScriptContents properly.
-        Str3=
-                    (LTRIM
-                    rmarkdown::word_document(
-                    toc = %bTOC%,
-                    toc_depth = %toc_depth%,
-                    number_sections = %bNumberSect%,
-                    fig_caption = TRUE,
-                    df_print = "default",
-                    highlight = "default",
-                    reference_docx="%template%",
-                    keep_md = FALSE,
-                    md_extensions = NULL,
-                    pandoc_args = NULL
-                    `)
-                    )
-                    output_type[k]:=Clipboard:=Str3
-        */
 
         Str:="rmarkdown::" this.type "(`n" ;; start string
         this._Adjust()
