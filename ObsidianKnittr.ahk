@@ -656,7 +656,7 @@ ProcessTags(Contents,bRemoveHashTagFromTags)
 
 guiCreate()
 {
-    global
+    static
     gui, destroy
     PotentialOutputs:=["First in YAML" , "html_document" , "pdf_document" , "word_document" , "odt_document" , "rtf_document" , "md_document" , "powerpoint_presentation" , "ioslides_presentation" , "tufte::tufte_html" , "github_document" , "All"]
     gui_control_options := "xm w220 " . cForeground . " -E0x200"  ; remove border around edit field
