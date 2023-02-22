@@ -986,5 +986,5 @@ Base64PNG_to_HICON( B64, nBytes:="", W:="", H:="" ) {
 #Include, <Quote>
 #Include, <ttip>
 #Include, <OK_TF>
-#Include, %A_ScriptDir%/Test/DynamicArguments.ahk
-#Include, %A_ScriptDir%/SRC_ImageConverter.ahk
+#Include, <DynamicArguments>
+#Include, <SRC_ImageConverter>
