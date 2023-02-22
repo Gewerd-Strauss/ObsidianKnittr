@@ -21,6 +21,7 @@ CreditsRaw=
 author1   -		 snippetName1		   		  			-	URL1
 author2,author3   -		 snippetName1		   		  			-	URL2,URL3
 ScriptObj  							- Gewerd S, original by RaptorX							    - https://github.com/Gewerd-Strauss/ScriptObj/blob/master/ScriptObj.ahk, https://github.com/RaptorX/ScriptObj/blob/master/ScriptObj.ahk
+ttip,
 )
 FileGetTime, ModDate,%A_ScriptFullPath%,M
 FileGetTime, CrtDate,%A_ScriptFullPath%,C
@@ -203,7 +204,6 @@ main()
             }
             Else
             {
-                Clipboard:=result
                 FileDelete, % A_ScriptDir "\Executionlog.txt"
                 FileAppend, % GeneralInfo ObsidianKnittr_Info ObsidianHTML_Info "`n`nIssued Command:`n" Cmd "`n---`n`nCommand Line output below:`n`n" result, % A_ScriptDir "\Executionlog.txt"
                 run, % A_ScriptDir "\Executionlog.txt"
@@ -229,7 +229,6 @@ main()
                 }
                 Else
                 {
-                    Clipboard:=result
                     FileDelete, % A_ScriptDir "\Executionlog.txt"
                     FileAppend, % GeneralInfo ObsidianKnittr_Info ObsidianHTML_Info "`n`nIssued Command:`n" Cmd "`n---`n`nCommand Line output below:`n`n" result, % A_ScriptDir "\Executionlog.txt"
                     run, % A_ScriptDir "\Executionlog.txt"
@@ -241,7 +240,6 @@ main()
                 script.config.version.ObsidianHTML_Version:=ObsidianHTML_Version:=RegexReplace(ComObjCreate("WScript.Shell").Exec("obsidianhtml version").StdOut.ReadAll(),"\s*")
                 ObsidianKnittr_Info.= "`nOutput Folder: " GetOutputPath(ConvertMDToRMD(vMDPath,"index"),script.config.Destination,manuscriptpath).1 "`nRaw input copy:" GetOutputPath(ConvertMDToRMD(vMDPath,"index"),script.config.Destination,manuscriptpath).2 "`n"
                 ObsidianHTML_Info:="`nObsidianHTML:`nVersion: " ObsidianHTML_Version "`nInput:`n" manuscriptpath "`nOutput Folder:`n" vMDPath "`nConfig:`n" obsidianhtml_configfile "`n---`n"
-                Clipboard:=result
                 FileDelete, % A_ScriptDir "\Executionlog.txt"
                 FileAppend, % GeneralInfo ObsidianKnittr_Info ObsidianHTML_Info "`n`nIssued Command:`n" Cmd "`n---`n`nCommand Line output below:`n`n" result, % A_ScriptDir "\Executionlog.txt"
                 run, % A_ScriptDir "\Executionlog.txt"
@@ -283,7 +281,7 @@ main()
 		{
 			FileRead,ExecutionLog, % ExecutionLog_Path
             FileDelete, % ExecutionLog_Path
-            Clipboard:=ExecutionLog:=OK_TF_Replace(ExecutionLog,"Document Settings","Document Settings`n" A_Tab strreplace(format,"`n","`n" A_Tab A_Tab))
+            ExecutionLog:=OK_TF_Replace(ExecutionLog,"Document Settings","Document Settings`n" A_Tab strreplace(format,"`n","`n" A_Tab A_Tab))
             FileAppend, % ExecutionLog,  %  ExecutionLog_Path
         }
     }
@@ -294,6 +292,7 @@ main()
     }
     Else
     {
+        ttip("Opening RMD-File",5)
         SplitPath, % rmd_Path, OutFileName, OutDir
         FileDelete, % OutDir "\build.R"
         FileAppend, % script_contents, % OutDir "\build.R"
@@ -415,7 +414,6 @@ BuildRScriptContent(Path,output_type,output_filename="",out="")
         Str.=Str2
         FormatOptions.= A_Tab strreplace(format,"`n",A_Tab "`n") "`n`n"
     }
-    Clipboard:=Str
     return [Str,FormatOptions]
 	
 }
@@ -515,17 +513,17 @@ fRemoveTempDir(md_Path)
     }
     return
 }
-ProcessAbstract(NewContents)
+ProcessAbstract(Contents)
 {
-    if (FileExist(NewContents))
-        FileRead NewContents, % NewContents
-    Lines:=Strsplit(NewContents,"`r`n")
+    if (FileExist(Contents))
+        FileRead Contents, % Contents
+    Lines:=Strsplit(Contents,"`r`n")
     , Rebuild:=""
     for index, Line in Lines
     {
         if (st_count(Rebuild,"`n")>1)
         {
-            Clipboard:=Rebuild.="`n" Line
+            Rebuild.="`n" Line
             continue
         }
         if (!Instr(Rebuild,"abstract"))
@@ -535,11 +533,11 @@ ProcessAbstract(NewContents)
     }
     return Rebuild
 }
-; ProcessHorizontalBreaks(NewContents)
+; ProcessHorizontalBreaks(Contents)
 ; {
 ;     Rebuild:=""
-;     Clipboard:=NewContents
-;     Lines:=strsplit(NewContents,"`n")
+;     Clipboard:=Contents
+;     Lines:=strsplit(Contents,"`n")
 ;     YAMLCount:=0
 ;     for Index,Line in Lines
 ;     {
@@ -555,14 +553,14 @@ ProcessAbstract(NewContents)
 ;     }
 ;     return Rebuild
 ; }
-ProcessTags(NewContents,bRemoveHashTagFromTags)
+ProcessTags(Contents,bRemoveHashTagFromTags)
 {
-    if (FileExist(NewContents))
-        FileRead NewContents, % NewContents
+    if (FileExist(Contents))
+        FileRead Contents, % Contents
     AlreadyReplaced:=""
-    if Instr(NewContents,"_obsidian_pattern")
+    if Instr(Contents,"_obsidian_pattern")
     {
-        Tags:=Strsplit(NewContents,"tags:").2
+        Tags:=Strsplit(Contents,"tags:").2
 
         ;; eliminate duplicates
         Lines:=strsplit(Tags,"`r`n")
@@ -582,14 +580,14 @@ ProcessTags(NewContents,bRemoveHashTagFromTags)
             Needle:="``{_obsidian_pattern_tag_" Tag "}``"
             if bRemoveHashTagFromTags
             {
-                NewContents:=Strreplace(NewContents,Needle,Tag)
-                if Instr(NewContents,Tag) && !Instr(NewContents,Needle)
+                Contents:=Strreplace(Contents,Needle,Tag)
+                if Instr(Contents,Tag) && !Instr(Contents,Needle)
                     Tags:=""
             }
             else
             {
-                NewContents:=Strreplace(NewContents,Needle,"#" Tag)
-                if Instr(NewContents,"#" Tag)
+                Contents:=Strreplace(Contents,Needle,"#" Tag)
+                if Instr(Contents,"#" Tag)
                     Tags:=""
             }
             AlreadyReplaced.=Tag "`n"
@@ -623,18 +621,18 @@ ProcessTags(NewContents,bRemoveHashTagFromTags)
                 Needle:="``{_obsidian_pattern_tag_" Tag "}``"
                 if bRemoveHashTagFromTags
                 {
-                    if !Instr(NewContents,Needle)
+                    if !Instr(Contents,Needle)
                         continue
-                    NewContents:=Strreplace(NewContents,Needle,Tag)
-                    if Instr(NewContents,Tag) && !Instr(NewContents,Needle)
+                    Contents:=Strreplace(Contents,Needle,Tag)
+                    if Instr(Contents,Tag) && !Instr(Contents,Needle)
                         Tags[Ind]:=""
                 }
                 else
                 {
-                    if !Instr(NewContents,Needle)
+                    if !Instr(Contents,Needle)
                         continue
-                    NewContents:=Strreplace(NewContents,Needle,"#" Tag)
-                    if Instr(NewContents,"#" Tag)
+                    Contents:=Strreplace(Contents,Needle,"#" Tag)
+                    if Instr(Contents,"#" Tag)
                         Tags[Ind]:=""
                 }
                 AlreadyReplaced.=Tag "`n"
@@ -647,13 +645,13 @@ ProcessTags(NewContents,bRemoveHashTagFromTags)
                 rebuild.="- " Tag "`r`n"
             }
             ;rebuild.="---"
-            NewContents:=strreplace(NewContents,OrigTags,rebuild)
-            NewContents:=StrReplace(NewContents,"---`r`n---", "`r`n---`r`n",,1)
-            Clipboard:=NewContents:=StrReplace(NewContents,"`r`n`r`n", "`r`n",,1)
+            Contents:=strreplace(Contents,OrigTags,rebuild)
+            Contents:=StrReplace(Contents,"---`r`n---", "`r`n---`r`n",,1)
+            Contents:=StrReplace(Contents,"`r`n`r`n", "`r`n",,1)
         }
     }
     
-    return NewContents
+    return Contents
 }
 
 guiCreate()
@@ -821,7 +819,6 @@ f_GetSelectedLVEntries()
 ChooseFile()
 {
     global
-    ;ttip(Clipboard)
     SplitPath, % Clipboard, , , Ext
     if CF_bool:=FileExist(Clipboard) && (Ext="md") && !GetKeyState("LShift","P")
         manuscriptpath:=(CF_bool?Clipboard:script.config.searchroot)
