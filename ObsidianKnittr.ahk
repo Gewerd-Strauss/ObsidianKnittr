@@ -817,6 +817,12 @@ f_GetSelectedLVEntries()
 ChooseFile()
 {
     global
+    if FileExist(r:=strreplace(Clipboard,"/","\"))
+        Clipboard:=strreplace(Clipboard,"/","\")
+    else if FileExist(r:=strreplace(Clipboard,"/","\"))
+        Clipboard:=strreplace(Clipboard,"/","\")
+	else
+		ttip("Clipboard does not contain a valid path.")
     SplitPath, % Clipboard, , , Ext
     if CF_bool:=FileExist(Clipboard) && (Ext="md") && !GetKeyState("LShift","P")
         manuscriptpath:=(CF_bool?Clipboard:script.config.searchroot)
