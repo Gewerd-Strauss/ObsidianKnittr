@@ -779,6 +779,8 @@ guiSubmit()
             bFullLogCheckbox:=script.config.LastRun.FullLog+0  
         }
     }
+    if !FileExist(manuscriptpath)
+        manuscriptpath:=ChooseFile()
     script.config.LastRun.manuscriptpath:=manuscriptpath
     script.config.LastRun.last_output_type:=""
     script.config.LastRun.Verbose:=bVerboseCheckbox+0
