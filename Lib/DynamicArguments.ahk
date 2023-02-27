@@ -9,10 +9,11 @@ ExitApp
 Class ot ;; output_type
 {
     
-    __New(Format:="",ConfigFile:="")
+    __New(Format:="",ConfigFile:="",DDL_ParamDelimiter:="-<>-")
     {
         this.type:=Format
         this.ClassName.= Format ")"
+        this.DDL_ParamDelimiter:=DDL_ParamDelimiter
         if FileExist(ConfigFile)
             this.ConfigFile:=ConfigFile
         else
@@ -170,8 +171,8 @@ Class ot ;; output_type
                 Value.Value:=DA_Quote(ParamString)
                 if (ParamString="")
                     Value.Value:=DA_Quote(strreplace(Trim(ParamBackup,""""),"\","/"))
-                if Instr(ParamBackup,"-||-")
-                    ParamBackup:=Trim(StrSplit(ParamBackup, "-||-").2)
+                if Instr(ParamBackup,this.DDL_ParamDelimiter)
+                    ParamBackup:=Trim(StrSplit(ParamBackup, this.DDL_ParamDelimiter).2)
                 if !FileExist(Value.Value) && !FileExist(strreplace(ParamBackup,"\","/"))
                     Value.Value:=DA_Quote(strreplace(Trim(ParamBackup,""""),"\","/"))
                 if !FileExist(Trim(Value.Value,"""")) && !FileExist(strreplace(ParamBackup,"\","/"))
