@@ -20,7 +20,7 @@ ConvertSRC_SYNTAX_V4(PathOrContent) {
             options .= "fig.cap='" Clean(match.alt) "', "
         if (match.title)
             options .= "fig.title='" Clean(match.title) "', "
-        options := RTrim(options, ", ")
+        options := RTrim(options, ", ") ;; TODO: src and others may contain faulty strings when converting umlaute
         tpl =
             (LTrim
 
@@ -54,13 +54,13 @@ Clean(sText) {
     return sText
 }
 
-; DecodeEntities(sText) {
-;     return _Decode(sText, 1)
-; }
+DecodeEntities(sText) {
+    return _Decode(sText, 1)
+}
 
-; DecodeUriComponent(sText) {
-;     return _Decode(sText, 2)
-; }
+DecodeUriComponent(sText) {
+    return _Decode(sText, 2)
+}
 
 
 
@@ -111,13 +111,13 @@ ConvertSRC_SYNTAX_V3(PathOrContent) { ;; converts % propely, does not recognise 
     return buffer
 }
 
-DecodeEntities(sText) {
-    return _Decode(sText, 1)
-}
+; DecodeEntities(sText) {
+;     return _Decode(sText, 1)
+; }
 
-DecodeUriComponent(sText) {
-    return _Decode(sText, 2)
-}
+; DecodeUriComponent(sText) {
+;     return _Decode(sText, 2)
+; }
 
 ; nMode
 ; 1 = HTML entity decode
