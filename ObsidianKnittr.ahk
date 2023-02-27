@@ -260,7 +260,11 @@ main()
     NewContents:=ProcessAbstract(NewContents)
     ; NewContents:=ProcessHorizontalBreaks(NewContents)
     FileDelete, % rmd_Path 
-    FileAppend, % NewContents,% rmd_Path
+    ; Current_FileEncoding:=A_FileEncoding
+    ; FileEncoding, UTF-8
+    WriteFile(rmd_Path,Clipboard:=NewContents,"UTF-8",,true)
+    ; FileAppend, % Clipboard:=NewContents,% rmd_Path
+    ; FileEncoding, % Current_FileEncoding
     ttip("Creating R-BuildScript",5)
     if bKeepFilename
         tmp:=BuildRScriptContent(rmd_Path,output_type,manuscriptName,out)
@@ -291,7 +295,8 @@ main()
         ttip("Opening RMD-File",5)
         SplitPath, % rmd_Path, OutFileName, OutDir
         FileDelete, % OutDir "\build.R"
-        FileAppend, % script_contents, % OutDir "\build.R"
+        WriteFile(OutDir "\build.R",script_contents,"UTF-8",,true)
+        ; FileAppend, % script_contents, % OutDir "\build.R"
         run, % rmd_Path
     }
     ttip("Building AHK-Starterscript",5)
@@ -414,16 +419,41 @@ BuildRScriptContent(Path,output_type,output_filename="",out="")
     return [Str,FormatOptions]
 	
 }
-
+WriteFile(Path,Content,Encoding:="",Flags:=0x2,bSafeOverwrite:=false) ;; decide if you want to use fapp (which is synonymous as I am currently deleting every file beforehand anyways), or use write-flag and forego the delete beforehand.
+{
+    if (bSafeOverwrite && FileExist(Path))  ;; if we want to ensure nonexistance.
+        FileDelete, % Path
+    if (Encoding!="")
+    {
+        if (fObj:=FileOpen(Path,Flags,Encoding))
+        {
+            fObj.Write(Content) ;; insert contents
+            fObj.Close()        ;; close file
+        }
+        else
+            throw Exception("File could not be opened. Flags:`n" Flags, -1, myFile)
+    }
+    else
+    {
+        if (fObj:=FileOpen(Path,Flags))
+        {
+            fObj.Write(Content) ;; insert contents
+            fObj.Close()        ;; close file
+        }
+        else
+            throw Exception("File could not be opened. Flags:`n" Flags, -1, myFile)
+    }
+    return
+}
 RunRScript(Path,output_type,script_contents,RScript_Path:="")
 {
     SplitPath, % Path, OutFileName, OutDir
     FileDelete, % OutDir "\build.R"
-    FileAppend, % script_contents, % OutDir "\build.R"
-    if (RScript_Path="")
-        RScript_Path:="C:\Program Files\R\R-4.2.0\bin\Rscript.exe"
-    CMD:=quote(RScript_Path) A_Space quote(strreplace(OutDir "\build.R","\","\\"))
-    Run, % CMD, % OutDir, Min, PID
+    WriteFile(OutDir "\build.R",script_contents,"UTF-8-RAW",,true)
+    ; FileAppend, % script_contents, % OutDir "\build.R"
+
+    Clipboard:=CMD:=quote(RScript_Path) A_Space quote(strreplace(OutDir "\build.R","\","\\")) ;; works with valid codefile (manually ensured no utf-corruption) from cmd, all three work for paths not containing umlaute with FileAppend
+    Run, % CMD, % OutDir, , PID
     WinWait, % "ahk_pid " PID
     WinWaitClose, % "ahk_pid " PID
     return
@@ -449,7 +479,8 @@ BuildAHKScriptContent(Path,script_contents,RScript_Path:="")
         )
         if FileExist(OutDir "\build.ahk")
             FileDelete, % OutDir "\build.ahk"
-        FileAppend, % AHK_Build, % OutDir "\build.ahk"
+        WriteFile(OutDir "\build.ahk",AHK_Build,"UTF-8",,true)
+        ; FileAppend, % AHK_Build, % OutDir "\build.ahk"
     }
     return
 }
@@ -462,7 +493,8 @@ CopyBack(Source,Destination,manuscriptpath)
         if FileExist(Destination "\" manuscriptname "\") ;; make sure the output is clean
             FileRemoveDir, % Destination "\" manuscriptname "\", true
         FileCopyDir, % Dir, % Output_Path:=Destination "\" manuscriptname "\", true
-        FileAppend,% manuscriptcontent, % Output_Path "\index.md"
+        WriteFile(Output_Path "\index.md",Clipboard:=manuscriptcontent,,,true)
+        ; FileAppend,% Clipboard:=manuscriptcontent, % Output_Path "\index.md"
         FileCopy, % manuscriptpath, % Output_Path "\" manuscriptname "_vault.md", 1
     }
     Else
