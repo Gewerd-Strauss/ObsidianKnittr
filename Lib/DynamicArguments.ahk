@@ -379,7 +379,7 @@ Class ot ;; output_type
         RunWait, % this.ConfigFile,,,PID
         WinWaitClose, % "ahk_PID" PID
         Gui +OwnDialogs
-        OnMessage(0x44, "OnMsgBox")
+        OnMessage(0x44, "DA_OnMsgBox")
         MsgBox 0x40044, %  this.ClassName " > " A_ThisFunc "()", You modified the configuration for this class.`nReload?
         OnMessage(0x44, "")
 
