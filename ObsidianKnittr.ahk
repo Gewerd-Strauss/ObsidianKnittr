@@ -681,9 +681,20 @@ guiCreate()
         Options:=((Instr(script.config.lastrun.last_output_type,v))?"Check":"-Check")
         LV_Add(Options,v)
     }
+    HistoryString:=""
+    for each, File in script.config.DDLHistory
+    {
+        SplitPath, % File, , OutDir, , FileName
+        SplitPath, % OutDir,OutFilename
+        HistoryString.=((each=1)?"":"|") FileName "(" OutFileName ")" " -<>- " File
+        if (each=1)
+            HistoryString.="|"
+    }
     ; gui, add, ddl, vDDLval, All||html_document|word_document|odt_document|rtf_document|md_document|
     Gui, add, button, gChooseFile, &Choose Manuscript
-    gui, add, edit, w330 vChosenFile hwndChsnFile disabled
+    DDLRows:=script.config.Config.HistoryLimit
+    gui, add, DDL, w330 vChosenFile hwndChsnFile r%DDLRows%, %  HistoryString
+    ; gui, add, edit, w330 vChosenFile hwndChsnFile disabled
     gui, add, checkbox, vbVerboseCheckbox, Set OHTML's Verbose-Flag?
     gui, add, checkbox, vbFullLogCheckbox, Full Log on successful execution?
     ; gui, add, checkbox, vbSRCConverterVersion, Use V2 conversion?
@@ -705,7 +716,6 @@ guiCreate()
         guicontrol,, bKeepFilename, % (script.config.LastRun.KeepFileName)
         guicontrol,, bRenderRMD, % (script.config.LastRun.RenderRMD)
         guicontrol,, bRemoveHashTagFromTags, % (script.config.LastRun.RemoveHashTagFromTags)
-        guicontrol,, ChosenFile, % manuscriptname "(" OutFileName ") -||- " script.config.lastrun.manuscriptpath
     }
     
     return
@@ -724,7 +734,7 @@ guiShow()
     Outputformats:={}
     for each, format in sel
     {
-        ot:=new ot(format,A_ScriptDir "\INI-Files\DynamicArguments.ini")
+        ot:=new ot(format,A_ScriptDir "\INI-Files\DynamicArguments.ini","-<>-")
         ot.GenerateGUI(x,y)
         ot.AssembleFormatString()
         Outputformats[format]:=ot
@@ -789,6 +799,7 @@ guiSubmit()
     script.config.LastRun.KeepFileName:=bKeepFilename+0
     script.config.LastRun.RenderRMD:=bRenderRMD+0
     script.config.LastRun.RemoveHashTagFromTags:=bRemoveHashTagFromTags+0
+    script.config.DDLHistory:=buildHistory(script.config.DDLHistory,script.config.Config.HistoryLimit,script.config.LastRun.manuscriptpath)
     
     for k,v in sel
     {
@@ -801,7 +812,18 @@ guiSubmit()
     script.save()
     return [DDLval,manuscriptpath,sel]  
 }
-
+buildHistory(History,NumberOfRecords,manuscriptpath:="")
+{
+    if (manuscriptpath!="")
+    {
+        if HasVal(History,manuscriptpath)
+            History.RemoveAt(HasVal(History,manuscriptpath),1)
+        History.InsertAt(1,manuscriptpath)
+    }
+    if (History.Count()>NumberOfRecords)
+        History.Delete(NumberOfRecords+1,History.Count())
+    return History
+}
 f_GetSelectedLVEntries()
 {
     vRowNum:=0
@@ -842,7 +864,21 @@ ChooseFile()
     }
     SplitPath, % manuscriptpath, , OutDir, , manuscriptname,
     SplitPath, % OutDir, OutFileName,
-    guicontrol,, ChosenFile, % manuscriptname "(" OutFileName ") - " manuscriptpath
+    
+    script.config.DDLHistory:=buildHistory(script.config.DDLHistory,script.config.Config.HistoryLimit,manuscriptpath)
+    HistoryString:=""
+    for each, File in script.config.DDLHistory
+    {
+        SplitPath, % File, , OutDir, , FileName
+        SplitPath, % OutDir,OutFilename
+        HistoryString.=((each=1)?"":"|") FileName "(" OutFileName ")" " -<>- " File
+        if (each=1)
+            HistoryString.="|"
+    }
+    ; GuiControl,, ChosenFile,""
+    GuiControl,, ChosenFile, |
+    guicontrol,, ChosenFile, % HistoryString
+    ; guicontrol,ChooseString, ChosenFile, % script.config.DDLHistory.1
     return manuscriptpath
 }
 
