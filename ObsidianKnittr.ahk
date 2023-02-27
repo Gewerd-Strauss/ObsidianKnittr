@@ -443,8 +443,8 @@ BuildAHKScriptContent(Path,script_contents,RScript_Path:="")
         OUTDIR_PATH:=OutDir
         AHK_Build=
         (Join`s LTRIM
-
-            `nrun, `% `"`"`"%RSCRIPT_PATH%"""
+            #Requires AutoHotkey v1.1.36+
+            `nrun, `% Clipboard:=`"`"`"%RSCRIPT_PATH%"""
             A_Space """%BUILD_RPATH%"""
             , `% "%OUTDIR_PATH%"
         )
