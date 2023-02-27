@@ -1,6 +1,11 @@
 ConvertSRC_SYNTAX_V4(PathOrContent) {
     if (FileExist(PathOrContent))
+    {
+        Current_FileEncoding:=A_FileEncoding
+        FileEncoding, UTF-8
         FileRead buffer, % PathOrContent
+        FileEncoding, % Current_FileEncoding
+    }
     else
         buffer := PathOrContent
     p := 1
