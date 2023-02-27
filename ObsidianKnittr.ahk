@@ -169,7 +169,6 @@ main()
     bUseCustomTOC:=out.3.7
         ; 3. 
     obsidianhtml_configfile:=script.config.config.obsidianhtml_configfile
-    manuscriptpath_q:=quote(manuscriptpath)
     SplitPath, % manuscriptpath, OutFileName, manuscriptLocation,, manuscriptName
     Verbose:=(bVerboseCheckbox?" -v ":" ")
     cmd =
@@ -254,7 +253,7 @@ main()
     rmd_Path:=CopyBack(rmd_Path,script.config.Destination,manuscriptpath)
     ; 7
     ttip("Converting Image SRC's")
-    NewContents:=ConvertSRC_SYNTAX_V4(rmd_Path)
+    Clipboard:=NewContents:=ConvertSRC_SYNTAX_V4(rmd_Path)
     ttip("Processing Tags",5)
     NewContents:=ProcessTags(NewContents,bRemoveHashTagFromTags)
     ttip("Processing Abstract",5)
