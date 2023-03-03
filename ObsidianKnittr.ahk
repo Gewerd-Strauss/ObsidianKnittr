@@ -690,7 +690,7 @@ guiCreate()
     PotentialOutputs:=["First in YAML" , "html_document" , "pdf_document" , "word_document" , "odt_document" , "rtf_document" , "md_document" , "powerpoint_presentation" , "ioslides_presentation" , "tufte::tufte_html" , "github_document" , "All"]
     gui_control_options := "xm w220 " . cForeground . " -E0x200"  ; remove border around edit field
     Gui, Margin, 16, 16
-    Gui, +AlwaysOnTop -SysMenu -ToolWindow -caption +Border +LabelGC
+    Gui, +AlwaysOnTop -SysMenu -ToolWindow -caption +Border +LabelGC +hwndOKGui
     cBackground := "c" . "1d1f21"
     cCurrentLine := "c" . "282a2e"
     cSelection := "c" . "373b41"
@@ -734,6 +734,11 @@ guiCreate()
     gui, add, checkbox, vbRemoveHashTagFromTags, % "Remove '#' from tags?"
     Gui, Font, s7 cWhite, Verdana
     gui, add, button, gGCSubmit, &Submit
+    onOpenConfig:=Func("EditMainConfig").Bind(script.configfile)
+    gui, add, button,  hwndOpenConfig yp xp+80, Edit General Configuration
+    GuiControl, +g,%OpenConfig%, % onOpenConfig
+    ;     ; gui, add, button, yp xp+60 hwndEditConfig, Edit Configuration
+    ;     ; onEditConfig:=ObjBindMethod(this, "EditConfig")
     Gui, Add, Text,x25,% "v." script.version " | Author: " script.author " | Obsidian-HTML: " script.config.version.ObsidianHTML_Version
 
     ; script.config.lastrun.last_output_type:=["html_document","word_document"]
@@ -868,6 +873,25 @@ f_GetSelectedLVEntries()
         sel.push(sCurrText1)
     }
     return sel
+}
+EditMainConfig(configfile)
+{
+    static
+    gui, Submit, NoHide
+    RunWait, % configfile,,,PID
+    WinWaitClose, % "ahk_PID" PID
+    Gui +OwnDialogs
+    OnMessage(0x44, "DA_OnMsgBox")
+    MsgBox 0x40044, %  this.ClassName " > " A_ThisFunc "()", You modified the configuration for this class.`nReload?
+    OnMessage(0x44, "")
+
+    IfMsgBox Yes, {
+        reload
+    } Else IfMsgBox No, {
+        
+    }
+
+
 }
 ChooseFile()
 {
