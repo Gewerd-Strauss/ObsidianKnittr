@@ -295,7 +295,7 @@ main()
         ttip("Opening RMD-File",5)
         SplitPath, % rmd_Path, OutFileName, OutDir
         FileDelete, % OutDir "\build.R"
-        WriteFile(OutDir "\build.R",script_contents,"UTF-8",,true)
+        WriteFile(OutDir "\build.R",script_contents,"UTF-8-RAW",,true)
         ; FileAppend, % script_contents, % OutDir "\build.R"
         run, % rmd_Path
     }
@@ -753,7 +753,6 @@ guiCreate()
         guicontrol,, bRenderRMD, % (script.config.LastRun.RenderRMD)
         guicontrol,, bRemoveHashTagFromTags, % (script.config.LastRun.RemoveHashTagFromTags)
     }
-    
     return
 }
 guiShow()
