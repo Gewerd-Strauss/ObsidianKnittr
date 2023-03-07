@@ -805,6 +805,9 @@ guiSubmit()
     sel:=f_GetSelectedLVEntries()
     gui, submit
     gui, destroy
+    if Instr(ChosenFile,"-<>-")
+        ChosenFile:=Trim(StrSplit(chosenFile,"-<>-").2)
+    manuscriptpath:=ChosenFile
     if (script.config.LastRun.manuscriptpath!="") && (manuscriptpath="")
     {
         manuscriptpath:=script.config.LastRun.manuscriptpath
