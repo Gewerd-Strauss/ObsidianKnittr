@@ -159,13 +159,19 @@ Class ot ;; output_type
             if (Parameter="reference_docx")
             {
                 ParamBackup:=Value.Value
-                ParamBackup:=Value.Value
-                ParamString:=strsplit(Value.Value,"(").2
-                ParamString:=Trim(ParamString,"""")
-                if SubStr(ParamString,0)=")"
+                if Instr(Value.Value,this.DDL_ParamDelimiter)
+                    ParamString:=strsplit(Value.Value,this.DDL_ParamDelimiter).2
+                else
+                    ParamString:=Value.Value
+                if Instr(ParamString,"(")
                 {
-                    tpl_Len:=StrLen(ParamString)-1
-                    ParamString:=SubStr(ParamString, 1, tpl_Len)
+                    ParamString:=strsplit(ParamString,"(").2
+                    ParamString:=Trim(ParamString,"""")
+                    if SubStr(ParamString,0)=")"
+                    {
+                        tpl_Len:=StrLen(ParamString)-1
+                        ParamString:=SubStr(ParamString, 1, tpl_Len)
+                    }
                 }
                 ParamString:=StrReplace(ParamString, "\", "/")
                 Value.Value:=DA_Quote(ParamString)
