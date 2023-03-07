@@ -275,7 +275,7 @@ Class ot ;; output_type
         gui, ParamsGUI:default
         SplitPath, % Chosen,,,,ChosenName
         if (Chosen!="")
-            guicontrol,% "ParamsGUI:",v%VarName%, % ChosenName " -||- " Chosen
+            guicontrol,% "ParamsGUI:",v%VarName%, % ChosenName A_Space this.DDL_ParamDelimiter A_Space Chosen
     }
 
     OpenFileSelectionFolder(Path)
