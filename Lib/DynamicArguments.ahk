@@ -262,7 +262,7 @@ Class ot ;; output_type
         }
     }
 
-    FileSelect(VarName)
+    ChooseFile(VarName)
     {
         FileSelectFile, Chosen, 3,% this.Arguments[VarName].SearchPath,% this.Arguments[VarName].String
         this.Arguments[VarName].Value:=Chosen
@@ -325,7 +325,7 @@ Class ot ;; output_type
                 Gui, ParamsGUI:Add, button, hwndSelectFile, % "Select &File"
                 gui, ParamsGUI:add, button, yp xp+77 hwndOpenFileSelectionFolder, % "Open File Selection Folder"
                 onOpenFileSelectionFolder:=ObjBindMethod(this, "OpenFileSelectionFolder", V.SearchPath)
-                onSelectFile := ObjBindMethod(this, "FileSelect",each)
+                onSelectFile := ObjBindMethod(this, "ChooseFile",each)
                 GuiControl, ParamsGUI:+g, %SelectFile%, % onSelectFile
                 GuiControl, ParamsGUI:+g, %OpenFileSelectionFolder%, % onOpenFileSelectionFolder
                 gui, ParamsGUI:add,text, w0 h0 yp+20 xp-77
