@@ -976,7 +976,7 @@ Base64PNG_to_HICON( B64, nBytes:="", W:="", H:="" ) {
          hICON := DllCall( "CreateIconFromResourceEx", "Ptr",&Bin, "UInt",nBytes, "Int",True
                          , "UInt",0x30000, "Int",W, "Int",H, "UInt",0, "UPtr" )
     Return hICON
-    }
+}
 
 ; --uID:1547783079
  ; Metadata:
