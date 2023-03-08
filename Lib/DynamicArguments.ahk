@@ -9,11 +9,12 @@ ExitApp
 Class ot ;; output_type
 {
     
-    __New(Format:="",ConfigFile:="",DDL_ParamDelimiter:="-<>-")
+    __New(Format:="",ConfigFile:="",DDL_ParamDelimiter:="-<>-",SkipGUI:=FALSE)
     {
         this.type:=Format
         this.ClassName.= Format ")"
         this.DDL_ParamDelimiter:=DDL_ParamDelimiter
+        this.SkipGUI:=SkipGUI
         if FileExist(ConfigFile)
             this.ConfigFile:=ConfigFile
         else
@@ -375,7 +376,10 @@ Class ot ;; output_type
         else
             gui, ParamsGUI:Show,,% GUIName:=this.GUITitle this.type
         WinWait, % GUIName
-        WinWaitClose, % GUIName
+        if this.SkipGUI
+            this.SubmitDynamicArguments() ;; auto-submit the GUI
+        Else
+            WinWaitClose, % GUIName
         return this
     }
     EditConfig()
