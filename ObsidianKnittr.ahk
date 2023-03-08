@@ -734,8 +734,9 @@ guiCreate()
     gui, add, checkbox, vbRemoveHashTagFromTags, % "Remove '#' from tags?"
     Gui, Font, s7 cWhite, Verdana
     gui, add, button, gGCSubmit, &Submit
+    gui, add, button, gGCAutoSubmit yp xp+60, &Full Submit
     onOpenConfig:=Func("EditMainConfig").Bind(script.configfile)
-    gui, add, button,  hwndOpenConfig yp xp+80, Edit General Configuration
+    gui, add, button,  hwndOpenConfig yp xp+81, Edit General Configuration
     GuiControl, +g,%OpenConfig%, % onOpenConfig
     ;     ; gui, add, button, yp xp+60 hwndEditConfig, Edit Configuration
     ;     ; onEditConfig:=ObjBindMethod(this, "EditConfig")
@@ -755,6 +756,11 @@ guiCreate()
     }
     return
 }
+GCAutoSubmit()
+{
+    global bAutoSubmitOTGUI:=True
+    return guiSubmit()
+}
 guiShow()
 {
     global
@@ -763,6 +769,7 @@ guiShow()
     h:=script.config.GuiPositioning.H
     x:=(script.config.GuiPositioning.X!=""?script.config.GuiPositioning.X:200)
     y:=(script.config.GuiPositioning.Y!=""?script.config.GuiPositioning.Y:200)
+    bAutoSubmitOTGUI:=false
     gui,1: show,x%x% y%y%, % script.name " - Choose manuscript"
     enableGuiDrag(1)
     WinWaitClose, % script.name " - Choose manuscript"
@@ -770,6 +777,8 @@ guiShow()
     for each, format in sel
     {
         ot:=new ot(format,A_ScriptDir "\INI-Files\DynamicArguments.ini","-<>-")
+        if bAutoSubmitOTGUI
+            ot.SkipGUI:=bAutoSubmitOTGUI
         ot.GenerateGUI(x,y)
         ot.AssembleFormatString()
         Outputformats[format]:=ot
