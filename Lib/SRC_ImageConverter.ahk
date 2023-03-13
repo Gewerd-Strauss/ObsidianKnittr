@@ -9,8 +9,7 @@ ConvertSRC_SYNTAX_V4(PathOrContent) {
     else
         buffer := PathOrContent
     p := 1
-    ;@ahk-neko-ignore 1 line
-    regex = <img src="(?<SRC>.+)"  width="(?<WIDTH>\d*)" alt="(?<ALT>.*)" title="(?<TITLE>.*)" \/>
+    regex = <img src="(?<SRC>.+)" width="(?<WIDTH>\d*)" alt="(?<ALT>.*)" title="(?<TITLE>.*)" \/>
     while (p := RegExMatch(buffer, "iOU)" regex, match, p)) {
         options := ""
         src := DecodeUriComponent(match.src)
@@ -31,6 +30,7 @@ ConvertSRC_SYNTAX_V4(PathOrContent) {
 
 
             )
+        buffer:=RegexReplace(buffer,"<figcaption>" Clean(match.alt) "</figcaption>","") ;; 09.03.2023 - required for removing the new figure syntax.
         buffer := StrReplace(buffer, match[0], tpl)
         p += StrLen(tpl)
     }
@@ -43,8 +43,9 @@ ConvertSRC_SYNTAX_V4(PathOrContent) {
         ``````
 
         )
-    buffer := RegExReplace(buffer, "\n---", "`n" tpl,,1,1)
-    Clipboard:=buffer
+    buffer := RegExReplace(buffer, "\n---", "`n" tpl,,1,1) ;; 09.03.2023 - required for removing the new figure syntax
+    buffer:=Regexreplace(buffer,"<figure>","") ;; 09.03.2023 - required for removing the new figure syntax
+    buffer:=Regexreplace(buffer,"</figure>","") ;; 09.03.2023 - required for removing the new figure syntax
     return buffer
 }
 
