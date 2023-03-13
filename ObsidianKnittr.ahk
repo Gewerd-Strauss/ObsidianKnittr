@@ -736,7 +736,8 @@ guiCreate()
     Gui, Color, 1d1f21, 373b41, 
     Gui, Font, s11 cWhite, Segoe UI 
     gui, add, text,xm ym, Choose output type:
-    gui, add, listview,  vvLV1 cWhite w330 checked, % "Type"
+    WideControlWidth:=330
+    gui, add, listview,  vvLV1 cWhite w%WideControlWidth% checked, % "Type"
     for k,v in PotentialOutputs
     {
         Options:=((Instr(script.config.lastrun.last_output_type,v))?"Check":"-Check")
@@ -754,10 +755,11 @@ guiCreate()
     ; gui, add, ddl, vDDLval, All||html_document|word_document|odt_document|rtf_document|md_document|
     Gui, add, button, gChooseFile, &Choose Manuscript
     DDLRows:=script.config.Config.HistoryLimit
-    gui, add, DDL, w330 vChosenFile hwndChsnFile r%DDLRows%, %  HistoryString
-    ; gui, add, edit, w330 vChosenFile hwndChsnFile disabled
+    gui, add, DDL, w%widecontrolwidth% vChosenFile hwndChsnFile r%DDLRows%, %  HistoryString
+    ; gui, add, edit, w%widecontrolwidth% vChosenFile hwndChsnFile disabled
     gui, add, checkbox, vbVerboseCheckbox, Set OHTML's Verbose-Flag?
     gui, add, checkbox, vbFullLogCheckbox, Full Log on successful execution?
+    
     ; gui, add, checkbox, vbSRCConverterVersion, Use V2 conversion?
     gui, add, checkbox, vbKeepFilename, Keep Filename?
     gui, add, checkbox, vbRenderRMD, Render RMD to chosen outputs?
