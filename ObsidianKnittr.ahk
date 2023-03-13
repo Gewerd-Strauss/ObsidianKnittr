@@ -143,7 +143,7 @@ main()
     .5 RenderRMD
     .6 RemoveHashTagFromTags
     .7 UseCustomTOC
-    .8 
+    .8 bForceFixPNGFiles
 4 Outputformats
 */
     ; [sel,manuscriptpath,[bVerboseCheckbox + 0,bFullLogCheckbox + 0,bSRCConverterVersion + 0,bKeepFilename + 0,bRenderRMD + 0,bRemoveHashTagFromTags + 0,bUseCustomTOC + 0],Outputformats]
@@ -167,6 +167,7 @@ main()
     bRenderRMD:=out.3.5
     bRemoveHashTagFromTags:=out.3.6
     bUseCustomTOC:=out.3.7
+    bForceFixPNGFiles:=out.3.8
         ; 3. 
     obsidianhtml_configfile:=script.config.config.obsidianhtml_configfile
     SplitPath, % manuscriptpath, OutFileName, manuscriptLocation,, manuscriptName
@@ -363,6 +364,27 @@ BuildRScriptContent(Path,output_type,output_filename="",out="")
     getwd()
 
     )
+    if out.3.8
+    {
+        Str2=
+        (LTrim
+        files <- list.files(pattern="*.PNG",recursive = TRUE)
+        files2 <- list.files(pattern="*.png",recursive = TRUE)
+        filesF <- c(files,files2)
+        lapply(filesF,ImgFix  <- function(Path="")
+        {
+        png_image  <- magick::image_read(Path)
+        jpeg_image <- magick::image_convert(png_image,"JPEG")
+        png_image  <- magick::image_convert(jpeg_image,"PNG")
+        magick::image_write(png_image,Path)
+        sprintf( "Fixed Path '`%s'", Path)
+        })
+        )
+        Str.="`n" Str2
+        bFixPNGS:=true
+    }
+    else
+        bFixPNGS:=false
     Name:=(output_filename!=""?output_filename:"index")
     , FormatOptions:=""
     for type,Class in out[4]
@@ -400,19 +422,27 @@ BuildRScriptContent(Path,output_type,output_filename="",out="")
             continue
         Str2=
         (LTrim
-        files <- list.files(pattern="*.PNG",recursive = TRUE)
-        files2 <- list.files(pattern="*.png",recursive = TRUE)
-        filesF <- c(files,files2)
-        lapply(filesF,ImgFix  <- function(Path="")
-        {
-        png_image  <- magick::image_read(Path)
-        jpeg_image <- magick::image_convert(png_image,"JPEG")
-        png_image  <- magick::image_convert(jpeg_image,"PNG")
-        magick::image_write(png_image,Path)
-        sprintf( "Fixed Path '`%s'", Path)
-        })
-        rmarkdown::render(`"index.rmd`",%format%,`"%Name%"`)`n
+            files <- list.files(pattern="*.PNG",recursive = TRUE)
+            files2 <- list.files(pattern="*.png",recursive = TRUE)
+            filesF <- c(files,files2)
+            lapply(filesF,ImgFix  <- function(Path="")
+            {
+                png_image  <- magick::image_read(Path)
+                jpeg_image <- magick::image_convert(png_image,"JPEG")
+                png_image  <- magick::image_convert(jpeg_image,"PNG")
+                magick::image_write(png_image,Path)
+                sprintf( "Fixed Path '`%s'", Path)
+            })
+            rmarkdown::render(`"index.rmd`",%format%,`"%Name%"`)`n
         )
+        if bFixPNGs
+        {
+            Str2=
+            (LTrim
+                
+                rmarkdown::render(`"index.rmd`",%format%,`"%Name%"`)`n
+            )
+        }
         Str.=Str2
         FormatOptions.= A_Tab strreplace(format,"`n",A_Tab "`n") "`n`n"
     }
@@ -732,6 +762,7 @@ guiCreate()
     gui, add, checkbox, vbKeepFilename, Keep Filename?
     gui, add, checkbox, vbRenderRMD, Render RMD to chosen outputs?
     gui, add, checkbox, vbRemoveHashTagFromTags, % "Remove '#' from tags?"
+    gui, add, checkbox, vbForceFixPNGFiles, Double-convert png-files pre-conversion?
     Gui, Font, s7 cWhite, Verdana
     gui, add, button, gGCSubmit, &Submit
     gui, add, button, gGCAutoSubmit yp xp+60, &Full Submit
@@ -753,6 +784,7 @@ guiCreate()
         guicontrol,, bKeepFilename, % (script.config.LastRun.KeepFileName)
         guicontrol,, bRenderRMD, % (script.config.LastRun.RenderRMD)
         guicontrol,, bRemoveHashTagFromTags, % (script.config.LastRun.RemoveHashTagFromTags)
+        guicontrol,, bForceFixPNGFiles, % (script.config.LastRun.ForceFixPNGFiles)
     }
     return
 }
@@ -788,7 +820,7 @@ guiShow()
 
     }
     if (manuscriptpath!="") && !ot.bClosedNoSubmit
-        return [sel,manuscriptpath,[bVerboseCheckbox + 0,bFullLogCheckbox + 0,bSRCConverterVersion + 0,bKeepFilename + 0,bRenderRMD + 0,bRemoveHashTagFromTags + 0,bUseCustomTOC + 0],Outputformats]
+        return [sel,manuscriptpath,[bVerboseCheckbox + 0,bFullLogCheckbox + 0,bSRCConverterVersion + 0,bKeepFilename + 0,bRenderRMD + 0,bRemoveHashTagFromTags + 0,bUseCustomTOC + 0,bForceFixPNGFiles + 0],Outputformats]
     Else
         ExitApp
 }
@@ -846,6 +878,7 @@ guiSubmit()
     script.config.LastRun.KeepFileName:=bKeepFilename+0
     script.config.LastRun.RenderRMD:=bRenderRMD+0
     script.config.LastRun.RemoveHashTagFromTags:=bRemoveHashTagFromTags+0
+    script.config.LastRun.ForceFixPNGFiles:=bForceFixPNGFiles+0
     script.config.DDLHistory:=buildHistory(script.config.DDLHistory,script.config.Config.HistoryLimit,script.config.LastRun.manuscriptpath)
     
     for k,v in sel
