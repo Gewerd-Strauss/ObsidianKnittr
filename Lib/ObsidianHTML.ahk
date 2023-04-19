@@ -74,7 +74,9 @@
     ;
 
     ; Run command inside a shell (to redirect the output)
-    Run % final_cmd:= A_ComSpec " /C " Quote_ObsidianHTML(command), % WD:=A_ScriptDir, UseErrorLevel,PID ;; is there a way to have this window moved to a specific portion of screen before continuing into the winwait?
+    final_cmd:= A_ComSpec " /C /K" Quote_ObsidianHTML(command)
+    OutputDebug, % "CMD:`n" final_cmd
+    Run % final_cmd, % WD:=A_ScriptDir, UseErrorLevel,PID ;; is there a way to have this window moved to a specific portion of screen before continuing into the winwait?
     Clipboard:=final_cmd
     WinMove, % "ahk_pid " PID, , 0, 0
     WinWait, % "ahk_pid " PID                           ;; I always prefer this to RunWait, not even sure _why_.
