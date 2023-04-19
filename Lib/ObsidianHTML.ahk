@@ -254,7 +254,7 @@ updateObsidianHTMLToMaster()
   ;;;             writeFile_ObsidianHTML(scriptWorkingDir "\gfa_renamer_log.txt",Files, "UTF-8-RAW","w",true)
   ;;;         }
 
-  writeFile_ObsidianHTML(Path,Content,Encoding:="",Flags:=0x2,bSafeOverwrite:=false) { 
+ writeFile_ObsidianHTML(Path,Content,Encoding:="",Flags:=0x2,bSafeOverwrite:=false) { 
  
     if (bSafeOverwrite && FileExist(Path))  ;; if we want to ensure nonexistance.
         FileDelete, % Path
