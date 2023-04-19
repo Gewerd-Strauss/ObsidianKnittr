@@ -10,8 +10,7 @@
         4.  retrieve the output.
         5.  be happy.
     */
-    FileDelete, % A_ScriptDir "\obsidianhtml.err"
-    FileDelete, % A_ScriptDir "\obsidianhtml.out"
+    
     ;; get ObsidianHTML_Path
     ComObj := ComObjCreate("WScript.Shell")
     ;Env:=ComObj.Exec("set")
@@ -55,13 +54,13 @@
 
     ;; Command minding quote_obsidianhtmls for configuration
     if bUseConvert {
-        command := """" obsidianhtml """" Clipboard:= " convert -i " Quote_ObsidianHTML(Trim(config_path))
+        command := """" obsidianhtml """" " convert -i " Quote_ObsidianHTML(Trim(config_path))
     } else {
         if (manuscript_path="") {
             MsgBox 0x2010, script.name " > " A_ThisFunc, No manuscript_path was provided to the run-verb execution. The script will reload. `n`nPlease provide a valid note-path or choose to convert.
             reload
         }
-        command := """" obsidianhtml """" Clipboard:= " run -f " Quote_ObsidianHTML(Trim(manuscript_path)) " -i " Quote_ObsidianHTML(Trim(config_path))
+        command := """" obsidianhtml """" " run -f " Quote_ObsidianHTML(Trim(manuscript_path)) " -i " Quote_ObsidianHTML(Trim(config_path))
     }
 
     ;; Check Verbosity
@@ -73,9 +72,12 @@
     ;
     ; RESERVED, read explanation.
     ;
-    
+
     ; Run command inside a shell (to redirect the output)
+    final_cmd:= A_ComSpec " /C /K" Quote_ObsidianHTML(command)
+    OutputDebug, % "CMD:`n" final_cmd
     Run % final_cmd, % WD:=A_ScriptDir, UseErrorLevel,PID ;; is there a way to have this window moved to a specific portion of screen before continuing into the winwait?
+    Clipboard:=final_cmd
     WinMove, % "ahk_pid " PID, , 0, 0
     WinWait, % "ahk_pid " PID                           ;; I always prefer this to RunWait, not even sure _why_.
     WinWaitClose, % "ahk_pid " PID
@@ -98,7 +100,7 @@
         Exit ; Ends the thread
     }
 
-    OutputDebug, % "CMD:`n" final_cmd "`n`nOutput:`n" stdOut "`n`nErr:`n" stdErr
+    OutputDebug, % "CMD:`n" final_cmd "`n`nOutput:`n" stdOut
     ; Happy ending
 
 
@@ -109,20 +111,13 @@
     ;RetOut:=Ret.stdOut.ReadAll()
     ;RetErr:=Ret.stdErr.ReadAll()
     ;OutputDebug, % "`n`nCOMOBJ_VARIANT:`n`n" "CMD:`n" final_cmd "`n`nOutput:`n" RetOut
-    return {"CMD":final_cmd,"stdOut":stdOut,"stdErr":stdErr,"obsidianhtml_version":obsidianhtml_version,"obsidianhtml_path":obsidianhtml_path}
+    return {"CMD":final_cmd,"stdOut":stdOut,"obsidianhtml_version":obsidianhtml_version,"obsidianhtml_path":obsidianhtml_path}
 }
-createTemporaryObsidianHTML_Config(manuscriptpath, obsidianhtml_configfile,Verbose,Convert:=false)
+createTemporaryObsidianHTML_Config(manuscriptpath, obsidianhtml_configfile,Verbose)
 {
     FileRead, configfile_contents, % obsidianhtml_configfile
-    if !InStr(configfile_contents,"#obsidian_entrypoint_path_str: '%obsidian_entrypoint_path_str%'") && Convert {
-        configfile_contents:= "`n" "#obsidian_entrypoint_path_str: '%obsidian_entrypoint_path_str%'","obsidian_entrypoint_path_str: '" "`n" configfile_contents
-    }
-    if Convert {
-        
-        configfile_contents:=StrReplace(configfile_contents,"#obsidian_entrypoint_path_str: '%obsidian_entrypoint_path_str%'","obsidian_entrypoint_path_str: '" manuscriptpath "'")
-    }
+    configfile_contents:=StrReplace(configfile_contents,"#obsidian_entrypoint_path_str: '%obsidian_entrypoint_path_str%'","obsidian_entrypoint_path_str: '" manuscriptpath "'")
     SplitPath, % manuscriptpath, , manuscriptdir
-    Clipboard:=configfile_contents
     writeFile_ObsidianHTML(configfile_path:=A_ScriptDir "\OHTMLconfig_temp.yaml",configfile_contents,,true)
     return [(FileExist(configfile_path)?configfile_path:false),configfile_contents]
 }
