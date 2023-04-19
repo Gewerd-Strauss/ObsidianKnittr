@@ -116,21 +116,34 @@ main()
         bundleAHKRecompileStarter=0
         Destination=0
         FullLogOnSuccess=0
+        HistoryLimit=25
         obsidianhtml_configfile=%given_obsidianhtml_configfile%
+        obsidianTagEndChars=():´
+        OpenParentfolderInstead=1
         RScriptPath=%given_rscriptpath%
         searchroot=%given_searchroot%
+        SetSearchRoottOLastRuManuscriptFolder=1
         [Version]
-        version=1.5.0
+        ObsidianHTML_Version=3.4.1
+        version=1.9.0
         [LastRun]
+        Conversion=
+        ForceFixPNGFiles=0
         FullLog=0
+        InsertSetupChunk=0
+        KeepFileName=1
         last_output_type=
         manuscriptpath=
+        RemoveHashTagFromTags=1
+        RenderRMD=1
+        UseCustomTOC=0
         Verbose=0
         [GuiPositioning]
         H=
         W=
         X=
         Y=
+        [DDLHistory]
         )
         FileAppend, % InitialSettings, % script.configfile
         script.load()
@@ -332,14 +345,14 @@ main()
         ttip("Opening RMD-File",5)
         SplitPath, % rmd_Path, OutFileName, OutDir
         FileDelete, % OutDir "\build.R"
-        WriteFile(OutDir "\build.R",script_contents,"UTF-8-RAW",,true)
+        writeFile(OutDir "\build.R",script_contents,"UTF-8-RAW",,true)
         ; FileAppend, % script_contents, % OutDir "\build.R"
         run, % rmd_Path
     }
     ttip("Building AHK-Starterscript",5)
-    BuildAHKScriptContent(rmd_Path,script_contents,script.config.config.RScriptPath)
-    OpenFolder(rmd_Path)
-    fRemoveTempDir(md_Path)
+    buildAHKScriptContent(rmd_Path,script_contents,script.config.config.RScriptPath)
+    openFolder(rmd_Path)
+    removeTempDir(md_Path)
     script.save()
     return
 }
