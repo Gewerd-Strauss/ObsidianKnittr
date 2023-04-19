@@ -16,12 +16,19 @@ space author, SnippetNameX and URLX out by spaces or tabs, and remember to inclu
 when 2+ snippets are located at the same url, concatenate them with "|" and treat them as a single one when putting together the URL's descriptor string
 finally, make sure toingest 'CreditsRaw' into the 'credits'-field of the template below.
 */
-CreditsRaw=
+creditsRaw=
 (LTRIM
-author1   -		 snippetName1		   		  			-	URL1
+Gewerd Strauss   -      main script
+tidbit et al - st_count - https://www.autohotkey.com/boards/viewtopic.php?t=53
+jNizM   -   HasVal  - https://www.autohotkey.com/boards/viewtopic.php?p=109173&sid=e530e129dcf21e26636fec1865e3ee30#p109173
+SKAN        - Base64PNG_to_HICON, regarding licensing             -   https://www.autohotkey.com/boards/viewtopic.php?f=6&t=36636, https://www.autohotkey.com/board/topic/75906-about-my-scripts-and-snippets/
 author2,author3   -		 snippetName1		   		  			-	URL2,URL3
-ScriptObj  							- Gewerd S, original by RaptorX							    - https://github.com/Gewerd-Strauss/ScriptObj/blob/master/ScriptObj.ahk, https://github.com/RaptorX/ScriptObj/blob/master/ScriptObj.ahk
-ttip,
+Gewerd Strauss      -   partial, self-written subset of ScriptObj						    - https://github.com/Gewerd-Strauss/ScriptObj/blob/master/ScriptObj.ahk
+SKAN, Goyyah    - enableGuiDrag - http://autohotkey.com/board/topic/80594-how-to-enable-drag-for-a-gui-without-a-titlebar
+anonymous1184 - Quote   - https://www.reddit.com/r/AutoHotkey/comments/p2z9co/comment/h8oq1av/?utm_source=share&utm_medium=web2x&context=3
+Gewerd Strauss      - ttip      -   https://gist.github.com/Gewerd-Strauss/fad218c28b8120ab1a3cadea1a8dea9b
+hi5 - TF.ahk, license   - https://github.com/hi5/TF, https://github.com/hi5/TF/blob/master/license.txt
+anonymous1184, in request of help from Gewerd Strauss - SRC_ImageConverter
 )
 FileGetTime, ModDate,%A_ScriptFullPath%,M
 FileGetTime, CrtDate,%A_ScriptFullPath%,C
@@ -41,7 +48,7 @@ global script := {   base         : script
                     ,homepagetext : ""
                     ,homepagelink : ""
                     ,ghtext 	  : "GH-Repo"
-                    ,ghlink       : "https://github.com/Gewerd-Strauss/REPOSITORY_NAME"
+                    ,ghlink       : "https://github.com/Gewerd-Strauss/ObsidianScripts"
                     ,doctext	  : ""
                     ,doclink	  : ""
                     ,forumtext	  : ""
@@ -50,9 +57,9 @@ global script := {   base         : script
                     ,resfolder    : A_ScriptDir "\res"
                     ,iconfile	  : ""
 ;					  ,reqInternet: false
-					,rfile  	  : "https://github.com/Gewerd-Strauss/REPOSITORY_NAME/archive/refs/heads/BRANCH_NAME.zip"
-					,vfile_raw	  : "https://raw.githubusercontent.com/Gewerd-Strauss/REPOSITORY_NAME/BRANCH_NAME/version.ini" 
-					,vfile 		  : "https://raw.githubusercontent.com/Gewerd-Strauss/REPOSITORY_NAME/BRANCH_NAME/version.ini" 
+					,rfile  	  : "https://github.com/Gewerd-Strauss/OBSIDIANSCRIPTS/archive/refs/heads/main.zip"
+					,vfile_raw	  : "https://raw.githubusercontent.com/Gewerd-Strauss/OBSIDIANSCRIPTS/main/version.ini" 
+					,vfile 		  : "https://raw.githubusercontent.com/Gewerd-Strauss/OBSIDIANSCRIPTS/main/version.ini" 
 					,vfile_local  : A_ScriptDir "\version.ini" 
 ;					,DataFolder:	A_ScriptDir ""
                     ,config:		[]
