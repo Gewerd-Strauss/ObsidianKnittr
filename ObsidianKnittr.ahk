@@ -348,146 +348,7 @@ OpenFolder(Path)
     return
 }
 
-BuildRScriptContent(Path,output_type,output_filename="",out="")
-{
-    SplitPath, % Path, , Path2, , Name
-    RScriptFilePath:=strreplace(Path2,"\","\\")
-    , RScriptFolder:=strreplace(Path2,"\","/")
-    Str=
-    (LTRIM
-    getwd()
-    if (getwd() != "%RScriptFolder%")
-    {
-        setwd("%RScriptFilePath%")
-        getwd()
-    }
-    getwd()
 
-    )
-    if out.3.8
-    {
-        Str2=
-        (LTrim
-        files <- list.files(pattern="*.PNG",recursive = TRUE)
-        files2 <- list.files(pattern="*.png",recursive = TRUE)
-        filesF <- c(files,files2)
-        lapply(filesF,ImgFix  <- function(Path="")
-        {
-        png_image  <- magick::image_read(Path)
-        jpeg_image <- magick::image_convert(png_image,"JPEG")
-        png_image  <- magick::image_convert(jpeg_image,"PNG")
-        magick::image_write(png_image,Path)
-        sprintf( "Fixed Path '`%s'", Path)
-        })
-        )
-        Str.="`n" Str2
-        bFixPNGS:=true
-    }
-    else
-        bFixPNGS:=false
-    Name:=(output_filename!=""?output_filename:"index")
-    , FormatOptions:=""
-    for type,Class in out[4]
-    {
-        bDoPDFLast:=false
-        format:=Class.AssembledFormatString
-        if Instr(format,"pdf_document")
-        {
-            bDoPDFLast:=true
-            continue
-        }
-        if (format="")
-        {
-            Str2=
-            (LTRIM
-            
-            rmarkdown::render(`"index.rmd`",NULL,`"%Name%"`)`n
-            )
-        }
-        else
-        {
-            Str2=
-            (LTRIM
-            
-            rmarkdown::render(`"index.rmd`",%format%,`"%Name%"`)`n
-            )
-        }
-        Str.=Str2
-        FormatOptions.= A_Tab strreplace(format,"`n",A_Tab "`n") "`n`n"
-    }
-    for type, Class in Out[4]
-    {
-        format:=Class.AssembledFormatString
-        if !Instr(format,"pdf_document")
-            continue
-        Str2=
-        (LTrim
-            files <- list.files(pattern="*.PNG",recursive = TRUE)
-            files2 <- list.files(pattern="*.png",recursive = TRUE)
-            filesF <- c(files,files2)
-            lapply(filesF,ImgFix  <- function(Path="")
-            {
-                png_image  <- magick::image_read(Path)
-                jpeg_image <- magick::image_convert(png_image,"JPEG")
-                png_image  <- magick::image_convert(jpeg_image,"PNG")
-                magick::image_write(png_image,Path)
-                sprintf( "Fixed Path '`%s'", Path)
-            })
-            rmarkdown::render(`"index.rmd`",%format%,`"%Name%"`)`n
-        )
-        if bFixPNGs
-        {
-            Str2=
-            (LTrim
-                
-                rmarkdown::render(`"index.rmd`",%format%,`"%Name%"`)`n
-            )
-        }
-        Str.=Str2
-        FormatOptions.= A_Tab strreplace(format,"`n",A_Tab "`n") "`n`n"
-    }
-    return [Str,FormatOptions]
-	
-}
-WriteFile(Path,Content,Encoding:="",Flags:=0x2,bSafeOverwrite:=false) ;; decide if you want to use fapp (which is synonymous as I am currently deleting every file beforehand anyways), or use write-flag and forego the delete beforehand.
-{
-    if (bSafeOverwrite && FileExist(Path))  ;; if we want to ensure nonexistance.
-        FileDelete, % Path
-    if (Encoding!="")
-    {
-        if (fObj:=FileOpen(Path,Flags,Encoding))
-        {
-            fObj.Write(Content) ;; insert contents
-            fObj.Close()        ;; close file
-        }
-        else
-            throw Exception("File could not be opened. Flags:`n" Flags, -1, myFile)
-    }
-    else
-    {
-        if (fObj:=FileOpen(Path,Flags))
-        {
-            fObj.Write(Content) ;; insert contents
-            fObj.Close()        ;; close file
-        }
-        else
-            throw Exception("File could not be opened. Flags:`n" Flags, -1, myFile)
-    }
-    return
-}
-RunRScript(Path,output_type,script_contents,RScript_Path:="")
-{
-    SplitPath, % Path, OutFileName, OutDir
-    FileDelete, % OutDir "\build.R"
-    WriteFile(OutDir "\build.R",script_contents,"UTF-8-RAW",,true)
-    ; FileAppend, % script_contents, % OutDir "\build.R"
-
-    Clipboard:=CMD:=quote(RScript_Path) A_Space quote(strreplace(OutDir "\build.R","\","\\")) ;; works with valid codefile (manually ensured no utf-corruption) from cmd, all three work for paths not containing umlaute with FileAppend
-    Run, % CMD, % OutDir, , PID
-    WinWait, % "ahk_pid " PID
-    WinWaitClose, % "ahk_pid " PID
-    return
-}
 BuildAHKScriptContent(Path,script_contents,RScript_Path:="")
 {
     SplitPath, % Path, OutFileName, OutDir
@@ -1012,115 +873,15 @@ fTraySetup()
     return
 }
 
-Base64PNG_to_HICON( B64, nBytes:="", W:="", H:="" ) {
-    Local Bin, BLen, hICON:=0
-    if !nBytes
-    nBytes := ceil(strlen(strReplace( B64,"=","=",e))/4*3)-e
-    
-      VarSetCapacity( Bin,nBytes,0 ), BLen := StrLen(B64)
-      If DllCall( "Crypt32.dll\CryptStringToBinary", "Str",B64, "UInt",BLen, "UInt",0x1
-                , "Ptr",&Bin, "UIntP",nBytes, "Int",0, "Int",0 )
-         hICON := DllCall( "CreateIconFromResourceEx", "Ptr",&Bin, "UInt",nBytes, "Int",True
-                         , "UInt",0x30000, "Int",W, "Int",H, "UInt",0, "UPtr" )
-    Return hICON
-}
-
-; --uID:1547783079
- ; Metadata:
-  ; Snippet: HasVal  ;  (v.1.0.0)
-  ; --------------------------------------------------------------
-  ; Author: jNizM
-  ; Source: https://www.autohotkey.com/boards/viewtopic.php?p=109173&sid=e530e129dcf21e26636fec1865e3ee30#p109173
-  ; (18.01.2023)
-  ; --------------------------------------------------------------
-  ; Library: Personal Library
-  ; Section: 13 - Objects
-  ; Dependencies: /
-  ; AHK_Version: v1
-  ; --------------------------------------------------------------
 
 
- ;; Description:
-  ;; Checks if an Array/Object has a value and returns its index/key.
-  ;; 
-  ;; If value occurs more than once in the array/object, ONLY THE FIRST occurence's key is returned
-
- ;;; Example:
-  ;;; A:=[1,2,3]
-  ;;; msgbox, % HasVal(A,2)
-  ;;; B:={I:"1",J:"2",K:"3"}
-  ;;; msgbox, % HasVal(B,2)
-  ;;; 
-
- HasVal(haystack, needle) 
- {
-     if !(IsObject(haystack)) || (haystack.Length() = 0)
-         return 0
-     for index, value in haystack
-         if (value = needle)
-             return index
-     return 0
- }
 
 
-; --uID:1547783079
-; --uID:2849897047
- ; Metadata:
-  ; Snippet: st_count  ;  (v.2.6)
-  ; --------------------------------------------------------------
-  ; Author: tidbit et al
-  ; License: none
-  ; Source: https://www.autohotkey.com/boards/viewtopic.php?t=53
-  ; 
-  ; --------------------------------------------------------------
-  ; Library: Libs
-  ; Section: 05 - String/Array/Text
-  ; Dependencies: /
-  ; AHK_Version: v1
-  ; --------------------------------------------------------------
-  ; Keywords: string things,
-
- ;; Description:
-  ;; 
-  ;; Count
-  ;;    Counts the number of times a tolken exists in the specified string.
-  ;; 
-  ;;    string    = The string which contains the content you want to count.
-  ;;    searchFor = What you want to search for and count.
-  ;; 
-  ;;    note: If you're counting lines, you may need to add 1 to the results.
-  ;; 
-  ;; 
-  ;; Name: String Things - Common String & Array Functions
-  ;; Version 2.6 (Fri May 30, 2014)
-  ;; Created: Sat March 02, 2013
-  ;; Author: tidbit
-  ;; Credit:
-  ;;    AfterLemon  --- st_insert(), st_overwrite() bug fix. st_strip(), and more.
-  ;;    Bon         --- word(), leftOf(), rightOf(), between() - These have been replaced
-  ;;    faqbot      --- jumble()
-  ;;    Lexikos     --- flip()
-  ;;    MasterFocus --- Optimizing LineWrap and WordWrap.
-  ;;    rbrtryn     --- group()
-  ;;    Rseding91   --- Optimizing LineWrap and WordWrap.
-  ;;    Verdlin     --- st_concat(), A couple nifty forum-only functions.
-  ;;    
-  ;; Description:
-  ;;    A compilation of commonly needed function for strings and arrays.
-
- ;;; Example:
-  ;;; msgbox, % st_count("aaa`nbbb`nccc`nddd", "`n")+1 ; add one to count the last line
-  ;;; ;; output: 4
-
- st_count(string, searchFor="`n")
- {
-    StringReplace, string, string, %searchFor%, %searchFor%, UseErrorLevel
-    return ErrorLevel
- }
-
-
-; --uID:2849897047
-
+#Include, <PrettyTickCount>
+#Include, <CodeTimer>
+#Include, <st_count>
+#Include, <HasVal>
+#Include, <Base64PNG_to_HICON>
 #Include, <ScriptObj/ScriptObj>
 #Include, <enableGuiDrag>
 #Include, <Quote>
@@ -1128,3 +889,7 @@ Base64PNG_to_HICON( B64, nBytes:="", W:="", H:="" ) {
 #Include, <OK_TF>
 #Include, <DynamicArguments>
 #Include, <SRC_ImageConverter>
+#Include, <ObsidianHTML>
+#Include, <writeFile>
+#Include, <RScript>
+#Include, <CMDret_RunReturn>
