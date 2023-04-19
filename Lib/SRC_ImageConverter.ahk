@@ -1,4 +1,6 @@
-ConvertSRC_SYNTAX_V4(PathOrContent) {
+;clipboard:=ConvertSRC_SYNTAX_V4("D:\Dokumente neu\000 AAA Dokumente\000 AAA HSRW\General\AHK scripts\Projects\Finished\ObsidianScripts\Test\index.md",true,true)
+return
+ConvertSRC_SYNTAX_V4(PathOrContent,bInsertSetupChunk,bRemoveObsidianHTMLErrors) {
     if (FileExist(PathOrContent))
     {
         Current_FileEncoding:=A_FileEncoding
@@ -20,6 +22,9 @@ ConvertSRC_SYNTAX_V4(PathOrContent) {
         if (match.title)
             options .= "fig.title='" Clean(match.title) "', "
         options := RTrim(options, ", ") ;; TODO: src and others may contain faulty strings when converting umlaute
+        if InStr(src,"../") {
+            src:=StrReplace(src,"../")
+        }
         tpl =
             (LTrim
 
@@ -30,6 +35,8 @@ ConvertSRC_SYNTAX_V4(PathOrContent) {
 
 
             )
+        buffer:=RegexReplace(buffer,"<figcaption>" Clean(match.alt) "</figcaption>","") ;; 09.03.2023 - required for removing the new figure syntax.
+        buffer := StrReplace(buffer, match[0], tpl)
         buffer:=RegexReplace(buffer,"<figcaption>" Clean(match.alt) "</figcaption>","") ;; 09.03.2023 - required for removing the new figure syntax.
         buffer := StrReplace(buffer, match[0], tpl)
         p += StrLen(tpl)
@@ -43,9 +50,18 @@ ConvertSRC_SYNTAX_V4(PathOrContent) {
         ``````
 
         )
-    buffer := RegExReplace(buffer, "\n---", "`n" tpl,,1,1) ;; 09.03.2023 - required for removing the new figure syntax
+    if bInsertSetupChunk
+        buffer := RegExReplace(buffer, "\n---", "`n" tpl,,1,1) ;; 09.03.2023 - required for removing the new figure syntax
     buffer:=Regexreplace(buffer,"<figure>","") ;; 09.03.2023 - required for removing the new figure syntax
     buffer:=Regexreplace(buffer,"</figure>","") ;; 09.03.2023 - required for removing the new figure syntax
+    if (bRemoveObsidianHTMLErrors) {
+        matches:=RegexMatchAll(buffer,"m)^(((\<|\>)\s*\**obsidian-html error:\**.*)|(Obsidianhtml.*))$")
+        for _, match in matches {
+            buffer:=StrReplace(buffer, match[0])
+        }
+    }
+    if WinActive("ahk_exe code.exe")
+        Clipboard:=buffer
     return buffer
 }
 
@@ -62,6 +78,27 @@ DecodeEntities(sText) {
 DecodeUriComponent(sText) {
     return _Decode(sText, 2)
 }
+
+
+
+
+RegExMatchAll(Haystack, NeedleRegEx, StartingPosition := 1) {
+    out := []
+    RegExMatch(NeedleRegEx, "^([imsxADJUXPOSC`r`n`a]+)?\)?(.+)", match)
+    NeedleRegEx := "O" StrReplace(match1, "O") ")" match2
+    loop {
+        StartingPosition := RegExMatch(Haystack, NeedleRegEx, match, StartingPosition)
+        if (!StartingPosition)
+            break
+        StartingPosition += match.Len(0)
+        out.Push(match)
+    }
+    return out
+}
+
+
+
+
 
 
 
