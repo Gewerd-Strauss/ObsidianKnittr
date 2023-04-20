@@ -199,7 +199,7 @@ main()
     SplitPath, % manuscriptpath, OutFileName, manuscriptLocation,, manuscriptName
     Verbose:=(bVerboseCheckbox?" -v ":" ")
     
-    tmpconfig:=createTemporaryObsidianHTML_Config(manuscriptpath, obsidianhtml_configfile,Verbose)
+    tmpconfig:=createTemporaryObsidianHTML_Config(manuscriptpath, obsidianhtml_configfile,Verbose,bConvertInsteadofRun)
     
     
     ttip("Running ObsidianHTML",5)
