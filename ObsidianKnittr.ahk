@@ -122,7 +122,8 @@ main()
         OpenParentfolderInstead=1
         RScriptPath=%given_rscriptpath%
         searchroot=%given_searchroot%
-        SetSearchRoottOLastRuManuscriptFolder=1
+        SetSearchRootToLastRunManuscriptFolder=1
+        OHTML_OutputDir=%A_Desktop%\TempTemporal
         [Version]
         ObsidianHTML_Version=3.4.1
         version=1.9.0
@@ -207,10 +208,11 @@ main()
     GeneralInfo:="Execution ObsidianHTML > " A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec "`n"
     CodeTimer("Timing ComObjTime, Verb: " (bConvertInsteadofRun?"Convert":"Run"))
     ObsidianKnittr_Info:=script.name ":`nVerbose:" bVerboseCheckbox "`nFull Log:" (script.config.config.FullLogOnSuccess || bFullLogCheckbox) "`nUsed Verb:'" ((tmpconfig[1] && bConvertInsteadofRun)?"Convert":"Run") "'`nSRC_Converter: " (bSRCConverterVersion?"V2 Conversion (no universal decoding employed, can output '' to "")":"V4 Conversion (should convert everything cleanly)") "`n" A_Tab "Document Settings`n" 
+    OHTML_OutputDir:=Deref(script.config.config.OHTML_OutputDir)
     if (tmpconfig[1] && bConvertInsteadofRun) {
-        ret:=ObsidianHtml(,tmpconfig[1],Verbose)
+        ret:=ObsidianHtml(,tmpconfig[1],Verbose,,OHTML_OutputDir)
     } else {
-        ret:=ObsidianHtml(manuscriptpath,tmpconfig[1],Verbose)
+        ret:=ObsidianHtml(manuscriptpath,tmpconfig[1],Verbose,,OHTML_OutputDir)
 
     }
     t:=CodeTimer("Timing ComObjTime, Verb: " (bConvertInsteadofRun?"Convert":"Run"))
@@ -910,3 +912,4 @@ fTraySetup()
 #Include, <writeFile>
 #Include, <RScript>
 
+#Include, <Deref>

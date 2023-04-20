@@ -1,4 +1,4 @@
-﻿ObsidianHtml(manuscript_path:="",config_path:="",bUseConvert:=true,bVerbose:=false) {
+﻿ObsidianHtml(manuscript_path:="",config_path:="",bUseConvert:=true,bVerbose:=false,WD="") {
     /*
         stuff to change:
 
@@ -28,6 +28,10 @@
     if (obsidianhtml="") {
         MsgBox 0x2010, script.name " - ObsidianHTML not found ", "The CLI-Utility ObsidianHTML could not be found via 'where obsidianhtml'.`nAs this script is not functional without it, it will exit now."
         return false
+    }
+
+    if (!FileExist(WD)) { ;; ensure the Working Directory exists before running OHTML
+        FileCreateDir, % WD
     }
 
     ;; get ObsidianHTML_Version
@@ -76,7 +80,7 @@
     ; Run command inside a shell (to redirect the output)
     final_cmd:= A_ComSpec " /C " Quote_ObsidianHTML(command)
     OutputDebug, % "CMD:`n" final_cmd
-    RunWait % final_cmd, % WD:=A_ScriptDir, UseErrorLevel,PID ;; is there a way to have this window moved to a specific portion of screen before continuing into the winwait?
+    RunWait % final_cmd, % WD, UseErrorLevel,PID ;; is there a way to have this window moved to a specific portion of screen before continuing into the winwait?
     Clipboard:=final_cmd
     
     ; ErrorLevel is overwritten, grab it
