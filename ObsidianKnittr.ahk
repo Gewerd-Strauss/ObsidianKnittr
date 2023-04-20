@@ -295,9 +295,7 @@ main()
     ttip("Processing Abstract",5)
     NewContents:=processAbstract(NewContents)
     ; NewContents:=ProcessHorizontalBreaks(NewContents)
-    FileDelete, % rmd_Path 
-    ; Current_FileEncoding:=A_FileEncoding
-    ; FileEncoding, UTF-8
+    
     writeFile(rmd_Path,Clipboard:=NewContents,"UTF-8",,true)
     ; FileAppend, % Clipboard:=NewContents,% rmd_Path
     ; FileEncoding, % Current_FileEncoding
