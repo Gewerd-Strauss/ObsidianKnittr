@@ -594,8 +594,13 @@ processTags(Contents,bRemoveHashTagFromTags)
             Contents:=StrReplace(Contents,"---`r`n---", "`r`n---`r`n",,1)
             Contents:=StrReplace(Contents,"`r`n`r`n", "`r`n",,1)
         }
+        Matches:=RegexMatchAll(Contents,"(?<IDStart>\{_obsidian_pattern_tag_)(?<Tag>.+)(?<IDEnd>}`)")
+        for _, match in matches {
+            _match:=match[0]
+            Contents:=strreplace(Contents,"``" _match "``",(bRemoveHashTagFromTags?"":"#") match[2])
+        }
     }
-    
+     ;; #todo: regexreplaceall for these patterns: "`{_obsidian_pattern_tag_XXXX}", as they are not found in the frontmatter and thus are not replaced
     return Contents
 }
 guiCreate()
