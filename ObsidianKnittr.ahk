@@ -126,7 +126,7 @@ main()
         OHTML_OutputDir=%A_Desktop%\TempTemporal
         [Version]
         ObsidianHTML_Version=3.4.1
-        version=1.9.0
+        version=2.1.3
         [LastRun]
         Conversion=
         ForceFixPNGFiles=0
