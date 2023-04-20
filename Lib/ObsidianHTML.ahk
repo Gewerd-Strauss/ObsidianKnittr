@@ -89,19 +89,20 @@
     ; Read into variables the output/error
     FileRead stdErr, % WD "\obsidianhtml.err"
     FileRead stdOut, % WD "\obsidianhtml.out"
-    
-    ; Cleanup
-    FileDelete % WD "\obsidianhtml.err"
-    FileDelete % WD "\obsidianhtml.out"
-    
     ; Report if there was an error
     if (gotErrors) {
         ; Show the actual error
         MsgBox 0x1010, There was an error with obsidianhtml, % stdErr
+        run,% WD "\obsidianhtml.err"
+        run,% WD "\obsidianhtml.out"
+        sleep, 4000
+        ; Cleanup
+        FileDelete % WD "\obsidianhtml.*"
         Exit ; Ends the thread
     }
-
-    OutputDebug, % "CMD:`n" final_cmd "`n`nOutput:`n" stdOut
+    ; Cleanup
+    FileDelete % WD "\obsidianhtml.*"
+    OutputDebug, % "CMD:`n" final_cmd "`n`n" stdOut
     ; Happy ending
 
 
@@ -204,48 +205,7 @@ fixYAMLSyntax(template) {
     OutputDebug, % out
     return out
 }
-ObsidianHtml_WORKINGTemplate(Config:="") {
-;FOR THE LOVE OF GOD DON'T CHANGE THIS.
-    ;; Get ObsidianHTML_Path
-    ComObj := ComObjCreate("WScript.Shell")
-    obsidianhtml_path:=Trim(ComObj.Exec("where obsidianhtml").stdOut.ReadAll)
-    obsidianhtml:=strreplace(obsidianhtml_path,"`r`n")
 
-    
-    ; If `obsidianhtml` is not in the %PATH%
-    ;obsidianhtml := "X:\Path\To\obsidianhtml.exe"
-    ; Your configuration (I'm hardcoding this, you need to "do your thing" before reaching to this point)
-    config := "D:\Dokumente neu\000 AAA Dokumente\000 AAA HSRW\General\AHK scripts\Projects\Finished\ObsidianScripts\OHTMLconfig_temp.yaml"
-    ; Command minding quote_obsidianhtmls for configuration
-    command := """" obsidianhtml """" " convert -i " Quote_ObsidianHTML(config)
-    ; Output/error redirection
-    command .= " 1> obsidianhtml.out 2> obsidianhtml.err"
-
-    ;
-    ; RESERVED, read explanation.
-    ;
-
-    ; Run command inside a shell (to redirect the output)
-    Run % final_cmd:= A_ComSpec " /C " Quote_ObsidianHTML(command), % A_Temp,  UseErrorLevel,PID
-    WinWait, % "ahk_pid " PID
-    WinWaitClose, % "ahk_pid " PID
-    ; ErrorLevel is overwritten, grab it
-    gotErrors := ErrorLevel
-    ; Read into variables the output/error
-    FileRead stdErr, % A_Temp "\obsidianhtml.err"
-    FileRead stdOut, % A_Temp "\obsidianhtml.out"
-    ; Cleanup
-    FileDelete % A_Temp "\obsidianhtml.*"
-    ; Report if there was an error
-    if (gotErrors) {
-        ; Show the actual error
-        MsgBox 0x1010, There was an error with obsidianhtml, % stdErr
-        Exit ; Ends the thread
-    }
-    OutputDebug, % "CMD:`n" final_cmd "`n`n" stdOut
-    ; Happy ending
-    return stdOut
-}
 updateObsidianHTMLToLastRelease()
 {
     RunWait, % A_Comspec "  /k echo y | pip uninstall obsidianhtml", , 
