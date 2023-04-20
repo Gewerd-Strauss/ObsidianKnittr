@@ -446,10 +446,10 @@ convertMDToRMD(md_Path,notename,bConvertSRC:=false)
     FileCopy, % md_Path "\" notename ".md", % md_Path "\" notename ".rmd",true
     return md_Path "\" notename ".rmd"
 }
-removeTempDir(md_Path)
+removeTempDir(Path)
 {
     global 
-    SplitPath, md_Path, OutFileName, OutDir, OutExtension, OutNameNoExt, OutDrive
+    SplitPath,% Path, OutFileName, OutDir, OutExtension, OutNameNoExt, OutDrive
     FileRemoveDir, % OutDir,1
     if FileExist(OutDir)
     {
