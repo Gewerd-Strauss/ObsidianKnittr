@@ -116,6 +116,28 @@
 }
 createTemporaryObsidianHTML_Config(manuscriptpath, obsidianhtml_configfile,Verbose)
 {
+    if !FileExist(obsidianhtml_configfile) || !InStr(obsidianhtml_configfile,A_ScriptDir) { ;; create a template in this folder
+        template= ;; do not use LTRIM here 
+        (LTRIM
+        # Input and output path of markdown files
+        # This can be an absolute or a relative path (relative to the working directory when calling obsidianhtml)
+        # Use full path or relative path, but don't use ~/
+        # md_folder_path_str:  'output/md'
+        # Number of links a note can be removed from the entrypoint note
+        # -1 for no max depth
+        # 0 means only the entrypoint note is processed
+        # 1 means only direct children are processed (and the entrypoint of course)
+        # and so forth. NOTE: DOES NOT APPLY TO INCLUSIONS!
+        #obsidian_entrypoint_path_str: '%obsidian_entrypoint_path_str%'
+        max_note_depth: 15
+        # preserve_inline_tags: False
+        toggles:
+        # When true, Obsidianhtml will not add three spaces at the end of every line
+        strict_line_breaks: True
+        )
+        template:=fixYAMLSyntax(template)
+        writeFile(script.configfolder "\OHTMLconfig_template.yaml",template,,,1)
+    }
     FileRead, configfile_contents, % obsidianhtml_configfile
     configfile_contents:=StrReplace(configfile_contents,"#obsidian_entrypoint_path_str: '%obsidian_entrypoint_path_str%'","obsidian_entrypoint_path_str: '" manuscriptpath "'")
     SplitPath, % manuscriptpath, , manuscriptdir
@@ -145,6 +167,42 @@ readObsidianHTML_Config(configpath)
     if (confstr="")
         return "E03: Config file contains no valid YAML config found in provided file."
     return [conf,confstr]
+}
+fixYAMLSyntax(template) {
+    out:=""
+    bInTogglesSection:=false
+    if (!RegexmatchAll(template,"im)(?<Val>^toggles:)",v)) { ;; no toggles section, so nothing to indent
+        return template
+    }
+    Lines:=strsplit(template,"`n")
+    for each, Line in Lines {
+        if !(bInTogglesSection || RegexMatch(Line,"mi)^toggles")) {
+            out.=Line "`n"
+            continue
+        } else {
+            if (!bInTogglesSection && RegexMatch(Line,"mi)^toggles")) {
+                out.=Line "`n"
+                bInTogglesSection:=true
+                Continue
+            }
+        }
+        if (bInTogglesSection) {
+            FirstChar:=SubStr(LTRIM(Line),1,1)
+            if (FirstChar="#") { ;; a comment
+                out.=Line "`n"
+                continue
+            } else { ;; an actual toggle
+                if (SubStr(Line,1,2)!="  ") {
+                    Line:=A_Space A_Space Line
+                    out.=Line "`n"
+                } else {
+                    out.=Line "`n"
+                }
+            }
+        }
+    }
+    OutputDebug, % out
+    return out
 }
 ObsidianHtml_WORKINGTemplate(Config:="") {
 ;FOR THE LOVE OF GOD DON'T CHANGE THIS.
