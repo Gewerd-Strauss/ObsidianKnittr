@@ -82,19 +82,7 @@ DecodeUriComponent(sText) {
 
 
 
-RegExMatchAll(Haystack, NeedleRegEx, StartingPosition := 1) {
-    out := []
-    RegExMatch(NeedleRegEx, "^([imsxADJUXPOSC`r`n`a]+)?\)?(.+)", match)
-    NeedleRegEx := "O" StrReplace(match1, "O") ")" match2
-    loop {
-        StartingPosition := RegExMatch(Haystack, NeedleRegEx, match, StartingPosition)
-        if (!StartingPosition)
-            break
-        StartingPosition += match.Len(0)
-        out.Push(match)
-    }
-    return out
-}
+
 
 
 

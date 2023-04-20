@@ -911,5 +911,5 @@ fTraySetup()
 #Include, <ObsidianHTML>
 #Include, <writeFile>
 #Include, <RScript>
-
+#Include, <RegexMatchAll>
 #Include, <Deref>
