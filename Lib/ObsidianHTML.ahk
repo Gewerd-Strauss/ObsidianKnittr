@@ -113,7 +113,7 @@
     ;RetOut:=Ret.stdOut.ReadAll()
     ;RetErr:=Ret.stdErr.ReadAll()
     ;OutputDebug, % "`n`nCOMOBJ_VARIANT:`n`n" "CMD:`n" final_cmd "`n`nOutput:`n" RetOut
-    return {"CMD":final_cmd,"stdOut":stdOut,"obsidianhtml_version":obsidianhtml_version,"obsidianhtml_path":obsidianhtml_path}
+    return {"CMD":final_cmd,"stdOut":stdOut,"obsidianhtml_version":obsidianhtml_version,"obsidianhtml_path":obsidianhtml_path,"stdErr":stdErr}
 }
 createTemporaryObsidianHTML_Config(manuscriptpath, obsidianhtml_configfile,Verbose)
 {
