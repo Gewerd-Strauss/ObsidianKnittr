@@ -115,7 +115,7 @@
     ;OutputDebug, % "`n`nCOMOBJ_VARIANT:`n`n" "CMD:`n" final_cmd "`n`nOutput:`n" RetOut
     return {"CMD":final_cmd,"stdOut":stdOut,"obsidianhtml_version":obsidianhtml_version,"obsidianhtml_path":obsidianhtml_path,"stdErr":stdErr}
 }
-createTemporaryObsidianHTML_Config(manuscriptpath, obsidianhtml_configfile,Verbose)
+createTemporaryObsidianHTML_Config(manuscriptpath, obsidianhtml_configfile,Verbose,Convert)
 {
     if !FileExist(obsidianhtml_configfile) || !InStr(obsidianhtml_configfile,A_ScriptDir) { ;; create a template in this folder
         template= ;; do not use LTRIM here 
@@ -140,7 +140,9 @@ createTemporaryObsidianHTML_Config(manuscriptpath, obsidianhtml_configfile,Verbo
         writeFile(script.configfolder "\OHTMLconfig_template.yaml",template,,,1)
     }
     FileRead, configfile_contents, % obsidianhtml_configfile
-    configfile_contents:=StrReplace(configfile_contents,"#obsidian_entrypoint_path_str: '%obsidian_entrypoint_path_str%'","obsidian_entrypoint_path_str: '" manuscriptpath "'")
+    if (Convert) {
+        configfile_contents:=StrReplace(configfile_contents,"#obsidian_entrypoint_path_str: '%obsidian_entrypoint_path_str%'","obsidian_entrypoint_path_str: '" manuscriptpath "'")
+    }
     SplitPath, % manuscriptpath, , manuscriptdir
     writeFile_ObsidianHTML(configfile_path:=A_ScriptDir "\OHTMLconfig_temp.yaml",configfile_contents,,true)
     return [(FileExist(configfile_path)?configfile_path:false),configfile_contents]
