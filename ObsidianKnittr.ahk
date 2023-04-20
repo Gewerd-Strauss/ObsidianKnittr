@@ -195,6 +195,9 @@ main()
     bConvertInsteadofRun:=out.3.10
     bRemoveObsidianHTMLErrors:=out.3.11
         ; 3. 
+    if (output_type="") && (bVerboseCheckbox="") {
+        reload
+    }
     obsidianhtml_configfile:=script.config.config.obsidianhtml_configfile
     SplitPath, % manuscriptpath, OutFileName, manuscriptLocation,, manuscriptName
     Verbose:=(bVerboseCheckbox?" -v ":" ")
