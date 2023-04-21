@@ -1,11 +1,11 @@
-#NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
+#NoEnv ; Recommended for performance and compatibility with future AutoHotkey releases.
 #Requires AutoHotkey v1.1.36+ ;; version at which script was written.
 #SingleInstance,Force
 #MaxHotkeysPerInterval, 99999999
 #Warn All, Outputdebug
-;#Persistent 
-SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
-SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
+;#Persistent
+SendMode Input ; Recommended for new scripts due to its superior speed and reliability.
+SetWorkingDir %A_ScriptDir% ; Ensures a consistent starting directory.
 DetectHiddenWindows, On
 SetKeyDelay -1,-1
 SetBatchLines,-1
@@ -18,56 +18,56 @@ finally, make sure toingest 'CreditsRaw' into the 'credits'-field of the templat
 */
 creditsRaw=
 (LTRIM
-Gewerd Strauss   -      main script
-tidbit et al - st_count - https://www.autohotkey.com/boards/viewtopic.php?t=53
-jNizM   -   HasVal  - https://www.autohotkey.com/boards/viewtopic.php?p=109173&sid=e530e129dcf21e26636fec1865e3ee30#p109173
-SKAN        - Base64PNG_to_HICON, regarding licensing             -   https://www.autohotkey.com/boards/viewtopic.php?f=6&t=36636, https://www.autohotkey.com/board/topic/75906-about-my-scripts-and-snippets/
-author2,author3   -		 snippetName1		   		  			-	URL2,URL3
-Gewerd Strauss      -   partial, self-written subset of ScriptObj						    - https://github.com/Gewerd-Strauss/ScriptObj/blob/master/ScriptObj.ahk
-SKAN, Goyyah    - enableGuiDrag - http://autohotkey.com/board/topic/80594-how-to-enable-drag-for-a-gui-without-a-titlebar
-anonymous1184 - Quote   - https://www.reddit.com/r/AutoHotkey/comments/p2z9co/comment/h8oq1av/?utm_source=share&utm_medium=web2x&context=3
-Gewerd Strauss      - ttip      -   https://gist.github.com/Gewerd-Strauss/fad218c28b8120ab1a3cadea1a8dea9b
-hi5 - TF.ahk, license   - https://github.com/hi5/TF, https://github.com/hi5/TF/blob/master/license.txt
-anonymous1184, in request of help from Gewerd Strauss - SRC_ImageConverter
+    Gewerd Strauss   -      main script
+    tidbit et al - st_count - https://www.autohotkey.com/boards/viewtopic.php?t=53
+    jNizM   -   HasVal  - https://www.autohotkey.com/boards/viewtopic.php?p=109173&sid=e530e129dcf21e26636fec1865e3ee30#p109173
+    SKAN        - Base64PNG_to_HICON, regarding licensing             -   https://www.autohotkey.com/boards/viewtopic.php?f=6&t=36636, https://www.autohotkey.com/board/topic/75906-about-my-scripts-and-snippets/
+    author2,author3   -		 snippetName1		   		  			-	URL2,URL3
+    Gewerd Strauss      -   partial, self-written subset of ScriptObj						    - https://github.com/Gewerd-Strauss/ScriptObj/blob/master/ScriptObj.ahk
+    SKAN, Goyyah    - enableGuiDrag - http://autohotkey.com/board/topic/80594-how-to-enable-drag-for-a-gui-without-a-titlebar
+    anonymous1184 - Quote   - https://www.reddit.com/r/AutoHotkey/comments/p2z9co/comment/h8oq1av/?utm_source=share&utm_medium=web2x&context=3
+    Gewerd Strauss      - ttip      -   https://gist.github.com/Gewerd-Strauss/fad218c28b8120ab1a3cadea1a8dea9b
+    hi5 - TF.ahk, license   - https://github.com/hi5/TF, https://github.com/hi5/TF/blob/master/license.txt
+    anonymous1184, in request of help from Gewerd Strauss - SRC_ImageConverter
 )
 FileGetTime, ModDate,%A_ScriptFullPath%,M
 FileGetTime, CrtDate,%A_ScriptFullPath%,C
-CrtDate:=SubStr(CrtDate,7,  2) "." SubStr(CrtDate,5,2) "." SubStr(CrtDate,1,4)
-ModDate:=SubStr(ModDate,7,  2) "." SubStr(ModDate,5,2) "." SubStr(ModDate,1,4)
-global script := {   base         : script
-                    ,name         : regexreplace(A_ScriptName, "\.\w+")
-                    ,version      : ""
-                    ,author       : "Gewerd Strauss"
-					,authorID	  : "Laptop-C"
-					,authorlink   : ""
-                    ,email        : ""
-                    ,credits      : CreditsRaw
-					,creditslink  : ""
-                    ,crtdate      : CrtDate
-                    ,moddate      : ModDate
-                    ,homepagetext : ""
-                    ,homepagelink : ""
-                    ,ghtext 	  : "GH-Repo"
-                    ,ghlink       : "https://github.com/Gewerd-Strauss/ObsidianScripts"
-                    ,doctext	  : ""
-                    ,doclink	  : ""
-                    ,forumtext	  : ""
-                    ,forumlink	  : ""
-                    ,donateLink	  : ""
-                    ,resfolder    : A_ScriptDir "\res"
-                    ,iconfile	  : ""
-;					  ,reqInternet: false
-					,rfile  	  : "https://github.com/Gewerd-Strauss/OBSIDIANSCRIPTS/archive/refs/heads/main.zip"
-					,vfile_raw	  : "https://raw.githubusercontent.com/Gewerd-Strauss/OBSIDIANSCRIPTS/main/version.ini" 
-					,vfile 		  : "https://raw.githubusercontent.com/Gewerd-Strauss/OBSIDIANSCRIPTS/main/version.ini" 
-					,vfile_local  : A_ScriptDir "\version.ini" 
-;					,DataFolder:	A_ScriptDir ""
-                    ,config:		[]
-					,configfile   : A_ScriptDir "\INI-Files\" regexreplace(A_ScriptName, "\.\w+") ".ini"
-                    ,configfolder : A_ScriptDir "\INI-Files"}
+CrtDate:=SubStr(CrtDate,7, 2) "." SubStr(CrtDate,5,2) "." SubStr(CrtDate,1,4)
+ModDate:=SubStr(ModDate,7, 2) "." SubStr(ModDate,5,2) "." SubStr(ModDate,1,4)
+global script := { base : script
+    ,name : regexreplace(A_ScriptName, "\.\w+")
+    ,version : ""
+    ,author : "Gewerd Strauss"
+    ,authorID	 : "Laptop-C"
+    ,authorlink : ""
+    ,email : ""
+    ,credits : CreditsRaw
+    ,creditslink : ""
+    ,crtdate : CrtDate
+    ,moddate : ModDate
+    ,homepagetext : ""
+    ,homepagelink : ""
+    ,ghtext 	 : "GH-Repo"
+    ,ghlink : "https://github.com/Gewerd-Strauss/ObsidianScripts"
+    ,doctext	 : ""
+    ,doclink	 : ""
+    ,forumtext	 : ""
+    ,forumlink	 : ""
+    ,donateLink	 : ""
+    ,resfolder : A_ScriptDir "\res"
+    ,iconfile	 : ""
+    ;					  ,reqInternet: false
+    ,rfile 	 : "https://github.com/Gewerd-Strauss/OBSIDIANSCRIPTS/archive/refs/heads/main.zip"
+    ,vfile_raw	 : "https://raw.githubusercontent.com/Gewerd-Strauss/OBSIDIANSCRIPTS/main/version.ini"
+    ,vfile 		 : "https://raw.githubusercontent.com/Gewerd-Strauss/OBSIDIANSCRIPTS/main/version.ini"
+    ,vfile_local : A_ScriptDir "\version.ini"
+    ;					,DataFolder:	A_ScriptDir ""
+    ,config:		[]
+    ,configfile : A_ScriptDir "\INI-Files\" regexreplace(A_ScriptName, "\.\w+") ".ini"
+    ,configfolder : A_ScriptDir "\INI-Files"}
 
 main()
-ExitApp, 
+ExitApp,
 return
 
 main()
@@ -77,11 +77,11 @@ main()
         Steps:
         Obsidian-Sided:
         0. Load Config
-        1. Finish manuscript (must contain csl, bib, conforming includes/image formats) * 
+        1. Finish manuscript (must contain csl, bib, conforming includes/image formats) *
         2. Insert `output: word_document|html_document|...` into the frontmatter and save
         2.2 get manuscript's path
 
-        AHK-script sided: 
+        AHK-script sided:
         3. run obsidianhtml (get manuscript's path) ;; TODO: check if 'max_note_depth' is correctly applied by making a chain of 20 notes including into each other.
 
         loop, 20
@@ -90,7 +90,7 @@ main()
         5. rename to .rmd
         6. open r at that location
         7. load BuildRScriptContent ;; TODO: automate properly, instead of using R Studio.
-        8. set pwd 
+        8. set pwd
         9. BuildRScriptContent at location
         10. Copy resulting output to predefined output folder
         11. open output folder
@@ -104,47 +104,47 @@ main()
     ; OnExit("fRemoveTempDir").Bind(md_path)
     ; 0
     fTraySetup()
-        
+
     if !script.load()
     {
         InputBox, given_obsidianhtml_configfile, % script.name " - Initiate settings","Please give the path of your configfile for obsidianhtml."
         InputBox, given_searchroot, % script.name " - Initiate settings","Please give the path of your configfile for obsidianhtml."
-        InputBox, given_rscriptpath, % script.name,% "Please give the absolute path of your installed 'Rscript.exe'-file you wish to use.`nIf you don't want to use this step, leave this empty and continue.",  , , , , , , , % "C:\Program Files\R\R-MAJORVERSION.MINORVERSION.PATCH\bin\Rscript.exe"
+        InputBox, given_rscriptpath, % script.name,% "Please give the absolute path of your installed 'Rscript.exe'-file you wish to use.`nIf you don't want to use this step, leave this empty and continue.", , , , , , , , % "C:\Program Files\R\R-MAJORVERSION.MINORVERSION.PATCH\bin\Rscript.exe"
         InitialSettings=
         (LTrim
-        [Config]
-        bundleAHKRecompileStarter=0
-        Destination=0
-        FullLogOnSuccess=0
-        HistoryLimit=25
-        obsidianhtml_configfile=%given_obsidianhtml_configfile%
-        obsidianTagEndChars=():´
-        OpenParentfolderInstead=1
-        RScriptPath=%given_rscriptpath%
-        searchroot=%given_searchroot%
-        SetSearchRootToLastRunManuscriptFolder=1
-        OHTML_OutputDir=%A_Desktop%\TempTemporal
-        [Version]
-        ObsidianHTML_Version=3.4.1
-        version=2.1.3
-        [LastRun]
-        Conversion=
-        ForceFixPNGFiles=0
-        FullLog=0
-        InsertSetupChunk=0
-        KeepFileName=1
-        last_output_type=
-        manuscriptpath=
-        RemoveHashTagFromTags=1
-        RenderRMD=1
-        UseCustomTOC=0
-        Verbose=0
-        [GuiPositioning]
-        H=
-        W=
-        X=
-        Y=
-        [DDLHistory]
+            [Config]
+            bundleAHKRecompileStarter=0
+            Destination=0
+            FullLogOnSuccess=0
+            HistoryLimit=25
+            obsidianhtml_configfile=%given_obsidianhtml_configfile%
+            obsidianTagEndChars=():´
+            OpenParentfolderInstead=1
+            RScriptPath=%given_rscriptpath%
+            searchroot=%given_searchroot%
+            SetSearchRootToLastRunManuscriptFolder=1
+            OHTML_OutputDir=%A_Desktop%\TempTemporal
+            [Version]
+            ObsidianHTML_Version=3.4.1
+            version=2.1.3
+            [LastRun]
+            Conversion=
+            ForceFixPNGFiles=0
+            FullLog=0
+            InsertSetupChunk=0
+            KeepFileName=1
+            last_output_type=
+            manuscriptpath=
+            RemoveHashTagFromTags=1
+            RenderRMD=1
+            UseCustomTOC=0
+            Verbose=0
+            [GuiPositioning]
+            H=
+            W=
+            X=
+            Y=
+            [DDLHistory]
         )
         FileAppend, % InitialSettings, % script.configfile
         script.load()
@@ -194,23 +194,22 @@ main()
     bInsertSetupChunk:=out.3.9
     bConvertInsteadofRun:=out.3.10
     bRemoveObsidianHTMLErrors:=out.3.11
-        ; 3. 
+    ; 3.
     if (output_type="") && (bVerboseCheckbox="") {
         reload
     }
     obsidianhtml_configfile:=script.config.config.obsidianhtml_configfile
     SplitPath, % manuscriptpath, OutFileName, manuscriptLocation,, manuscriptName
     Verbose:=(bVerboseCheckbox?" -v ":" ")
-    
-    tmpconfig:=createTemporaryObsidianHTML_Config(manuscriptpath, obsidianhtml_configfile,Verbose,bConvertInsteadofRun)
-    
-    
+
+    tmpconfig:=createTemporaryObsidianHTML_Config(manuscriptpath, obsidianhtml_configfile,bConvertInsteadofRun)
+
     ttip("Running ObsidianHTML",5)
     if (obsidianhtml_configfile="")
         obsidianhtml_configfile:=script.config.config.obsidianhtml_configfile
     GeneralInfo:="Execution ObsidianHTML > " A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec "`n"
     CodeTimer("Timing ComObjTime, Verb: " (bConvertInsteadofRun?"Convert":"Run"))
-    ObsidianKnittr_Info:=script.name ":`nVerbose:" bVerboseCheckbox "`nFull Log:" (script.config.config.FullLogOnSuccess || bFullLogCheckbox) "`nUsed Verb:'" ((tmpconfig[1] && bConvertInsteadofRun)?"Convert":"Run") "'`nSRC_Converter: " (bSRCConverterVersion?"V2 Conversion (no universal decoding employed, can output '' to "")":"V4 Conversion (should convert everything cleanly)") "`n" A_Tab "Document Settings`n" 
+    ObsidianKnittr_Info:=script.name ":`nVerbose:" bVerboseCheckbox "`nFull Log:" (script.config.config.FullLogOnSuccess || bFullLogCheckbox) "`nUsed Verb:'" ((tmpconfig[1] && bConvertInsteadofRun)?"Convert":"Run") "'`nSRC_Converter: " (bSRCConverterVersion?"V2 Conversion (no universal decoding employed, can output '' to "")":"V4 Conversion (should convert everything cleanly)") "`n" A_Tab "Document Settings`n"
     OHTML_OutputDir:=Deref(script.config.config.OHTML_OutputDir)
     if (tmpconfig[1] && bConvertInsteadofRun) {
         ret:=ObsidianHtml(,tmpconfig[1],Verbose,,OHTML_OutputDir)
@@ -219,10 +218,10 @@ main()
 
     }
     t:=CodeTimer("Timing ComObjTime, Verb: " (bConvertInsteadofRun?"Convert":"Run"))
-    GeneralInfo.="Execution ObsidianHTML < " A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec 
+    GeneralInfo.="Execution ObsidianHTML < " A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
     d:= ret.obsidianHTML_Version
     e:= ret["obsidianHTML_Version"]
-    GeneralInfo.="`n                                      " strreplace(strreplace(strreplace(t[3],"h"),"m"),"s") "`n`n"
+    GeneralInfo.="`n " strreplace(strreplace(strreplace(t[3],"h"),"m"),"s") "`n`n"
     OutputDebug, % "`n`n" GeneralInfo
     if RegExMatch(Ret["stdOut"], "md: (?<MDPath>.*)(\s*)", v) || FileExist(ret.OutputPath)
     {
@@ -247,7 +246,7 @@ main()
             FileDelete, % A_ScriptDir "\Executionlog.txt"
             FileAppend, % GeneralInfo ObsidianKnittr_Info ObsidianHTML_Info "`n`nIssued Command (Execution time " t[3] "):`n" ret["CMD"] "`n---`n`nCommand Line output below:`n`n" ret["stdout"], % A_ScriptDir "\Executionlog.txt"
             run, % A_ScriptDir "\Executionlog.txt"
-            MsgBox 0x40010, % script.name, % "File  md_Path does not seem to exist. Please check manually."
+            MsgBox 0x40010, % script.name, % "File md_Path does not seem to exist. Please check manually."
         }
     }
     else
@@ -255,8 +254,8 @@ main()
         if RegExMatch(Ret["stdOut"], "Created empty output folder path (?<MDPath>.*)(\s*)", v)
         {
             script.config.version.ObsidianHTML_Version:=ret.obsidianhtml_Version
-            ObsidianHTML_Info:="`nObsidianHTML:`nVersion: " ret.obsidianHTML_Version "`nObsiidanHTML-Path:" ret.obsidianhtml_path  "`nInput:`n" manuscriptpath "`nOutput Folder:`n" vMDPath "`nConfig:`n" obsidianhtml_configfile "`nCustom Config contents:`n" readObsidianHTML_Config(obsidianhtml_configfile).2 "`n---`n"
-            
+            ObsidianHTML_Info:="`nObsidianHTML:`nVersion: " ret.obsidianHTML_Version "`nObsiidanHTML-Path:" ret.obsidianhtml_path "`nInput:`n" manuscriptpath "`nOutput Folder:`n" vMDPath "`nConfig:`n" obsidianhtml_configfile "`nCustom Config contents:`n" readObsidianHTML_Config(obsidianhtml_configfile).2 "`n---`n"
+
             if FileExist(vMDPath)
             {
                 ObsidianKnittr_Info.= "`nOutput Folder: " getOutputPath(convertMDToRMD(vMDPath,"index"),script.config.Destination,manuscriptpath).1 "`nRaw input copy:" getOutputPath(convertMDToRMD(vMDPath,"index"),script.config.Destination,manuscriptpath).2 "`n"
@@ -272,7 +271,7 @@ main()
                 FileDelete, % A_ScriptDir "\Executionlog.txt"
                 FileAppend, % GeneralInfo ObsidianKnittr_Info ObsidianHTML_Info "`n`nIssued Command (Execution time " t[3] "):`n" ret["CMD"] "`n---`n`nCommand Line output below:`n`n" ret["stdout"], % A_ScriptDir "\Executionlog.txt"
                 run, % A_ScriptDir "\Executionlog.txt"
-                MsgBox 0x40010, % script.name, % "File  md_Path does not seem to exist. Please check manually."
+                MsgBox 0x40010, % script.name, % "File md_Path does not seem to exist. Please check manually."
             }
         }
         else
@@ -288,7 +287,7 @@ main()
         }
     }
     ; 4
-    
+
     ttip("Converting to .rmd-file",5)
     rmd_Path:=convertMDToRMD(md_Path,"index",true)
     ; 5, 6
@@ -302,7 +301,7 @@ main()
     ttip("Processing Abstract",5)
     NewContents:=processAbstract(NewContents)
     ; NewContents:=ProcessHorizontalBreaks(NewContents)
-    
+
     writeFile(rmd_Path,Clipboard:=NewContents,"UTF-8",,true)
     ; FileAppend, % Clipboard:=NewContents,% rmd_Path
     ; FileEncoding, % Current_FileEncoding
@@ -317,13 +316,13 @@ main()
     {
         ExecutionLog_Path:=MD_ModTime:=SD_ModTime:=""
         format:=tmp.2
-		SplitPath, % rmd_Path,, OutDir
-		if FileExist(ExecutionLog_Path:=OutDir "\ExecutionLog.txt")
-		{
-			FileRead,ExecutionLog, % ExecutionLog_Path
+        SplitPath, % rmd_Path,, OutDir
+        if FileExist(ExecutionLog_Path:=OutDir "\ExecutionLog.txt")
+        {
+            FileRead,ExecutionLog, % ExecutionLog_Path
             FileDelete, % ExecutionLog_Path
             ExecutionLog:=OK_TF_Replace(ExecutionLog,"Document Settings","Document Settings`n" A_Tab strreplace(format,"`n","`n" A_Tab A_Tab))
-            FileAppend, % ExecutionLog,  %  ExecutionLog_Path
+            FileAppend, % ExecutionLog, % ExecutionLog_Path
         }
     }
     if bRenderRMD
@@ -335,15 +334,15 @@ main()
         ExecutionLog:=OK_TF_Replace(ExecutionLog,"`n`nObsidianKnittr:`n","`nExecution RBuildScript > " A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec "`n`nObsidianKnittr:`n")
         OutputDebug, % "`n`n" ExecutionLog
         ;m(clipboard:=Executionlog)
-        
+
         
         ttip("Executing R-BuildScript",5)
         runRScript(rmd_Path,output_type,script_contents,script.config.config.RScriptPath)
         t:=CodeTimer("Timing R-Script-Execution")
-        ExecutionLog:=OK_TF_Replace(ExecutionLog,"`n`nObsidianKnittr:`n","`nExecution RBuildScript < " A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec "`n                                      " strreplace(strreplace(strreplace(t[3],"h"),"m"),"s") "`n`nObsidianKnittr:`n")
+        ExecutionLog:=OK_TF_Replace(ExecutionLog,"`n`nObsidianKnittr:`n","`nExecution RBuildScript < " A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec "`n " strreplace(strreplace(strreplace(t[3],"h"),"m"),"s") "`n`nObsidianKnittr:`n")
         OutputDebug, % "`n`n" ExecutionLog
         ;m(clipboard:=Executionlog)
-        FileAppend, % ExecutionLog,  %  ExecutionLog_Path
+        FileAppend, % ExecutionLog, % ExecutionLog_Path
         OutputDebug, % t[3]
 
     }
@@ -410,8 +409,8 @@ buildAHKScriptContent(Path,script_contents,RScript_Path:="")
 }
 copyBack(Source,Destination,manuscriptpath)
 {
-    SplitPath, Source, OutFileName, Dir, 
-    SplitPath, % manuscriptpath ,  , ,,manuscriptname, 
+    SplitPath, Source, OutFileName, Dir,
+    SplitPath, % manuscriptpath , , ,,manuscriptname,
     if Destination
     {
         if FileExist(Destination "\" manuscriptname "\") ;; make sure the output is clean
@@ -428,12 +427,12 @@ copyBack(Source,Destination,manuscriptpath)
         FileCopyDir, % Dir, % Output_Path:= A_Desktop "\TempTemporal\" manuscriptname "\" , true
         FileCopy, % manuscriptpath, % Output_Path "\" manuscriptname "_vault.md ", 1
     }
-    return Output_Path  OutFileName
+    return Output_Path OutFileName
 }
 getOutputPath(Source,Destination,manuscriptpath)
 {
-    SplitPath, Source, OutFileName, Dir, 
-    SplitPath, % manuscriptpath ,  , ,,manuscriptname, 
+    SplitPath, Source, OutFileName, Dir,
+    SplitPath, % manuscriptpath , , ,,manuscriptname,
     if Destination
     {
         Output_Path:=Destination "\" manuscriptname "\"
@@ -441,7 +440,7 @@ getOutputPath(Source,Destination,manuscriptpath)
     }
     else
     {
-        Output_Path:= A_Desktop "\TempTemporal\" manuscriptname 
+        Output_Path:= A_Desktop "\TempTemporal\" manuscriptname
         Raw_InputFile:=Output_Path "\" manuscriptname "_vault.md "
     }
     return [Output_Path,Raw_InputFile]
@@ -453,7 +452,7 @@ convertMDToRMD(md_Path,notename,bConvertSRC:=false)
 }
 removeTempDir(Path)
 {
-    global 
+    global
     SplitPath,% Path, OutFileName, OutDir, OutExtension, OutNameNoExt, OutDrive
     FileRemoveDir, % OutDir,1
     if FileExist(OutDir)
@@ -468,7 +467,7 @@ processAbstract(Contents)
     if (FileExist(Contents))
         FileRead Contents, % Contents
     Lines:=Strsplit(Contents,"`r`n")
-    , Rebuild:=""
+        , Rebuild:=""
     for index, Line in Lines
     {
         if (st_count(Rebuild,"`n")>1)
@@ -479,7 +478,7 @@ processAbstract(Contents)
         if (!Instr(Rebuild,"abstract"))
             Rebuild.=((Index=1)?Line:"`n" Line)
         else
-            Rebuild.=((SubStr(Line,1,2)="  ")?A_Space LTrim(Line):"`n" Line)
+            Rebuild.=((SubStr(Line,1,2)=" ")?A_Space LTrim(Line):"`n" Line)
     }
     return Rebuild
 }
@@ -605,7 +604,7 @@ processTags(Contents,bRemoveHashTagFromTags)
             Contents:=strreplace(Contents,"``" _match "``",(bRemoveHashTagFromTags?"":"#") match[2])
         }
     }
-     ;; #todo: regexreplaceall for these patterns: "`{_obsidian_pattern_tag_XXXX}", as they are not found in the frontmatter and thus are not replaced
+    ;; #todo: regexreplaceall for these patterns: "`{_obsidian_pattern_tag_XXXX}", as they are not found in the frontmatter and thus are not replaced
     return Contents
 }
 guiCreate()
@@ -613,7 +612,7 @@ guiCreate()
     global
     gui, destroy
     PotentialOutputs:=["First in YAML" , "html_document" , "pdf_document" , "word_document" , "odt_document" , "rtf_document" , "md_document" , "powerpoint_presentation" , "ioslides_presentation" , "tufte::tufte_html" , "github_document" , "All"]
-    gui_control_options := "xm w220 " . cForeground . " -E0x200"  ; remove border around edit field
+    gui_control_options := "xm w220 " . cForeground . " -E0x200" ; remove border around edit field
     Gui, Margin, 16, 16
     Gui, +AlwaysOnTop -SysMenu -ToolWindow -caption +Border +LabelGC +hwndOKGui
     cBackground := "c" . "1d1f21"
@@ -628,11 +627,11 @@ guiCreate()
     cAqua := "c" . "8abeb7"
     cBlue := "c" . "81a2be"
     cPurple := "c" . "b294bb"
-    Gui, Color, 1d1f21, 373b41, 
-    Gui, Font, s11 cWhite, Segoe UI 
+    Gui, Color, 1d1f21, 373b41,
+    Gui, Font, s11 cWhite, Segoe UI
     gui, add, text,xm ym, Choose output type:
     WideControlWidth:=330
-    gui, add, listview,  vvLV1 cWhite w%WideControlWidth% checked, % "Type"
+    gui, add, listview, vvLV1 cWhite w%WideControlWidth% checked, % "Type"
     for k,v in PotentialOutputs
     {
         Options:=((Instr(script.config.lastrun.last_output_type,v))?"Check":"-Check")
@@ -650,11 +649,11 @@ guiCreate()
     ; gui, add, ddl, vDDLval, All||html_document|word_document|odt_document|rtf_document|md_document|
     Gui, add, button, gChooseFile, &Choose Manuscript
     DDLRows:=script.config.Config.HistoryLimit
-    gui, add, DDL, w%widecontrolwidth% vChosenFile hwndChsnFile r%DDLRows%, %  HistoryString
+    gui, add, DDL, w%widecontrolwidth% vChosenFile hwndChsnFile r%DDLRows%, % HistoryString
     ; gui, add, edit, w%widecontrolwidth% vChosenFile hwndChsnFile disabled
     gui, add, checkbox, vbVerboseCheckbox, Set OHTML's Verbose-Flag?
     gui, add, checkbox, vbFullLogCheckbox, Full Log on successful execution?
-    
+
     ; gui, add, checkbox, vbSRCConverterVersion, Use V2 conversion?
     gui, add, checkbox, vbKeepFilename, Keep Filename?
     gui, add, checkbox, vbRenderRMD, Render RMD to chosen outputs?
@@ -667,7 +666,7 @@ guiCreate()
     gui, add, button, gGCSubmit, &Submit
     gui, add, button, gGCAutoSubmit yp xp+60, &Full Submit
     onOpenConfig:=Func("EditMainConfig").Bind(script.configfile)
-    gui, add, button,  hwndOpenConfig yp xp+81, Edit General Configuration
+    gui, add, button, hwndOpenConfig yp xp+81, Edit General Configuration
     gui, add, button, gGCAbout hwndAbout yp xp+157, &About
     GuiControl, +g,%OpenConfig%, % onOpenConfig
     ;     ; gui, add, button, yp xp+60 hwndEditConfig, Edit Configuration
@@ -761,7 +760,7 @@ guiSubmit()
     {
         manuscriptpath:=script.config.LastRun.manuscriptpath
         bVerboseCheckbox:=bVerboseCheckbox+0
-        bFullLogCheckbox:=bFullLogCheckbox+0  
+        bFullLogCheckbox:=bFullLogCheckbox+0
     }
     if (manuscriptpath="") && (sel.count()=0)
     {
@@ -773,7 +772,7 @@ guiSubmit()
                 sel:=script.config.lastrun.last_output_type
             manuscriptpath:=script.config.lastrun.manuscriptpath
             bVerboseCheckbox:=script.config.LastRun.Verbose+0
-            bFullLogCheckbox:=script.config.LastRun.FullLog+0  
+            bFullLogCheckbox:=script.config.LastRun.FullLog+0
         }
     }
     if !FileExist(manuscriptpath)
@@ -791,17 +790,17 @@ guiSubmit()
     script.config.LastRun.ConvertInsteadofRun:=bConvertInsteadofRun+0
     script.config.LastRun.RemoveObsidianHTMLErrors:=bRemoveObsidianHTMLErrors+0
     script.config.DDLHistory:=buildHistory(script.config.DDLHistory,script.config.Config.HistoryLimit,script.config.LastRun.manuscriptpath)
-    
+
     for k,v in sel
     {
-        
+
         script.config.LastRun.last_output_type.=v
         if (k<sel.count())
             script.config.LastRun.last_output_type.=", "
 
     }
     script.save()
-    return [DDLval,manuscriptpath,sel]  
+    return [DDLval,manuscriptpath,sel]
 }
 buildHistory(History,NumberOfRecords,manuscriptpath:="")
 {
@@ -822,7 +821,7 @@ getSelectedLVEntries()
     loop
     {
         vRowNum:=LV_GetNext(vRowNum,"C")
-        if not vRowNum  ; The above returned zero, so there are no more selected rows.
+        if not vRowNum ; The above returned zero, so there are no more selected rows.
             break
         LV_GetText(sCurrText1,vRowNum,1)
         sel.push(sCurrText1)
@@ -837,7 +836,7 @@ editMainConfig(configfile)
     WinWaitClose, % "ahk_PID" PID
     Gui +OwnDialogs
     OnMessage(0x44, "DA_OnMsgBox")
-    MsgBox 0x40044, %  this.ClassName " > " A_ThisFunc "()", You modified the configuration for this class.`nReload?
+    MsgBox 0x40044, % this.ClassName " > " A_ThisFunc "()", You modified the configuration for this class.`nReload?
     OnMessage(0x44, "")
     IfMsgBox Yes, {
         reload
@@ -851,8 +850,8 @@ chooseFile()
         Clipboard:=strreplace(Clipboard,"/","\")
     else if FileExist(r:=strreplace(Clipboard,"/","\"))
         Clipboard:=strreplace(Clipboard,"/","\")
-	else
-		ttip("Clipboard does not contain a valid path.")
+    else
+        ttip("Clipboard does not contain a valid path.")
     SplitPath, % Clipboard, , , Ext
     if CF_bool:=FileExist(Clipboard) && (Ext="md") && !GetKeyState("LShift","P")
         manuscriptpath:=(CF_bool?Clipboard:script.config.searchroot)
@@ -861,16 +860,16 @@ chooseFile()
         if script.config.config.SetSearchRootToLastRunManuscriptFolder
         {
             SplitPath, % script.config.Lastrun.manuscriptpath,, LastRunDir
-            FileSelectFile, manuscriptpath, 3, % (FileExist(Clipboard)?Clipboard:LastRunDir)  , % "Choose &manuscript file", *.md
+            FileSelectFile, manuscriptpath, 3, % (FileExist(Clipboard)?Clipboard:LastRunDir) , % "Choose &manuscript file", *.md
         }
         else
-            FileSelectFile, manuscriptpath, 3, % (FileExist(Clipboard)?Clipboard:script.config.config.searchroot)  , % "Choose &manuscript file", *.md
+            FileSelectFile, manuscriptpath, 3, % (FileExist(Clipboard)?Clipboard:script.config.config.searchroot) , % "Choose &manuscript file", *.md
         if (manuscriptpath="")
             return
     }
     SplitPath, % manuscriptpath, , OutDir, , manuscriptname,
     SplitPath, % OutDir, OutFileName,
-    
+
     script.config.DDLHistory:=buildHistory(script.config.DDLHistory,script.config.Config.HistoryLimit,manuscriptpath)
     HistoryString:=""
     for each, File in script.config.DDLHistory
@@ -891,12 +890,12 @@ chooseFile()
 fTraySetup()
 {
     b64QuickIcon_64x64 := "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"
-    hICON := Base64PNG_to_HICON( b64QuickIcon_64x64 )  ; Create a HICON for Tray
+    hICON := Base64PNG_to_HICON( b64QuickIcon_64x64 ) ; Create a HICON for Tray
 
-    Menu, Tray, Icon, HICON:*%hICON%                      ; AHK makes a copy of HICON when * is used
+    Menu, Tray, Icon, HICON:*%hICON% ; AHK makes a copy of HICON when * is used
     Menu, Tray, Icon
-    DllCall( "DestroyIcon", "Ptr",hICON  )                ; Destroy original HICON
-    menu, tray, add, 
+    DllCall( "DestroyIcon", "Ptr",hICON ) ; Destroy original HICON
+    menu, tray, add,
     Menu, tray, add, Update ObsidianHTML to Master Branch ,updateObsidianHTMLToMaster
     Menu, tray, add, Update ObsidianHTML to Last Release ,updateObsidianHTMLToLastRelease
     return
