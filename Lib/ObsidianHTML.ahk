@@ -132,7 +132,7 @@ getObsidianHTML_WD(String)
     }
 
 }
-createTemporaryObsidianHTML_Config(manuscriptpath, obsidianhtml_configfile,Verbose,Convert)
+createTemporaryObsidianHTML_Config(manuscriptpath, obsidianhtml_configfile,Convert)
 {
     if !FileExist(obsidianhtml_configfile) || !InStr(obsidianhtml_configfile,A_ScriptDir) { ;; create a template in this folder
         template= ;; do not use LTRIM here 
