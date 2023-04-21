@@ -116,7 +116,21 @@
     ;RetOut:=Ret.stdOut.ReadAll()
     ;RetErr:=Ret.stdErr.ReadAll()
     ;OutputDebug, % "`n`nCOMOBJ_VARIANT:`n`n" "CMD:`n" final_cmd "`n`nOutput:`n" RetOut
-    return {"CMD":final_cmd,"stdOut":stdOut,"obsidianhtml_version":obsidianhtml_version,"obsidianhtml_path":obsidianhtml_path,"stdErr":stdErr}
+    if (stdOut!="") {
+        OHTML_Output:=getObsidianHTML_WD(stdOut)
+    }
+    return {"CMD":final_cmd,"stdOut":stdOut,"obsidianhtml_version":obsidianhtml_version,"obsidianhtml_path":obsidianhtml_path,"stdErr":stdErr,OutputPath:OHTML_Output}
+}
+getObsidianHTML_WD(String)
+{
+    ret:=""
+    Clipboard:=String
+    if Regexmatch(String,"from (?<Path>.*obshtml_.*\/)",v) {
+        return vPath
+    } else {
+        return String
+    }
+
 }
 createTemporaryObsidianHTML_Config(manuscriptpath, obsidianhtml_configfile,Verbose,Convert)
 {

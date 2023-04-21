@@ -224,8 +224,12 @@ main()
     e:= ret["obsidianHTML_Version"]
     GeneralInfo.="`n                                      " strreplace(strreplace(strreplace(t[3],"h"),"m"),"s") "`n`n"
     OutputDebug, % "`n`n" GeneralInfo
-    if RegExMatch(Ret["stdOut"], "md: (?<MDPath>.*)(\s*)", v)
+    if RegExMatch(Ret["stdOut"], "md: (?<MDPath>.*)(\s*)", v) || FileExist(ret.OutputPath)
     {
+        if FileExist(ret.OutputPath){
+            vMDPath:=strreplace(ret.OutputPath "/md","//","\")
+            vMDPath:=strreplace(vMDPath ,"/","\")
+        }
         script.config.version.ObsidianHTML_Version:=ret.obsidianhtml_Version
         ObsidianHTML_Info:="`nObsidianHTML:`nVersion: " ret.obsidianHTML_Version "`nObsiidanHTML-Path:" ret.obsidianhtml_path "`nInput:`n" manuscriptpath "`nOutput Folder:`n" vMDPath "`nConfig:`n" obsidianhtml_configfile "`nCustom Config contents:`n" readObsidianHTML_Config(obsidianhtml_configfile).2 "`n---`n"
         if FileExist(vMDPath)
