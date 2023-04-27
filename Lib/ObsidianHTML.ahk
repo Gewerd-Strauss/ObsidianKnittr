@@ -2,7 +2,6 @@
 
     ;; get ObsidianHTML_Path
     ComObj := ComObjCreate("WScript.Shell")
-    ;Env:=ComObj.Exec("set")
     obsidianhtml_path:=Trim(ComObj.Exec("where obsidianhtml").stdOut.ReadAll()) ;; works
     obsidianhtml:=strreplace(obsidianhtml_path,"`r`n")
     if (obsidianhtml="") {
@@ -60,7 +59,6 @@
 
     if bUseOwnOHTMLFork {
         status:=GetStdStreams_WithInput("python -m " command2,WorkDir_OwnFork,data_modded:="`n")
-        m(data_modded)
         ohtmlversion_out:=strreplace(ohtmlversion_modded,"`n commit:"," (commit:")
         ohtmlversion_out:=strreplace(ohtmlversion_out,"`n") ")"
         data_out:=data_modded
