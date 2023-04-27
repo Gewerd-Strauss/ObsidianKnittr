@@ -204,7 +204,6 @@ main()
     }
     obsidianhtml_configfile:=script.config.config.obsidianhtml_configfile
     SplitPath, % manuscriptpath, OutFileName, manuscriptLocation,, manuscriptName
-    Verbose:=(bVerboseCheckbox?" -v ":" ")
 
     tmpconfig:=createTemporaryObsidianHTML_Config(manuscriptpath, obsidianhtml_configfile,bConvertInsteadofRun)
 
@@ -342,7 +341,6 @@ main()
         OutputDebug, % "`n`n" ExecutionLog
         ;m(clipboard:=Executionlog)
 
-        
         ttip("Executing R-BuildScript",5)
         runRScript(rmd_Path,output_type,script_contents,script.config.config.RScriptPath)
         t:=CodeTimer("Timing R-Script-Execution")
@@ -374,7 +372,6 @@ main()
     return
 }
 
-
 openFolder(Path)
 {
     SplitPath, % Path, OutFileName, OutDir
@@ -390,7 +387,6 @@ openFolder(Path)
         run, % OutDir
     return
 }
-
 
 buildAHKScriptContent(Path,script_contents,RScript_Path:="")
 {
@@ -749,6 +745,7 @@ guiShow()
     Else
         ExitApp
 }
+
 GCAbout()
 {
     script.About()
