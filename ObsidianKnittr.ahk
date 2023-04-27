@@ -461,15 +461,23 @@ convertMDToRMD(md_Path,notename)
     FileCopy, % md_Path "\" notename ".md", % md_Path "\" notename ".rmd",true
     return md_Path "\" notename ".rmd"
 }
-removeTempDir(Path)
+removeTempDir(Path,RemoveParent:=TRUE)
 {
-    global
-    SplitPath,% Path, OutFileName, OutDir, OutExtension, OutNameNoExt, OutDrive
-    FileRemoveDir, % OutDir,1
-    if FileExist(OutDir)
-    {
-        MsgBox, % "Error occured - Directory '" OutDir "' could not be removed"
-        Run, % "explorer " OutDir
+    if RemoveParent {
+        SplitPath,% Path,, OutDir
+        FileRemoveDir, % OutDir,1
+        if FileExist(OutDir)
+        {
+            MsgBox, % "Error occured - Directory '" OutDir "' could not be removed"
+            Run, % "explorer " OutDir
+        }
+    } else {
+        FileRemoveDir, % Path,1
+        if FileExist(OutDir)
+        {
+            MsgBox, % "Error occured - Directory '" OutDir "' could not be removed"
+            Run, % "explorer " OutDir
+        }
     }
     return
 }
