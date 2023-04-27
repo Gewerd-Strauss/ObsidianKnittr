@@ -1,4 +1,12 @@
-﻿ObsidianHtml(manuscript_path:="",config_path:="",bUseConvert:=true,bUseOwnOHTMLFork:=false,bVerbose:=false,WD="") {
+﻿ObsidianHtml(manuscript_path:="",config_path:="",bUseConvert:=true,bUseOwnOHTMLFork:=false,bVerbose:=false,WD="",WorkDir:="",WorkDir_OwnFork:="") {
+
+    if (WorkDir="") {
+        WorkDir:= A_Desktop "\ObsidianHTMLOutput"
+    }
+    if (WorkDir_OwnFork="") {
+        WorkDir_OwnFork:= A_Desktop "\ObsidianHTMLOutput"
+
+    }
 
     ;; get ObsidianHTML_Path
     ComObj := ComObjCreate("WScript.Shell")
@@ -29,8 +37,6 @@
         }
     }
 
-    WorkDir2 := "C:\Users\Claudius Main\Desktop\TempTemporal"
-    WorkDir_OwnFork := "D:\Dokumente neu\ObsidianPluginDev\obsidian-html"
     command2_getversion := "obsidianhtml version"
     if bUseConvert {
         command2:= "obsidianhtml convert -i " Quote_ObsidianHTML(Trim(config_path))
@@ -64,14 +70,14 @@
         data_out:=data_modded
         WorkDir_out:=WorkDir_OwnFork
     } else {
-        status:=GetStdStreams_WithInput(command2_getversion,workDir2,ohtmlversion)
-        status:=GetStdStreams_WithInput(command2,WorkDir2,data:="`n")
+        status:=GetStdStreams_WithInput(command2_getversion,workDir,ohtmlversion)
+        status:=GetStdStreams_WithInput(command2,WorkDir,data:="`n")
         ohtmlversion_out:=ohtmlversion
         data_out:=data
-        WorkDir_out:=WorkDir2
+        WorkDir_out:=WorkDir
     }
     OutputDebug, % "`n`n" command2 "`n`n"
-    OutputDebug, % "`n`n" WorkDir2 "`n`n"
+    OutputDebug, % "`n`n" WorkDir "`n`n"
     OutputDebug, % "`n`n" WorkDir_OwnFork "`n`n"
 
     if (data!="") {

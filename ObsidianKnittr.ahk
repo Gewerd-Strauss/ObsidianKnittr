@@ -173,7 +173,8 @@ main()
         4 Outputformats
     */
     ; [sel,manuscriptpath,[bVerboseCheckbox + 0,bFullLogCheckbox + 0,bSRCConverterVersion + 0,bKeepFilename + 0,bRenderRMD + 0,bRemoveHashTagFromTags + 0,bUseCustomTOC + 0],Outputformats]
-
+    WorkDir := "C:\Users\Claudius Main\Desktop\TempTemporal"
+    WorkDir_OwnFork := "D:\Dokumente neu\ObsidianPluginDev\obsidian-html"
     for each,format in out.4
         if format.HasKey("Error") && (format.Error.ID=0)
         {
@@ -215,9 +216,9 @@ main()
     ObsidianKnittr_Info:=script.name ":`nVerbose:" bVerboseCheckbox "`nFull Log:" (script.config.config.FullLogOnSuccess || bFullLogCheckbox) "`nUsed Verb:'" ((tmpconfig[1] && bConvertInsteadofRun)?"Convert":"Run") "'`nSRC_Converter: " (bSRCConverterVersion?"V2 Conversion (no universal decoding employed, can output '' to "")":"V4 Conversion (should convert everything cleanly)") "`n" A_Tab "Document Settings`n"
     OHTML_OutputDir:=Deref(script.config.config.OHTML_OutputDir)
     if (tmpconfig[1] && bConvertInsteadofRun) {
-        ret:=ObsidianHtml(,tmpconfig[1],,bUseOwnOHTMLFork,bVerboseCheckbox,OHTML_OutputDir)
+        ret:=ObsidianHtml(,tmpconfig[1],,bUseOwnOHTMLFork,bVerboseCheckbox,OHTML_OutputDir,WorkDir,WorkDir_OwnFork)
     } else {
-        ret:=ObsidianHtml(manuscriptpath,tmpconfig[1],,bUseOwnOHTMLFork,bVerboseCheckbox,OHTML_OutputDir)
+        ret:=ObsidianHtml(manuscriptpath,tmpconfig[1],,bUseOwnOHTMLFork,bVerboseCheckbox,OHTML_OutputDir,WorkDir,WorkDir_OwnFork)
 
     }
     t:=CodeTimer("Timing ComObjTime, Verb: " (bConvertInsteadofRun?"Convert":"Run"))
