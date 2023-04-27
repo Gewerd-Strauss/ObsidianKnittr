@@ -127,7 +127,7 @@ main()
             OHTML_OutputDir=%A_Desktop%\TempTemporal
             [Version]
             ObsidianHTML_Version=3.4.1
-            version=2.1.3
+            ObsidianKnittr_Version=2.1.3
             [LastRun]
             Conversion=
             ForceFixPNGFiles=0
@@ -150,7 +150,7 @@ main()
         FileAppend, % InitialSettings, % script.configfile
         script.load()
     }
-    script.version:=script.config.Version.Version
+    script.version:=script.config.version.ObsidianKnittr_Version
 
     ; 2.2
     out:=guiShow()
@@ -236,7 +236,7 @@ main()
         vMDPath:=LTrim(vMDPath)
         vMDPath:=RTrim(vMDPath)
         vMDPath:=strreplace(vMDPath,"`n")
-        script.config.version.ObsidianHTML_Version:=ret.obsidianhtml_Version
+        script.config.version.ObsidianHTML_Version:=strreplace(ret.obsidianhtml_Version,"`n")
         ObsidianHTML_Info:="`nObsidianHTML:`nVersion: " ret.obsidianHTML_Version "`nObsiidanHTML-Path:" ret.obsidianhtml_path "`nInput:`n" manuscriptpath "`nOutput Folder:`n" vMDPath "`nConfig:`n" obsidianhtml_configfile "`nCustom Config contents:`n" readObsidianHTML_Config(obsidianhtml_configfile).2 "`n---`n"
         if FileExist(vMDPath)
         {
@@ -698,7 +698,7 @@ guiCreate()
     GuiControl, +g,%OpenConfig%, % onOpenConfig
     ;     ; gui, add, button, yp xp+60 hwndEditConfig, Edit Configuration
     ;     ; onEditConfig:=ObjBindMethod(this, "EditConfig")
-    Gui, Add, Text,x15,% "v." script.config.version.ObsidianKnittr_Version " | Obsidian-HTML: " script.config.version.ObsidianHTML_Version
+    Gui, Add, Text,x15,% script.name " v." script.config.version.ObsidianKnittr_Version " | Obsidian-HTML: v." strreplace(script.config.version.ObsidianHTML_Version,"commit:")
     script.version:=script.config.version.ObsidianKnittr_Version
 
     ; script.config.lastrun.last_output_type:=["html_document","word_document"]
