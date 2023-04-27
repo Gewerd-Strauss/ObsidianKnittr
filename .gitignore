@@ -18,3 +18,5 @@ INI-Files/ObsidianHTML_Config.yml
 obsidianhtml.out
 obsidianhtml.err
 INI-Files/OHTMLconfig_template.yaml
+Lib/ObsidianHTML_Dev.ahk
+testrun.ahk
