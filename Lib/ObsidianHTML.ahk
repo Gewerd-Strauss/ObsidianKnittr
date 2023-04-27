@@ -137,8 +137,8 @@ getObsidianHTML_WD(String)
                 }
             }
         }
-        return String
     }
+    return String
 }
 createTemporaryObsidianHTML_Config(manuscriptpath, obsidianhtml_configfile,Convert)
 {
