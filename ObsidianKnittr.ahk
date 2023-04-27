@@ -345,7 +345,12 @@ main()
         runRScript(rmd_Path,output_type,script_contents,script.config.config.RScriptPath)
         t:=CodeTimer("Timing R-Script-Execution")
         ExecutionLog:=OK_TF_Replace(ExecutionLog,"`n`nObsidianKnittr:`n","`nExecution RBuildScript < " A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec "`n " strreplace(strreplace(strreplace(t[3],"h"),"m"),"s") "`n`nObsidianKnittr:`n")
-        OutputDebug, % "`n`n" ExecutionLog
+        if DEBUG {
+            printed_ExecutionLog:=RegexReplace(ExecutionLog,"(Excluded.*)<","<")
+            Clipboard:=printed_ExecutionLog:=RegexReplace(printed_ExecutionLog,"> COMPILING MARKDOWN FROM OBSIDIAN CODE.*You can find your output at:","> COMPILING MARKDOWN FROM OBSIDIAN CODE`n< COMPILING MARKDOWN FROM OBSIDIAN CODE`n`nYou can find your output at:")
+            OutputDebug, % "`n`n"
+        }
+        Clipboard:=ExecutionLog
         ;m(clipboard:=Executionlog)
         FileAppend, % ExecutionLog, % ExecutionLog_Path
         OutputDebug, % t[3]
