@@ -108,9 +108,7 @@ runRScript(Path,output_type,script_contents,RScript_Path:="")
     ; FileAppend, % script_contents, % OutDir "\build.R"
 
     Clipboard:=CMD:=quote(RScript_Path) A_Space quote(strreplace(OutDir "\build.R","\","\\")) ;; works with valid codefile (manually ensured no utf-corruption) from cmd, all three work for paths not containing umlaute with FileAppend
-    ;Run, Target [, WorkingDir, Max|Min|Hide|UseErrorLevel, OutputVarPID]
     Run, % CMD, % OutDir, , PID
-    ;Run, Target [, WorkingDir, Max|Min|Hide|UseErrorLevel, OutputVarPID]
     WinWait, % "ahk_pid " PID
     WinMove, % "ahk_pid " PID, , 0, 0, 464, 75
     WinWaitClose, % "ahk_pid " PID
