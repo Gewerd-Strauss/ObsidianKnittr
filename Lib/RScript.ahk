@@ -100,7 +100,7 @@ buildRScriptContent(Path,output_type,output_filename="",out="")
 
 }
 
-runRScript(Path,output_type,script_contents,RScript_Path:="")
+runRScript(Path,script_contents,RScript_Path:="")
 {
     SplitPath, % Path, OutFileName, OutDir
     FileDelete, % OutDir "\build.R"
