@@ -2,33 +2,33 @@ buildRScriptContent(Path,output_type,output_filename="",out="")
 {
     SplitPath, % Path, , Path2, , Name
     RScriptFilePath:=strreplace(Path2,"\","\\")
-    , RScriptFolder:=strreplace(Path2,"\","/")
+        , RScriptFolder:=strreplace(Path2,"\","/")
     Str=
     (LTRIM
-    getwd()
-    if (getwd() != "%RScriptFolder%")
-    {
+        getwd()
+        if (getwd() != "%RScriptFolder%")
+        {
         setwd("%RScriptFilePath%")
         getwd()
-    }
-    getwd()
+        }
+        getwd()
 
     )
     if out.3.8
     {
         Str2=
         (LTrim
-        files <- list.files(pattern="*.PNG",recursive = TRUE)
-        files2 <- list.files(pattern="*.png",recursive = TRUE)
-        filesF <- c(files,files2)
-        lapply(filesF,ImgFix  <- function(Path="")
-        {
-        png_image  <- magick::image_read(Path)
-        jpeg_image <- magick::image_convert(png_image,"JPEG")
-        png_image  <- magick::image_convert(jpeg_image,"PNG")
-        magick::image_write(png_image,Path)
-        sprintf( "Fixed Path '`%s'", Path)
-        })
+            files <- list.files(pattern="*.PNG",recursive = TRUE)
+            files2 <- list.files(pattern="*.png",recursive = TRUE)
+            filesF <- c(files,files2)
+            lapply(filesF,ImgFix  <- function(Path="")
+            {
+            png_image  <- magick::image_read(Path)
+            jpeg_image <- magick::image_convert(png_image,"JPEG")
+            png_image  <- magick::image_convert(jpeg_image,"PNG")
+            magick::image_write(png_image,Path)
+            sprintf( "Fixed Path '`%s'", Path)
+            })
         )
         Str.="`n" Str2
         bFixPNGS:=true
@@ -36,7 +36,7 @@ buildRScriptContent(Path,output_type,output_filename="",out="")
     else
         bFixPNGS:=false
     Name:=(output_filename!=""?output_filename:"index")
-    , FormatOptions:=""
+        , FormatOptions:=""
     for type,Class in out[4]
     {
         bDoPDFLast:=false
@@ -50,16 +50,16 @@ buildRScriptContent(Path,output_type,output_filename="",out="")
         {
             Str2=
             (LTRIM
-            
-            rmarkdown::render(`"index.rmd`",NULL,`"%Name%"`)`n
+
+                rmarkdown::render(`"index.rmd`",NULL,`"%Name%"`)`n
             )
         }
         else
         {
             Str2=
             (LTRIM
-            
-            rmarkdown::render(`"index.rmd`",%format%,`"%Name%"`)`n
+
+                rmarkdown::render(`"index.rmd`",%format%,`"%Name%"`)`n
             )
         }
         Str.=Str2
@@ -77,11 +77,11 @@ buildRScriptContent(Path,output_type,output_filename="",out="")
             filesF <- c(files,files2)
             lapply(filesF,ImgFix  <- function(Path="")
             {
-                png_image  <- magick::image_read(Path)
-                jpeg_image <- magick::image_convert(png_image,"JPEG")
-                png_image  <- magick::image_convert(jpeg_image,"PNG")
-                magick::image_write(png_image,Path)
-                sprintf( "Fixed Path '`%s'", Path)
+            png_image  <- magick::image_read(Path)
+            jpeg_image <- magick::image_convert(png_image,"JPEG")
+            png_image  <- magick::image_convert(jpeg_image,"PNG")
+            magick::image_write(png_image,Path)
+            sprintf( "Fixed Path '`%s'", Path)
             })
             rmarkdown::render(`"index.rmd`",%format%,`"%Name%"`)`n
         )
@@ -89,7 +89,7 @@ buildRScriptContent(Path,output_type,output_filename="",out="")
         {
             Str2=
             (LTrim
-                
+
                 rmarkdown::render(`"index.rmd`",%format%,`"%Name%"`)`n
             )
         }
@@ -97,7 +97,7 @@ buildRScriptContent(Path,output_type,output_filename="",out="")
         FormatOptions.= A_Tab strreplace(format,"`n",A_Tab "`n") "`n`n"
     }
     return [Str,FormatOptions]
-	
+
 }
 
 runRScript(Path,output_type,script_contents,RScript_Path:="")
