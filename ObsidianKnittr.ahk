@@ -342,7 +342,7 @@ main()
         ;m(clipboard:=Executionlog)
 
         ttip("Executing R-BuildScript",5)
-        runRScript(rmd_Path,output_type,script_contents,script.config.config.RScriptPath)
+        runRScript(rmd_Path,script_contents,script.config.config.RScriptPath)
         t:=CodeTimer("Timing R-Script-Execution")
         ExecutionLog:=OK_TF_Replace(ExecutionLog,"`n`nObsidianKnittr:`n","`nExecution RBuildScript < " A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec "`n " strreplace(strreplace(strreplace(t[3],"h"),"m"),"s") "`n`nObsidianKnittr:`n")
         if DEBUG {
