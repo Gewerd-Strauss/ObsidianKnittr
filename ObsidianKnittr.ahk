@@ -425,14 +425,20 @@ copyBack(Source,Destination,manuscriptpath)
         FileCopyDir, % Dir, % Output_Path:=Destination "\" manuscriptname "\", true
         writeFile(Output_Path "\index.md",Clipboard:=manuscriptcontent,,,true)
         ; FileAppend,% Clipboard:=manuscriptcontent, % Output_Path "\index.md"
-        FileCopy, % manuscriptpath, % Output_Path "\" manuscriptname "_vault.md", 1
+        FileCopy, % manuscriptpath, % regexreplace(Output_Path "\" manuscriptname "_vault.md ","\\{2,}","\"), 1
     }
     Else
     {
-        if FileExist(A_Desktop "\TempTemporal\" manuscriptname "\") ;; make sure the output is clean
-            FileRemoveDir, % A_Desktop "\TempTemporal\" manuscriptname "\", true
+        ;if FileExist(A_Desktop "\TempTemporal\" manuscriptname "\") ;; make sure the output is clean
+        ;    FileRemoveDir, % A_Desktop "\TempTemporal\" manuscriptname "\", true
         FileCopyDir, % Dir, % Output_Path:= A_Desktop "\TempTemporal\" manuscriptname "\" , true
-        FileCopy, % manuscriptpath, % Output_Path "\" manuscriptname "_vault.md ", 1
+        if Errorlevel {
+
+            msgbox, % Errorlevel
+        }
+        pd:=regexreplace(Output_Path "\" manuscriptname "_vault.md ","\\{2,}","\")
+        pd:=Trim(pd)
+        FileCopy, % manuscriptpath, % pd, 1
     }
     return Output_Path OutFileName
 }
