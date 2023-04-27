@@ -168,6 +168,8 @@ main()
             .8  bForceFixPNGFiles
             .9  bInsertSetupChunk
             .10 bUseConvertInsteadOfRun
+            .11 bRemoveObsidianHTMLErrors
+            .12 bUseOwnOHTMLFork
         4 Outputformats
     */
     ; [sel,manuscriptpath,[bVerboseCheckbox + 0,bFullLogCheckbox + 0,bSRCConverterVersion + 0,bKeepFilename + 0,bRenderRMD + 0,bRemoveHashTagFromTags + 0,bUseCustomTOC + 0],Outputformats]
@@ -195,6 +197,7 @@ main()
     bInsertSetupChunk:=out.3.9
     bConvertInsteadofRun:=out.3.10
     bRemoveObsidianHTMLErrors:=out.3.11
+    bUseOwnOHTMLFork:=out.3.12
     ; 3.
     if (output_type="") && (bVerboseCheckbox="") {
         reload
@@ -632,7 +635,7 @@ guiCreate()
     Gui, Font, s11 cWhite, Segoe UI
     gui, add, text,xm ym, Choose output type:
     WideControlWidth:=330
-    gui, add, listview, vvLV1 cWhite w%WideControlWidth% checked, % "Type"
+    gui, add, listview, vvLV1 cWhite LV0x8 w%WideControlWidth% checked, % "Type"
     for k,v in PotentialOutputs
     {
         Options:=((Instr(script.config.lastrun.last_output_type,v))?"Check":"-Check")
@@ -652,27 +655,28 @@ guiCreate()
     DDLRows:=script.config.Config.HistoryLimit
     gui, add, DDL, w%widecontrolwidth% vChosenFile hwndChsnFile r%DDLRows%, % HistoryString
     ; gui, add, edit, w%widecontrolwidth% vChosenFile hwndChsnFile disabled
-    gui, add, checkbox, vbVerboseCheckbox, Set OHTML's Verbose-Flag?
+    gui, add, checkbox, vbConvertInsteadofRun, !!Use verb 'Convert' for OHTML-call?
+    gui, add, checkbox, vbUseOwnOHTMLFork, !!!Use the personal fork? *CAUTION*
+    gui, add, checkbox, vbRemoveObsidianHTMLErrors, !Purge OHTML-Error-strings?
     gui, add, checkbox, vbFullLogCheckbox, Full Log on successful execution?
-
-    ; gui, add, checkbox, vbSRCConverterVersion, Use V2 conversion?
+    gui, add, checkbox, vbVerboseCheckbox, Set OHTML's Verbose-Flag?
+    Gui, Add, Text, w%WideControlWidth% h1 0x7 ;Horizontal Line > Black
+    gui, add, checkbox, vbRemoveHashTagFromTags, % "Remove '#' from tags?"
+    gui, add, checkbox, vbInsertSetupChunk, !Insert Setup-Chunk?
+    gui, add, checkbox, vbForceFixPNGFiles, Double-convert png-files pre-conversion?
     gui, add, checkbox, vbKeepFilename, Keep Filename?
     gui, add, checkbox, vbRenderRMD, Render RMD to chosen outputs?
-    gui, add, checkbox, vbRemoveHashTagFromTags, % "Remove '#' from tags?"
-    gui, add, checkbox, vbForceFixPNGFiles, Double-convert png-files pre-conversion?
-    gui, add, checkbox, vbInsertSetupChunk, !Insert Setup-Chunk?
-    gui, add, checkbox, vbConvertInsteadofRun, !!Use verb 'Convert' for OHTML-call?
-    gui, add, checkbox, vbRemoveObsidianHTMLErrors, !Purge OHTML-Error-strings?
     Gui, Font, s7 cWhite, Verdana
     gui, add, button, gGCSubmit, &Submit
     gui, add, button, gGCAutoSubmit yp xp+60, &Full Submit
     onOpenConfig:=Func("EditMainConfig").Bind(script.configfile)
-    gui, add, button, hwndOpenConfig yp xp+81, Edit General Configuration
-    gui, add, button, gGCAbout hwndAbout yp xp+157, &About
+    gui, add, button, hwndOpenConfig yp xp+81, Edit General Config
+    gui, add, button, gGCAbout hwndAbout yp xp+122, &About
     GuiControl, +g,%OpenConfig%, % onOpenConfig
     ;     ; gui, add, button, yp xp+60 hwndEditConfig, Edit Configuration
     ;     ; onEditConfig:=ObjBindMethod(this, "EditConfig")
-    Gui, Add, Text,x25,% "v." script.version " | Author: " script.author " | Obsidian-HTML: " script.config.version.ObsidianHTML_Version
+    Gui, Add, Text,x15,% "v." script.config.version.ObsidianKnittr_Version " | Obsidian-HTML: " script.config.version.ObsidianHTML_Version
+    script.version:=script.config.version.ObsidianKnittr_Version
 
     ; script.config.lastrun.last_output_type:=["html_document","word_document"]
     if (script.config.LastRun.manuscriptpath!="") && (script.config.LastRun.last_output_type!="")
@@ -689,6 +693,7 @@ guiCreate()
         guicontrol,, bInsertSetupChunk, % (script.config.LastRun.InsertSetupChunk)
         guicontrol,, bConvertInsteadofRun, % (script.config.LastRun.ConvertInsteadofRun)
         guicontrol,, bRemoveObsidianHTMLErrors, % (script.config.LastRun.RemoveObsidianHTMLErrors)
+        guicontrol,, bUseOwnOHTMLFork, % (script.config.LastRun.UseOwnOHTMLFork)
     }
     return
 }
@@ -725,7 +730,7 @@ guiShow()
 
     }
     if (manuscriptpath!="") && !ot.bClosedNoSubmit
-        return [sel,manuscriptpath,[bVerboseCheckbox + 0,bFullLogCheckbox + 0,bSRCConverterVersion + 0,bKeepFilename + 0,bRenderRMD + 0,bRemoveHashTagFromTags + 0,bUseCustomTOC + 0,bForceFixPNGFiles + 0, bInsertSetupChunk + 0, bConvertInsteadofRun + 0, bRemoveObsidianHTMLErrors + 0],Outputformats]
+        return [sel,manuscriptpath,[bVerboseCheckbox + 0,bFullLogCheckbox + 0,bSRCConverterVersion + 0,bKeepFilename + 0,bRenderRMD + 0,bRemoveHashTagFromTags + 0,bUseCustomTOC + 0,bForceFixPNGFiles + 0, bInsertSetupChunk + 0, bConvertInsteadofRun + 0, bRemoveObsidianHTMLErrors + 0,bUseOwnOHTMLFork + 0],Outputformats]
     Else
         ExitApp
 }
@@ -790,6 +795,7 @@ guiSubmit()
     script.config.LastRun.InsertSetupChunk:=bInsertSetupChunk+0
     script.config.LastRun.ConvertInsteadofRun:=bConvertInsteadofRun+0
     script.config.LastRun.RemoveObsidianHTMLErrors:=bRemoveObsidianHTMLErrors+0
+    script.config.LastRun.UseOwnOHTMLFork:=bUseOwnOHTMLFork+0
     script.config.DDLHistory:=buildHistory(script.config.DDLHistory,script.config.Config.HistoryLimit,script.config.LastRun.manuscriptpath)
 
     for k,v in sel
