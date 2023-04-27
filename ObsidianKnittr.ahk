@@ -296,7 +296,7 @@ main()
     ; 4
 
     ttip("Converting to .rmd-file",5)
-    rmd_Path:=convertMDToRMD(md_Path,"index",true)
+    rmd_Path:=convertMDToRMD(md_Path,"index")
     ; 5, 6
     ttip("Moving to output folder",5)
     rmd_Path:=copyBack(rmd_Path,script.config.Destination,manuscriptpath)
@@ -456,7 +456,7 @@ getOutputPath(Source,Destination,manuscriptpath)
     }
     return [Output_Path,Raw_InputFile]
 }
-convertMDToRMD(md_Path,notename,bConvertSRC:=false)
+convertMDToRMD(md_Path,notename)
 {
     FileCopy, % md_Path "\" notename ".md", % md_Path "\" notename ".rmd",true
     return md_Path "\" notename ".rmd"
