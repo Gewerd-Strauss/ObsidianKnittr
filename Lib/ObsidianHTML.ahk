@@ -17,13 +17,15 @@
         return false
     }
 
-    if (!FileExist(WD)) { ;; ensure the Working Directory exists before running OHTML
+    ;; ensure the Working Directory exists before running OHTML
+    if (!FileExist(WD)) {
         FileCreateDir, % WD
     }
 
-    bUseConvert:=(manuscript_path=""?true:false) ;; if no manuscript is provided, we must assume the config to contain it and use convert
+    ;; if no manuscript is provided, we must assume the config to contain it and use convert
+    bUseConvert:=(manuscript_path=""?true:false)
+
     ;; Validate config file.
-    ; Your configuration (I'm hardcoding this, you need to "do your thing" before reaching to this point)
     if (!FileExist(config_path)) {
         MsgBox 0x2010, script.name " - provided Config file does not exist ", % "The config-file provided to 'obsidianhtml convert - i <config_file> does not exist. Returning early."
         return false
