@@ -216,23 +216,26 @@ main()
     ObsidianKnittr_Info:=script.name ":`nVerbose:" bVerboseCheckbox "`nFull Log:" (script.config.config.FullLogOnSuccess || bFullLogCheckbox) "`nUsed Verb:'" ((tmpconfig[1] && bConvertInsteadofRun)?"Convert":"Run") "'`nSRC_Converter: " (bSRCConverterVersion?"V2 Conversion (no universal decoding employed, can output '' to "")":"V4 Conversion (should convert everything cleanly)") "`n" A_Tab "Document Settings`n"
     OHTML_OutputDir:=Deref(script.config.config.OHTML_OutputDir)
     if (tmpconfig[1] && bConvertInsteadofRun) {
-        ret:=ObsidianHtml(,tmpconfig[1],Verbose,,OHTML_OutputDir)
+        ret:=ObsidianHtml(,tmpconfig[1],,bUseOwnOHTMLFork,bVerboseCheckbox,OHTML_OutputDir)
     } else {
-        ret:=ObsidianHtml(manuscriptpath,tmpconfig[1],Verbose,,OHTML_OutputDir)
+        ret:=ObsidianHtml(manuscriptpath,tmpconfig[1],,bUseOwnOHTMLFork,bVerboseCheckbox,OHTML_OutputDir)
 
     }
     t:=CodeTimer("Timing ComObjTime, Verb: " (bConvertInsteadofRun?"Convert":"Run"))
     GeneralInfo.="Execution ObsidianHTML < " A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
-    d:= ret.obsidianHTML_Version
-    e:= ret["obsidianHTML_Version"]
     GeneralInfo.="`n " strreplace(strreplace(strreplace(t[3],"h"),"m"),"s") "`n`n"
     OutputDebug, % "`n`n" GeneralInfo
     if RegExMatch(Ret["stdOut"], "md: (?<MDPath>.*)(\s*)", v) || FileExist(ret.OutputPath)
     {
         if FileExist(ret.OutputPath){
-            vMDPath:=strreplace(ret.OutputPath "/md","//","\")
+            _:=SubStr(ret.OutputPath,-1)
+            vMDPath:=strreplace(ret.OutputPath (SubStr(ret.OutputPath,-1)="md"?"":"/md"),"//","\")
             vMDPath:=strreplace(vMDPath ,"/","\")
         }
+        vMDPath:=Trim(vMDPath)
+        vMDPath:=LTrim(vMDPath)
+        vMDPath:=RTrim(vMDPath)
+        vMDPath:=strreplace(vMDPath,"`n")
         script.config.version.ObsidianHTML_Version:=ret.obsidianhtml_Version
         ObsidianHTML_Info:="`nObsidianHTML:`nVersion: " ret.obsidianHTML_Version "`nObsiidanHTML-Path:" ret.obsidianhtml_path "`nInput:`n" manuscriptpath "`nOutput Folder:`n" vMDPath "`nConfig:`n" obsidianhtml_configfile "`nCustom Config contents:`n" readObsidianHTML_Config(obsidianhtml_configfile).2 "`n---`n"
         if FileExist(vMDPath)
@@ -363,6 +366,10 @@ main()
     buildAHKScriptContent(rmd_Path,script_contents,script.config.config.RScriptPath)
     openFolder(rmd_Path)
     removeTempDir(md_Path)
+    removeTempDir(ret.OutputPath)
+    ;#todo: make removeTempDir never delete subfolders containing the strings "_files" or "_cache" so that caching actually - CACHES
+    ;removeTempDir(ret.OutputPath_Deprecated)
+
     script.save()
     return
 }
