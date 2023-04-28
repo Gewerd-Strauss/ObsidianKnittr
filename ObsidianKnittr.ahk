@@ -323,7 +323,6 @@ main()
     }
     if bRenderRMD
     {
-
         FileRead,ExecutionLog, % ExecutionLog_Path
         t:=CodeTimer("Timing R-Script-Execution")
         ExecutionLog:=OK_TF_Replace(ExecutionLog,"`n`nObsidianKnittr:`n","`nExecution RBuildScript > " A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec "`n`nObsidianKnittr:`n")
@@ -340,7 +339,6 @@ main()
         }
         writeFile(ExecutionLog_Path,ExecutionLog,,,true)
         OutputDebug, % t[3]
-
     }
     Else
     {
@@ -444,7 +442,7 @@ convertMDToRMD(md_Path,notename)
 removeTempDir(Path,RemoveParent:=TRUE)
 {
     if RemoveParent {
-        SplitPath,% Path,, OutDir
+        SplitPath, % Path,, OutDir
         FileRemoveDir, % OutDir,1
         if FileExist(OutDir)
         {
