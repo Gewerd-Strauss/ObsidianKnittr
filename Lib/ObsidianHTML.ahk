@@ -99,6 +99,7 @@
 
 getObsidianHTML_WD(String)
 {
+    ;needles:=["from (?<Path>.*obshtml_.*\/)","md: (?<Path>.*obshtml_.*(\/|\\)md)","md: (?<Path>.*\md)","\> COMPILING HTML FROM MARKDOWN CODE \((?<Path>.*\\md)\\index\.md\)","m)\> COMPILING HTML FROM MARKDOWN CODE \((?<Path>.*)\)","m)\> COMPILING HTML FROM MARKDOWN CODE \((?<Path>.+)\)+$","\> COMPILING HTML FROM MARKDOWN CODE \((?<Path>.+)\)+","md: (?<Path>.*\\md)"]
     Regexmatch(String,"from (?<Path>.*obshtml_.*\/)",v)
     if FileExist(vPath) {
         return vPath
