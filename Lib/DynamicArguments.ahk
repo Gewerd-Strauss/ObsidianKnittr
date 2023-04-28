@@ -1,11 +1,3 @@
-; pdf:=new ot("pdf_document","D:\Dokumente neu\000 AAA Dokumente\000 AAA HSRW\General\AHK scripts\Projects\Finished\ObsidianScripts\INI-Files\DynamicArguments.ini")
-docx:=new ot("word_document","D:\Dokumente neu\000 AAA Dokumente\000 AAA HSRW\General\AHK scripts\Projects\Finished\ObsidianScripts\INI-Files\DynamicArguments.ini")
-docx:=docx.GenerateGUI()
-; pdf:=pdf.GenerateGUI()
-; pdfstr:=pdf.AssembleFormatString() 
-docxstr:=docx.AssembleFormatString()
-Clipboard:=pdfstr "`n" docxstr
-ExitApp
 Class ot ;; output_type
 {
     
@@ -83,7 +75,6 @@ Class ot ;; output_type
     }
     __Get(Param*)
     {
-        instance:=this
         ret:={}
         for _,key in Param
         {

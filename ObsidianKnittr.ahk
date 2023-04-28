@@ -328,7 +328,6 @@ main()
         t:=CodeTimer("Timing R-Script-Execution")
         ExecutionLog:=OK_TF_Replace(ExecutionLog,"`n`nObsidianKnittr:`n","`nExecution RBuildScript > " A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec "`n`nObsidianKnittr:`n")
         OutputDebug, % "`n`n" ExecutionLog
-        ;m(clipboard:=Executionlog)
 
         ttip("Executing R-BuildScript",5)
         runRScript(rmd_Path,script_contents,script.config.config.RScriptPath)
@@ -411,8 +410,6 @@ copyBack(Source,Destination,manuscriptpath)
     }
     Else
     {
-        ;if FileExist(A_Desktop "\TempTemporal\" manuscriptname "\") ;; make sure the output is clean
-        ;    FileRemoveDir, % A_Desktop "\TempTemporal\" manuscriptname "\", true
         FileCopyDir, % Dir, % Output_Path:= A_Desktop "\TempTemporal\" manuscriptname "\" , true
         if Errorlevel {
 
@@ -612,7 +609,6 @@ guiCreate()
         if (each=1)
             HistoryString.="|"
     }
-    ; gui, add, ddl, vDDLval, All||html_document|word_document|odt_document|rtf_document|md_document|
     Gui, add, button, gChooseFile, &Choose Manuscript
     DDLRows:=script.config.Config.HistoryLimit
     gui, add, DDL, w%widecontrolwidth% vChosenFile hwndChsnFile r%DDLRows%, % HistoryString
@@ -810,10 +806,8 @@ editMainConfig(configfile)
 }
 chooseFile()
 {
-    global
-    if FileExist(r:=strreplace(Clipboard,"/","\"))
-        Clipboard:=strreplace(Clipboard,"/","\")
-    else if FileExist(r:=strreplace(Clipboard,"/","\"))
+    ;global
+    if FileExist(strreplace(Clipboard,"/","\"))
         Clipboard:=strreplace(Clipboard,"/","\")
     else
         ttip("Clipboard does not contain a valid path.")
