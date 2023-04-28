@@ -56,7 +56,7 @@
     ;; validate used version of OHTML
     if bUseOwnOHTMLFork {
         GetStdStreams_WithInput("python --version",,out)
-        status:=GetStdStreams_WithInput("python -m " command2_getversion,WorkDir_OwnFork,ohtmlversion_modded)
+        GetStdStreams_WithInput("python -m " command2_getversion,WorkDir_OwnFork,ohtmlversion_modded)
         MsgBox 0x2034,% "Is the correct build version used?", % "Has the correct build version been used?`n" ohtmlversion_modded "`n`nCMD:`n" command2, 6
         IfMsgBox Yes, {
 
@@ -66,14 +66,14 @@
     }
 
     if bUseOwnOHTMLFork {
-        status:=GetStdStreams_WithInput("python -m " command2,WorkDir_OwnFork,data_modded:="`n")
+        GetStdStreams_WithInput("python -m " command2,WorkDir_OwnFork,data_modded:="`n")
         ohtmlversion_out:=strreplace(ohtmlversion_modded,"`n commit:"," (commit:")
         ohtmlversion_out:=strreplace(ohtmlversion_out,"`n") ")"
         data_out:=data_modded
         WorkDir_out:=WorkDir_OwnFork
     } else {
-        status:=GetStdStreams_WithInput(command2_getversion,workDir,ohtmlversion)
-        status:=GetStdStreams_WithInput(command2,WorkDir,data:="`n")
+        GetStdStreams_WithInput(command2_getversion,WorkDir,ohtmlversion)
+        GetStdStreams_WithInput(command2,WorkDir,data:="`n")
         ohtmlversion_out:=ohtmlversion
         data_out:=data
         WorkDir_out:=WorkDir
@@ -210,7 +210,7 @@ fixYAMLSyntax(template) {
         return template
     }
     Lines:=strsplit(template,"`n")
-    for each, Line in Lines {
+    for _, Line in Lines {
         if !(bInTogglesSection || RegexMatch(Line,"mi)^toggles")) {
             out.=Line "`n"
             continue
