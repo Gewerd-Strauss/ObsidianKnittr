@@ -381,38 +381,41 @@ Class ot ;; output_type
     }
 }
 
+; #region:DA_Quote (4179423054)
 
+; #region:Metadata:
+; Snippet: DA_Quote;  (v.1)
+; --------------------------------------------------------------
+; Author: u/anonymous1184
+; Source: https://www.reddit.com/r/AutoHotkey/comments/p2z9co/comment/h8oq1av/?utm_source=share&utm_medium=web2x&context=3
+; (11.11.2022)
+; --------------------------------------------------------------
+; Library: AHK-Rare
+; Section: 05 - String/Array/Text
+; Dependencies: /
+; AHK_Version: v1
+; --------------------------------------------------------------
+; Keywords: apostrophe
+; #endregion:Metadata
 
-; --uID:4179423054
- ; Metadata:
-  ; Snippet: DA_Quote  ;  (v.1)
-  ; --------------------------------------------------------------
-  ; Author: u/anonymous1184
-  ; Source: https://www.reddit.com/r/AutoHotkey/comments/p2z9co/comment/h8oq1av/?utm_source=share&utm_medium=web2x&context=3
-  ; 
-  ; --------------------------------------------------------------
-  ; Library: AHK-Rare
-  ; Section: 05 - String/Array/Text
-  ; Dependencies: /
-  ; AHK_Version: v1
-  ; --------------------------------------------------------------
-  ; Keywords: apostrophe
+; #region:Description:
+; Quotes a string
+; #endregion:Description
 
- ;; Description:
-  ;; DA_Quotes a string
+; #region:Example
+; Var:="Hello World"
+; msgbox, % DA_Quote(Var . " Test")
+;
+; #endregion:Example
 
- ;;; Example:
-  ;;; Var:="Hello World"
-  ;;; msgbox, % DA_Quote(Var . " Test")
-  ;;; 
+; #region:Code
+DA_Quote(String)
+{ ; u/anonymous1184 https://www.reddit.com/r/AutoHotkey/comments/p2z9co/comment/h8oq1av/?utm_source=share&utm_medium=web2x&context=3
+    return """" String """"
+}
+; #endregion:Code
 
- DA_Quote(String)
- 	{ ; u/anonymous1184 https://www.reddit.com/r/AutoHotkey/comments/p2z9co/comment/h8oq1av/?utm_source=share&utm_medium=web2x&context=3
- 		return """" String """"
- 	}
-
-
-; --uID:4179423054
+; #endregion:DA_Quote (4179423054)
 
 DA_OnMsgBox() {
     DetectHiddenWindows, On
