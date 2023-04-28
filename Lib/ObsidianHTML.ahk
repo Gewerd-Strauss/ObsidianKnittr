@@ -111,15 +111,15 @@ getObsidianHTML_WD(String)
             if FileExist(vPath) {
                 return vPath
             } else {
-                RegexMatch(String, "\> COMPILING HTML FROM MARKDOWN CODE \((?<Path>.*\\md)\\index\.md\)")
+                RegexMatch(String, "\> COMPILING HTML FROM MARKDOWN CODE \((?<Path>.*\\md)\\index\.md\)",v)
                 if FileExist(vPath) {
                     return vPath
                 } else {
-                    RegexMatch(String, "m)\> COMPILING HTML FROM MARKDOWN CODE \((?<Path>.*)\)")
+                    RegexMatch(String, "m)\> COMPILING HTML FROM MARKDOWN CODE \((?<Path>.*)\)",v)
                     if FileExist(vPath) {
                         return vPath
                     } else {
-                        RegexMatch(Clipboard:=String, "m)\> COMPILING HTML FROM MARKDOWN CODE \((?<Path>.+)\)+$")
+                        RegexMatch(Clipboard:=String, "m)\> COMPILING HTML FROM MARKDOWN CODE \((?<Path>.+)\)+$",v)
                         if FileExist(vPath) {
                             return vPath
                         } else {
@@ -127,7 +127,7 @@ getObsidianHTML_WD(String)
                             if FileExist(vPath) {
                                 return vPath
                             } else {
-                                Regexmatch(String,"md: (?<Path>.*\\md)")
+                                Regexmatch(String,"md: (?<Path>.*\\md)",v)
                                 if FileExist(vPath) {
                                     return vPath
                                 } else {
