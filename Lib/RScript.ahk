@@ -102,10 +102,8 @@ buildRScriptContent(Path,output_type,output_filename="",out="")
 
 runRScript(Path,script_contents,RScript_Path:="")
 {
-    SplitPath, % Path, OutFileName, OutDir
-    FileDelete, % OutDir "\build.R"
+    SplitPath, % Path,, OutDir
     writeFile(OutDir "\build.R",script_contents,"UTF-8-RAW",,true)
-    ; FileAppend, % script_contents, % OutDir "\build.R"
 
     Clipboard:=CMD:=quote(RScript_Path) A_Space quote(strreplace(OutDir "\build.R","\","\\")) ;; works with valid codefile (manually ensured no utf-corruption) from cmd, all three work for paths not containing umlaute with FileAppend
     Run, % CMD, % OutDir, , PID
