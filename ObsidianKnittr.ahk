@@ -698,7 +698,7 @@ guiCreate()
     GuiControl, +g,%OpenConfig%, % onOpenConfig
     ;     ; gui, add, button, yp xp+60 hwndEditConfig, Edit Configuration
     ;     ; onEditConfig:=ObjBindMethod(this, "EditConfig")
-    Gui, Add, Text,x15,% script.name " v." script.config.version.ObsidianKnittr_Version " | Obsidian-HTML: v." script.config.version.ObsidianHTML_Version
+    Gui, Add, Text,x15,% script.name " v." script.config.version.ObsidianKnittr_Version " | Obsidian-HTML: v." strreplace(script.config.version.ObsidianHTML_Version,"commit:")
     script.version:=script.config.version.ObsidianKnittr_Version
 
     ; script.config.lastrun.last_output_type:=["html_document","word_document"]
