@@ -39,7 +39,7 @@ Class ot ;; output_type
             return this
         }
         ;ttip(Lines)
-        for each, Line in Lines
+        for _, Line in Lines
         {
             Count:=1
             p := 1
@@ -56,56 +56,11 @@ Class ot ;; output_type
                     ObjRawSet(This.Arguments,matchKey,{})
                     ObjRawSet(This.Arguments[CurrentParam],"Control",matchVal)
                 }
-                ObjRawSet(This.Arguments[CurrentParam],matchkey,matchVal) ;; there ought to be a simpler method than ObjRawSet that I am utterly missing, or tested with bad data and assumed faulty...
+                ObjRawSet(This.Arguments[CurrentParam],matchKey,matchVal) ;; there ought to be a simpler method than ObjRawSet that I am utterly missing, or tested with bad data and assumed faulty...
                 ; This.Arguments.InsertAt([matchKey] matchKey:=matchVal
                 p+=StrLen(Match)
                 Count++
             }
-            /*
-                ; if RegExMatch(Line, "(?<Key>\w*)\:(?<Val>[^|:]+)", v)
-                ; {
-                    
-                ; }
-
-                ; Details:=Parameter:=Control:=Options:="" ;; clear if assigned in previous pass
-                ; Details:=strsplit(Line,"|")
-                ; Parameter:=strsplit(Details.1,":").1
-                ; Control:=strsplit(Details.1,":").2
-                ; if Instr(Control, ",")
-                ; {
-                ;     Options:=Strsplit(Control,",").2
-                ;     Control:=Strsplit(Control,",").1
-                ;     if Instr(Control,":")
-                ;         Control:=Strsplit(Control,":").2
-                ;     This.Arguments[Trim(Parameter)]:={Trim(Parameter):Trim(Parameter),Type:Details.2,Default:Details.3,String:Details.4,Control:Control,Value:"",Options:Options,Other:Details.6}
-                ; }
-                ; else
-                ; {
-                ;     if Instr(Control,":")
-                ;         Control:=Strsplit(Control,":").2
-                ;     This.Arguments[Trim(Parameter)]:={Trim(Parameter):Trim(Parameter),Type:Details.2,Default:Details.3,String:Details.4,Control:Control,Value:"",Other:Details.6}
-                ; }
-                ; if Instr("boolean,integer,number",Details.2) ;(Details.2="boolean" || Details.2="number") || (Instr(Details.2,"boolean") || InStr(Details.2,"number"))
-                ; {
-                ;     DefVal:=This.Arguments[Trim(Parameter),"Default"]+0
-                ;     This.Arguments[Trim(Parameter),"Default"]:=This.Arguments[Trim(Parameter),"Default"]+0
-                ;     ;This.Arguments[Trim(Parameter),"Value"]:=This.Arguments[Trim(Parameter),"Default"]+0
-                ; }
-                ; else if (Details.2="float")
-                ; {
-
-                ; }
-                ; else if (Details.2="string")
-                ; {
-
-                ; }
-                ; else if (Details.2="valid_path")
-                ; {
-                ;     this.Arguments[Trim(Parameter)].SearchPath:=strsplit(this.Arguments[Trim(Parameter)].Other,"=").2
-                ;     ; This.Arguments[Trim(Parameter),"Value"]:=
-                ; }
-                ;This.Arguments[Trim(Parameter),"Control"]:=Details.1
-            */
         }
         this.AssumeDefaults()
         this._Adjust()
@@ -281,7 +236,7 @@ Class ot ;; output_type
 
     OpenFileSelectionFolder(Path)
     {
-        SplitPath, % Path, OutFileName, OutDir
+        SplitPath, % Path,, OutDir
         run, % OutDir
     }
 
@@ -296,66 +251,67 @@ Class ot ;; output_type
             ID:=strsplit(this.Error,A_Space).2
             if !(SubStr(ID,1,1)="-")
                 return this
-            MsgBox 0x40031,%  this.ClassName " > " A_ThisFunc "()" ,% (this.Errors.HasKey(ID)?this.Errors[ID].String:"Fatal: Undefined Error with ID '" ID "'")
+            MsgBox 0x40031,% this.ClassName " > " A_ThisFunc "()" ,% (this.Errors.HasKey(ID)?this.Errors[ID].String:"Fatal: Undefined Error with ID '" ID "'")
             return this
         }
-            
+
         gui, ParamsGUI: new, +AlwaysOnTop -SysMenu -ToolWindow +caption +Border +LabelotGUI_ +hwndotGUI_
         gui, font, s8
 
-        for each,V in this.Arguments
+        for each,argument in this.Arguments
         {
-            Control:=V.Control
+            Control:=argument.Control
             if (Options="")
                 Options:=""
-            if (V.Control="Edit")
+            if (argument.Control="Edit")
             {
-                gui, ParamsGUI: add, text,, % tmp:=V.String
-                if (V.ctrlOptions="Number") 
+                gui, ParamsGUI: add, text,, % argument.String
+                if (argument.ctrlOptions="Number")
                 {
-                    if (v.Max!="") && (v.Min!="")
+                    if (argument.Max!="") && (argument.Min!="")
                     {
-                        V.ctrlOptions.= A_Space 
+                        argument.ctrlOptions.= A_Space
                         Gui, ParamsGUI:Add, Edit
-                        gui, ParamsGUI:add, UpDown, %  "h25 w80 Range" v.Min "-" v.Max " vv" each, % v.Default + 0
+                        gui, ParamsGUI:add, UpDown, % "h25 w80 Range" argument.Min "-" argument.Max " vv" each, % argument.Default + 0
                         continue
                     }
                 }
-                if !RegexMatch(v.ctrlOptions,"w\d*")
-                    v.ctrlOptions.= " w120"
-                gui, ParamsGUI: add, % V.Control, % V.ctrlOptions " vv" each, % (v.Value="NULL"?:v.Value)
+                if !RegexMatch(argument.ctrlOptions,"w\d*")
+                    argument.ctrlOptions.= " w120"
+                gui, ParamsGUI: add, % argument.Control, % argument.ctrlOptions " vv" each, % (argument.Value="NULL"?:argument.Value)
             }
-            else if (V.Control="File")
+            else if (argument.Control="File")
             {
-                gui, ParamsGUI:Add, Text,, % V.String
-                gui, ParamsGUI:Add, edit,  % V.ctrlOptions " vv" each " disabled w200", % V.Value
+                gui, ParamsGUI:Add, Text,, % argument.String
+                gui, ParamsGUI:Add, edit, % argument.ctrlOptions " vv" each " disabled w200", % argument.Value
                 Gui, ParamsGUI:Add, button, hwndSelectFile, % "Select &File"
                 gui, ParamsGUI:add, button, yp xp+77 hwndOpenFileSelectionFolder, % "Open File Selection Folder"
-                onOpenFileSelectionFolder:=ObjBindMethod(this, "OpenFileSelectionFolder", V.SearchPath)
+                onOpenFileSelectionFolder:=ObjBindMethod(this, "OpenFileSelectionFolder", argument.SearchPath)
                 onSelectFile := ObjBindMethod(this, "ChooseFile",each)
                 GuiControl, ParamsGUI:+g, %SelectFile%, % onSelectFile
                 GuiControl, ParamsGUI:+g, %OpenFileSelectionFolder%, % onOpenFileSelectionFolder
                 gui, ParamsGUI:add,text, w0 h0 yp+20 xp-77
             }
-            else if (V.Control="DDL")
+            else if (argument.Control="DDL")
             {
-                gui, ParamsGUI:Add, Text,, % V.String
-                if Instr(V.ctrlOptions,",") && !Instr(V.ctrlOptions,"|")
-                    V.ctrlOptions:=strreplace(V.ctrlOptions,",","|")
-                if !Instr(V.ctrlOptions,v.Default)
-                    v.ctrlOptions.=((SubStr(v.ctrlOptions,-1)="|")?"":"|") v.Default
-                if !Instr(V.ctrlOptions,v.Default "|")
-                    v.ctrlOptions:=strreplace(v.ctrlOptions,v.Default,v.Default "|")
-                if !Instr(V.ctrlOptions,v.Default "||")
-                    v.ctrlOptions:=strreplace(v.ctrlOptions,v.Default,v.Default "|")
-                if !Instr(V.ctrlOptions,v.Default "||")
-                    v.ctrlOptions:=strreplace(v.ctrlOptions,v.ctrlOptions "|")
-                gui, ParamsGUI:add, % V.Control, %  " vv" each, % V.ctrlOptions
+                gui, ParamsGUI:Add, Text,, % argument.String
+                if Instr(argument.ctrlOptions,",") && !Instr(argument.ctrlOptions,"|")
+                    argument.ctrlOptions:=strreplace(argument.ctrlOptions,",","|")
+                if !Instr(argument.ctrlOptions,argument.Default)
+                    argument.ctrlOptions.=((SubStr(argument.ctrlOptions,-1)="|")?"":"|") argument.Default
+                if !Instr(argument.ctrlOptions,argument.Default "|")
+                    argument.ctrlOptions:=strreplace(argument.ctrlOptions,argument.Default,argument.Default "|")
+                if !Instr(argument.ctrlOptions,argument.Default "||")
+                    argument.ctrlOptions:=strreplace(argument.ctrlOptions,argument.Default,argument.Default "|")
+                if !Instr(argument.ctrlOptions,argument.Default "||")
+                    argument.ctrlOptions:=strreplace(argument.ctrlOptions,argument.ctrlOptions "|")
+                gui, ParamsGUI:add, % argument.Control, % " vv" each, % argument.ctrlOptions
             }
             else
-                gui, ParamsGUI:add, % V.Control, % V.ctrlOptions " vv" each, % V.String
-            if (V.Control="Checkbox")
-                guicontrol,% "ParamsGUI:",v%each%, % V.Default
+                gui, ParamsGUI:add, % argument.Control, % argument.ctrlOptions " vv" each, % argument.String
+            if (argument.Control="Checkbox")
+                ;@ahk-neko-ignore-fn 1 line; at 4/28/2023, 9:49:09 AM ; case sensitivity
+                guicontrol,% "ParamsGUI:",v%each%, % argument.Default
 
             if (Control="Edit")
             {
