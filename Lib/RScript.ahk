@@ -1,4 +1,4 @@
-buildRScriptContent(Path,output_type,output_filename="",out="")
+buildRScriptContent(Path,output_filename="",out="")
 {
     SplitPath, % Path, , Path2, , Name
     RScriptFilePath:=strreplace(Path2,"\","\\")
@@ -37,13 +37,11 @@ buildRScriptContent(Path,output_type,output_filename="",out="")
         bFixPNGS:=false
     Name:=(output_filename!=""?output_filename:"index")
         , FormatOptions:=""
-    for type,Class in out[4]
+    for _,Class in out[4]
     {
-        bDoPDFLast:=false
         format:=Class.AssembledFormatString
         if Instr(format,"pdf_document")
         {
-            bDoPDFLast:=true
             continue
         }
         if (format="")
@@ -65,7 +63,7 @@ buildRScriptContent(Path,output_type,output_filename="",out="")
         Str.=Str2
         FormatOptions.= A_Tab strreplace(format,"`n",A_Tab "`n") "`n`n"
     }
-    for type, Class in Out[4]
+    for _, Class in Out[4]
     {
         format:=Class.AssembledFormatString
         if !Instr(format,"pdf_document")
@@ -105,7 +103,7 @@ runRScript(Path,script_contents,RScript_Path:="")
     SplitPath, % Path,, OutDir
     writeFile(OutDir "\build.R",script_contents,"UTF-8-RAW",,true)
 
-    Clipboard:=CMD:=quote(RScript_Path) A_Space quote(strreplace(OutDir "\build.R","\","\\")) ;; works with valid codefile (manually ensured no utf-corruption) from cmd, all three work for paths not containing umlaute with FileAppend
+    CMD:=quote(RScript_Path) A_Space quote(strreplace(OutDir "\build.R","\","\\")) ;; works with valid codefile (manually ensured no utf-corruption) from cmd, all three work for paths not containing umlaute with FileAppend
     Run, % CMD, % OutDir, , PID
     WinWait, % "ahk_pid " PID
     WinMove, % "ahk_pid " PID, , 0, 0, 464, 75

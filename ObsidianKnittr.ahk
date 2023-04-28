@@ -175,7 +175,7 @@ main()
     ; [sel,manuscriptpath,[bVerboseCheckbox + 0,bFullLogCheckbox + 0,bSRCConverterVersion + 0,bKeepFilename + 0,bRenderRMD + 0,bRemoveHashTagFromTags + 0,bUseCustomTOC + 0],Outputformats]
     WorkDir := "C:\Users\Claudius Main\Desktop\TempTemporal"
     WorkDir_OwnFork := "D:\Dokumente neu\ObsidianPluginDev\obsidian-html"
-    for each,format in out.4
+    for _,format in out.4
         if format.HasKey("Error") && (format.Error.ID=0)
         {
             Reload
@@ -204,7 +204,7 @@ main()
         reload
     }
     obsidianhtml_configfile:=script.config.config.obsidianhtml_configfile
-    SplitPath, % manuscriptpath, OutFileName, manuscriptLocation,, manuscriptName
+    SplitPath, % manuscriptpath,,,, manuscriptName
 
     tmpconfig:=createTemporaryObsidianHTML_Config(manuscriptpath, obsidianhtml_configfile,bConvertInsteadofRun)
 
@@ -240,7 +240,7 @@ main()
         ObsidianHTML_Info:="`nObsidianHTML:`nVersion: " ret.obsidianHTML_Version "`nObsiidanHTML-Path:" ret.obsidianhtml_path "`nInput:`n" manuscriptpath "`nOutput Folder:`n" vMDPath "`nConfig:`n" obsidianhtml_configfile "`nCustom Config contents:`n" readObsidianHTML_Config(obsidianhtml_configfile).2 "`n---`n"
         if FileExist(vMDPath)
         {
-            ObsidianKnittr_Info.= "`nOutput Folder: " getOutputPath(convertMDToRMD(vMDPath,"index"),script.config.Destination,manuscriptpath).1 "`nRaw input copy:" getOutputPath(convertMDToRMD(vMDPath,"index"),script.config.Destination,manuscriptpath).2 "`n"
+            ObsidianKnittr_Info.= "`nOutput Folder: " getOutputPath(script.config.Destination,manuscriptpath).1 "`nRaw input copy:" getOutputPath(script.config.Destination,manuscriptpath).2 "`n"
             if (script.config.config.FullLogOnSuccess || bFullLogCheckbox)
                 writeFile(vMDPath "\Executionlog.txt",GeneralInfo ObsidianKnittr_Info ObsidianHTML_Info "`n`nIssued Command (Execution time " t[3] "):`n" ret["CMD"] "`n---`n`nCommand Line output below:`n`n" ret["stdout"],,,true)
             else
@@ -263,7 +263,7 @@ main()
 
             if FileExist(vMDPath)
             {
-                ObsidianKnittr_Info.= "`nOutput Folder: " getOutputPath(convertMDToRMD(vMDPath,"index"),script.config.Destination,manuscriptpath).1 "`nRaw input copy:" getOutputPath(convertMDToRMD(vMDPath,"index"),script.config.Destination,manuscriptpath).2 "`n"
+                ObsidianKnittr_Info.= "`nOutput Folder: " getOutputPath(script.config.Destination,manuscriptpath).1 "`nRaw input copy:" getOutputPath(script.config.Destination,manuscriptpath).2 "`n"
                 if (script.config.config.FullLogOnSuccess || bFullLogCheckbox)
                     writeFile(vMDPath "\Executionlog.txt",GeneralInfo ObsidianKnittr_Info ObsidianHTML_Info "`n`nIssued Command (Execution time " t[3] "):`n" ret["CMD"] "`n---`n`nCommand Line output below:`n`n" ret["stdout"],,,true)
                 else
@@ -280,7 +280,7 @@ main()
         else
         {
             script.config.version.ObsidianHTML_Version:=ret.obsidianhtml_Version
-            ObsidianKnittr_Info.= "`nOutput Folder: " getOutputPath(convertMDToRMD(vMDPath,"index"),script.config.Destination,manuscriptpath).1 "`nRaw input copy:" getOutputPath(convertMDToRMD(vMDPath,"index"),script.config.Destination,manuscriptpath).2 "`n"
+            ObsidianKnittr_Info.= "`nOutput Folder: " getOutputPath(script.config.Destination,manuscriptpath).1 "`nRaw input copy:" getOutputPath(script.config.Destination,manuscriptpath).2 "`n"
             ObsidianHTML_Info:="`nObsidianHTML:`nVersion: " ret.obsidianHTML_Version "`nObsiidanHTML-Path:" ret.obsidianhtml_path "`nInput:`n" manuscriptpath "`nOutput Folder:`n" vMDPath "`nConfig:`n" obsidianhtml_configfile "`n---`n"
             writeFile(A_ScriptDir "\Executionlog.txt",GeneralInfo ObsidianKnittr_Info ObsidianHTML_Info "`n`nIssued Command (Execution time " t[3] "):`n" ret["CMD"] "`n---`n`nCommand Line output below:`n`n" ret["stdout"],,,true)
             run, % A_ScriptDir "\Executionlog.txt"
@@ -306,15 +306,13 @@ main()
     writeFile(rmd_Path,Clipboard:=NewContents,"UTF-8",,true)
     ttip("Creating R-BuildScript",5)
     if bKeepFilename
-        tmp:=buildRScriptContent(rmd_Path,output_type,manuscriptName,out)
+        tmp:=buildRScriptContent(rmd_Path,manuscriptName,out)
     else
-        tmp:=buildRScriptContent(rmd_Path,output_type,,out)
+        tmp:=buildRScriptContent(rmd_Path,,out)
     script_contents:=tmp.1
     format:=tmp.2
     if (format!="")
     {
-        ExecutionLog_Path:=MD_ModTime:=SD_ModTime:=""
-        format:=tmp.2
         SplitPath, % rmd_Path,, OutDir
         if FileExist(ExecutionLog_Path:=OutDir "\ExecutionLog.txt")
         {
@@ -348,17 +346,15 @@ main()
     Else
     {
         ttip("Opening RMD-File",5)
-        SplitPath, % rmd_Path, OutFileName, OutDir
+        SplitPath, % rmd_Path,, OutDir
         writeFile(OutDir "\build.R",script_contents,"UTF-8-RAW",,true)
         run, % rmd_Path
     }
     ttip("Building AHK-Starterscript",5)
-    buildAHKScriptContent(rmd_Path,script_contents,script.config.config.RScriptPath)
+    buildAHKScriptContent(rmd_Path,script.config.config.RScriptPath)
     openFolder(rmd_Path)
     removeTempDir(md_Path)
     removeTempDir(ret.OutputPath)
-    ;#todo: make removeTempDir never delete subfolders containing the strings "_files" or "_cache" so that caching actually - CACHES
-    ;removeTempDir(ret.OutputPath_Deprecated)
 
     script.save()
     return
@@ -366,7 +362,7 @@ main()
 
 openFolder(Path)
 {
-    SplitPath, % Path, OutFileName, OutDir
+    SplitPath, % Path,, OutDir
     SplitPath, % OutDir, OutFileName, OutDir2
     if (WinExist(OutFileName " ahk_exe explorer.exe"))
     {
@@ -380,11 +376,9 @@ openFolder(Path)
     return
 }
 
-buildAHKScriptContent(Path,script_contents,RScript_Path:="")
+buildAHKScriptContent(Path,RScript_Path:="")
 {
-    SplitPath, % Path, OutFileName, OutDir
-    ;FileDelete, % OutDir "\build.R"
-    ;FileAppend, % script_contents, % OutDir "\build.R"
+    SplitPath, % Path,, OutDir
     if (RScript_Path="")
         RScript_Path:="C:\Program Files\R\R-4.2.0\bin\Rscript.exe"
     if script.config.config.bundleAHKStarter && (RScript_Path!="")
@@ -405,8 +399,8 @@ buildAHKScriptContent(Path,script_contents,RScript_Path:="")
 }
 copyBack(Source,Destination,manuscriptpath)
 {
-    SplitPath, Source, OutFileName, Dir,
-    SplitPath, % manuscriptpath , , ,,manuscriptname,
+    SplitPath, % Source, OutFileName, Dir,
+    SplitPath, % manuscriptpath,,,,manuscriptname,
     if Destination
     {
         if FileExist(Destination "\" manuscriptname "\") ;; make sure the output is clean
@@ -430,10 +424,9 @@ copyBack(Source,Destination,manuscriptpath)
     }
     return Output_Path OutFileName
 }
-getOutputPath(Source,Destination,manuscriptpath)
+getOutputPath(Destination,manuscriptpath)
 {
-    SplitPath, Source, OutFileName, Dir,
-    SplitPath, % manuscriptpath , , ,,manuscriptname,
+    SplitPath, % manuscriptpath,,,, manuscriptname
     if Destination
     {
         Output_Path:=Destination "\" manuscriptname "\"
@@ -503,7 +496,7 @@ processTags(Contents,bRemoveHashTagFromTags)
         ;; eliminate duplicates
         Lines:=strsplit(Tags,"`r`n")
         Tags:=""
-        for ind, Line in Lines
+        for _, Line in Lines
         {
             if SubStr(Line,1,2)="- " && !Instr(Tags,Line)
                 Tags.=Line "`r`n"
@@ -537,11 +530,8 @@ processTags(Contents,bRemoveHashTagFromTags)
             for ind,Tag in Tags
             {
                 if (SubStr(Tag,1,1)="-")
-                    Tags[ind]:=SubStr(Tag,3)
-                else
                 {
-                    Cap:=Tags.Remove(Ind)
-                    continue
+                    Tags[ind]:=SubStr(Tag,3)
                 }
             }
 
@@ -601,21 +591,8 @@ guiCreate()
     global
     gui, destroy
     PotentialOutputs:=["First in YAML" , "html_document" , "pdf_document" , "word_document" , "odt_document" , "rtf_document" , "md_document" , "powerpoint_presentation" , "ioslides_presentation" , "tufte::tufte_html" , "github_document" , "All"]
-    gui_control_options := "xm w220 " . cForeground . " -E0x200" ; remove border around edit field
     Gui, Margin, 16, 16
     Gui, +AlwaysOnTop -SysMenu -ToolWindow -caption +Border +LabelGC +hwndOKGui
-    cBackground := "c" . "1d1f21"
-    cCurrentLine := "c" . "282a2e"
-    cSelection := "c" . "373b41"
-    cForeground := "c" . "c5c8c6"
-    cComment := "c" . "969896"
-    cRed := "c" . "cc6666"
-    cOrange := "c" . "de935f"
-    cYellow := "c" . "f0c674"
-    cGreen := "c" . "b5bd68"
-    cAqua := "c" . "8abeb7"
-    cBlue := "c" . "81a2be"
-    cPurple := "c" . "b294bb"
     Gui, Color, 1d1f21, 373b41,
     Gui, Font, s11 cWhite, Segoe UI
     gui, add, text,xm ym, Choose output type:
@@ -658,15 +635,12 @@ guiCreate()
     gui, add, button, hwndOpenConfig yp xp+81, Edit General Config
     gui, add, button, gGCAbout hwndAbout yp xp+122, &About
     GuiControl, +g,%OpenConfig%, % onOpenConfig
-    ;     ; gui, add, button, yp xp+60 hwndEditConfig, Edit Configuration
-    ;     ; onEditConfig:=ObjBindMethod(this, "EditConfig")
-    Gui, Add, Text,x15,% script.name " v." script.config.version.ObsidianKnittr_Version " | Obsidian-HTML: v." strreplace(script.config.version.ObsidianHTML_Version,"commit:")
+    Gui, Add, Text,x15,% script.name " v." script.config.version.ObsidianKnittr_Version " | Obsidian-HTML v." strreplace(script.config.version.ObsidianHTML_Version,"commit:")
     script.version:=script.config.version.ObsidianKnittr_Version
 
-    ; script.config.lastrun.last_output_type:=["html_document","word_document"]
     if (script.config.LastRun.manuscriptpath!="") && (script.config.LastRun.last_output_type!="")
     {
-        SplitPath, % script.config.lastrun.manuscriptpath, , OutDir, , manuscriptname,
+        SplitPath, % script.config.lastrun.manuscriptpath, , OutDir
         SplitPath, % OutDir, OutFileName, OutDir,
         guicontrol,, bVerboseCheckbox, % (script.config.LastRun.Verbose)
         guicontrol,, bFullLogCheckbox, % (script.config.LastRun.FullLog)
@@ -692,8 +666,6 @@ guiShow()
 {
     global
     guiCreate()
-    w:=script.config.GuiPositioning.W
-    h:=script.config.GuiPositioning.H
     x:=(script.config.GuiPositioning.X!=""?script.config.GuiPositioning.X:200)
     y:=(script.config.GuiPositioning.Y!=""?script.config.GuiPositioning.Y:200)
     bAutoSubmitOTGUI:=false
@@ -701,7 +673,7 @@ guiShow()
     enableGuiDrag(1)
     WinWaitClose, % script.name " - Choose manuscript"
     Outputformats:={}
-    for each, format in sel
+    for _, format in sel
     {
         ot:=new ot(format,A_ScriptDir "\INI-Files\DynamicArguments.ini","-<>-")
         if bAutoSubmitOTGUI
@@ -860,9 +832,6 @@ chooseFile()
         if (manuscriptpath="")
             return
     }
-    SplitPath, % manuscriptpath, , OutDir, , manuscriptname,
-    SplitPath, % OutDir, OutFileName,
-
     script.config.DDLHistory:=buildHistory(script.config.DDLHistory,script.config.Config.HistoryLimit,manuscriptpath)
     HistoryString:=""
     for each, File in script.config.DDLHistory
