@@ -147,7 +147,7 @@ main()
             Y=
             [DDLHistory]
         )
-        FileAppend, % InitialSettings, % script.configfile
+        writeFile(script.configfile,InitialSettings)
         script.load()
     }
     script.version:=script.config.version.ObsidianKnittr_Version
@@ -241,17 +241,15 @@ main()
         if FileExist(vMDPath)
         {
             ObsidianKnittr_Info.= "`nOutput Folder: " getOutputPath(convertMDToRMD(vMDPath,"index"),script.config.Destination,manuscriptpath).1 "`nRaw input copy:" getOutputPath(convertMDToRMD(vMDPath,"index"),script.config.Destination,manuscriptpath).2 "`n"
-            FileDelete, & vMDPath "\Executionlog.txt"
             if (script.config.config.FullLogOnSuccess || bFullLogCheckbox)
-                FileAppend, % GeneralInfo ObsidianKnittr_Info ObsidianHTML_Info "`n`nIssued Command (Execution time " t[3] "):`n" ret["CMD"] "`n---`n`nCommand Line output below:`n`n" ret["stdout"], % vMDPath "\Executionlog.txt"
+                writeFile(vMDPath "\Executionlog.txt",GeneralInfo ObsidianKnittr_Info ObsidianHTML_Info "`n`nIssued Command (Execution time " t[3] "):`n" ret["CMD"] "`n---`n`nCommand Line output below:`n`n" ret["stdout"],,,true)
             else
-                FileAppend, % GeneralInfo ObsidianKnittr_Info ObsidianHTML_Info "`n`nIssued Command (Execution time " t[3] "):`n" ret["CMD"] "`n---`n", % vMDPath "\Executionlog.txt"
+                writeFile(vMDPath "\Executionlog.txt",GeneralInfo ObsidianKnittr_Info ObsidianHTML_Info "`n`nIssued Command (Execution time " t[3] "):`n" ret["CMD"] "`n---`n",,,true)
             md_Path:=vMDPath
         }
         Else
         {
-            FileDelete, % A_ScriptDir "\Executionlog.txt"
-            FileAppend, % GeneralInfo ObsidianKnittr_Info ObsidianHTML_Info "`n`nIssued Command (Execution time " t[3] "):`n" ret["CMD"] "`n---`n`nCommand Line output below:`n`n" ret["stdout"], % A_ScriptDir "\Executionlog.txt"
+            writeFile(A_ScriptDir "\Executionlog.txt",GeneralInfo ObsidianKnittr_Info ObsidianHTML_Info "`n`nIssued Command (Execution time " t[3] "):`n" ret["CMD"] "`n---`n`nCommand Line output below:`n`n" ret["stdout"],,,true)
             run, % A_ScriptDir "\Executionlog.txt"
             MsgBox 0x40010, % script.name, % "File md_Path does not seem to exist. Please check manually."
         }
@@ -266,17 +264,15 @@ main()
             if FileExist(vMDPath)
             {
                 ObsidianKnittr_Info.= "`nOutput Folder: " getOutputPath(convertMDToRMD(vMDPath,"index"),script.config.Destination,manuscriptpath).1 "`nRaw input copy:" getOutputPath(convertMDToRMD(vMDPath,"index"),script.config.Destination,manuscriptpath).2 "`n"
-                FileDelete, & vMDPath "\Executionlog.txt"
                 if (script.config.config.FullLogOnSuccess || bFullLogCheckbox)
-                    FileAppend, % GeneralInfo ObsidianKnittr_Info ObsidianHTML_Info "`n`nIssued Command (Execution time " t[3] "):`n" ret["CMD"] "`n---`n`nCommand Line output below:`n`n" ret["stdout"], % vMDPath "\Executionlog.txt"
+                    writeFile(vMDPath "\Executionlog.txt",GeneralInfo ObsidianKnittr_Info ObsidianHTML_Info "`n`nIssued Command (Execution time " t[3] "):`n" ret["CMD"] "`n---`n`nCommand Line output below:`n`n" ret["stdout"],,,true)
                 else
-                    FileAppend, % GeneralInfo ObsidianKnittr_Info ObsidianHTML_Info "`n`nIssued Command (Execution time " t[3] "):`n" ret["CMD"] "`n---`n", % vMDPath "\Executionlog.txt"
+                    writeFile(vMDPath "\Executionlog.txt",GeneralInfo ObsidianKnittr_Info ObsidianHTML_Info "`n`nIssued Command (Execution time " t[3] "):`n" ret["CMD"] "`n---`n",,,true)
                 md_Path:=vMDPath
             }
             Else
             {
-                FileDelete, % A_ScriptDir "\Executionlog.txt"
-                FileAppend, % GeneralInfo ObsidianKnittr_Info ObsidianHTML_Info "`n`nIssued Command (Execution time " t[3] "):`n" ret["CMD"] "`n---`n`nCommand Line output below:`n`n" ret["stdout"], % A_ScriptDir "\Executionlog.txt"
+                writeFile(A_ScriptDir "\Executionlog.txt",GeneralInfo ObsidianKnittr_Info ObsidianHTML_Info "`n`nIssued Command (Execution time " t[3] "):`n" ret["CMD"] "`n---`n`nCommand Line output below:`n`n" ret["stdout"],,,true)
                 run, % A_ScriptDir "\Executionlog.txt"
                 MsgBox 0x40010, % script.name, % "File md_Path does not seem to exist. Please check manually."
             }
@@ -286,8 +282,7 @@ main()
             script.config.version.ObsidianHTML_Version:=ret.obsidianhtml_Version
             ObsidianKnittr_Info.= "`nOutput Folder: " getOutputPath(convertMDToRMD(vMDPath,"index"),script.config.Destination,manuscriptpath).1 "`nRaw input copy:" getOutputPath(convertMDToRMD(vMDPath,"index"),script.config.Destination,manuscriptpath).2 "`n"
             ObsidianHTML_Info:="`nObsidianHTML:`nVersion: " ret.obsidianHTML_Version "`nObsiidanHTML-Path:" ret.obsidianhtml_path "`nInput:`n" manuscriptpath "`nOutput Folder:`n" vMDPath "`nConfig:`n" obsidianhtml_configfile "`n---`n"
-            FileDelete, % A_ScriptDir "\Executionlog.txt"
-            FileAppend, % GeneralInfo ObsidianKnittr_Info ObsidianHTML_Info "`n`nIssued Command (Execution time " t[3] "):`n" ret["CMD"] "`n---`n`nCommand Line output below:`n`n" ret["stdout"], % A_ScriptDir "\Executionlog.txt"
+            writeFile(A_ScriptDir "\Executionlog.txt",GeneralInfo ObsidianKnittr_Info ObsidianHTML_Info "`n`nIssued Command (Execution time " t[3] "):`n" ret["CMD"] "`n---`n`nCommand Line output below:`n`n" ret["stdout"],,,true)
             run, % A_ScriptDir "\Executionlog.txt"
             MsgBox, 0x40010, % script.name " - Output could not be parsed.", % "DO NOT CONTINUE WITHOUT FULLY READING THIS!`n`nThe command line output of obsidianhtml does not contain the required information.`nThe output has been copied to the clipboard, and written to file under '" A_ScriptDir "\Executionlog.txt" "'`n`nTo carry on, find the path of the md-file and copy it to your clipboard.`nONLY THEN close this window."
             md_Path:=Clipboard
@@ -309,8 +304,6 @@ main()
     NewContents:=processAbstract(NewContents)
 
     writeFile(rmd_Path,Clipboard:=NewContents,"UTF-8",,true)
-    ; FileAppend, % Clipboard:=NewContents,% rmd_Path
-    ; FileEncoding, % Current_FileEncoding
     ttip("Creating R-BuildScript",5)
     if bKeepFilename
         tmp:=buildRScriptContent(rmd_Path,output_type,manuscriptName,out)
@@ -326,16 +319,14 @@ main()
         if FileExist(ExecutionLog_Path:=OutDir "\ExecutionLog.txt")
         {
             FileRead,ExecutionLog, % ExecutionLog_Path
-            FileDelete, % ExecutionLog_Path
             ExecutionLog:=OK_TF_Replace(ExecutionLog,"Document Settings","Document Settings`n" A_Tab strreplace(format,"`n","`n" A_Tab A_Tab))
-            FileAppend, % ExecutionLog, % ExecutionLog_Path
+            writeFile(ExecutionLog_Path,ExecutionLog,,,true)
         }
     }
     if bRenderRMD
     {
 
         FileRead,ExecutionLog, % ExecutionLog_Path
-        FileDelete, % ExecutionLog_Path
         t:=CodeTimer("Timing R-Script-Execution")
         ExecutionLog:=OK_TF_Replace(ExecutionLog,"`n`nObsidianKnittr:`n","`nExecution RBuildScript > " A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec "`n`nObsidianKnittr:`n")
         OutputDebug, % "`n`n" ExecutionLog
@@ -350,9 +341,7 @@ main()
             Clipboard:=printed_ExecutionLog:=RegexReplace(printed_ExecutionLog,"> COMPILING MARKDOWN FROM OBSIDIAN CODE.*You can find your output at:","> COMPILING MARKDOWN FROM OBSIDIAN CODE`n< COMPILING MARKDOWN FROM OBSIDIAN CODE`n`nYou can find your output at:")
             OutputDebug, % "`n`n"
         }
-        Clipboard:=ExecutionLog
-        ;m(clipboard:=Executionlog)
-        FileAppend, % ExecutionLog, % ExecutionLog_Path
+        writeFile(ExecutionLog_Path,ExecutionLog,,,true)
         OutputDebug, % t[3]
 
     }
@@ -360,9 +349,7 @@ main()
     {
         ttip("Opening RMD-File",5)
         SplitPath, % rmd_Path, OutFileName, OutDir
-        FileDelete, % OutDir "\build.R"
         writeFile(OutDir "\build.R",script_contents,"UTF-8-RAW",,true)
-        ; FileAppend, % script_contents, % OutDir "\build.R"
         run, % rmd_Path
     }
     ttip("Building AHK-Starterscript",5)
@@ -412,10 +399,7 @@ buildAHKScriptContent(Path,script_contents,RScript_Path:="")
             A_Space """%BUILD_RPATH%"""
             , `% "%OUTDIR_PATH%"
         )
-        if FileExist(OutDir "\build.ahk")
-            FileDelete, % OutDir "\build.ahk"
         writeFile(OutDir "\build.ahk",AHK_Build,"UTF-8",,true)
-        ; FileAppend, % AHK_Build, % OutDir "\build.ahk"
     }
     return
 }
@@ -429,7 +413,6 @@ copyBack(Source,Destination,manuscriptpath)
             FileRemoveDir, % Destination "\" manuscriptname "\", true
         FileCopyDir, % Dir, % Output_Path:=Destination "\" manuscriptname "\", true
         writeFile(Output_Path "\index.md",Clipboard:=manuscriptcontent,,,true)
-        ; FileAppend,% Clipboard:=manuscriptcontent, % Output_Path "\index.md"
         FileCopy, % manuscriptpath, % regexreplace(Output_Path "\" manuscriptname "_vault.md ","\\{2,}","\"), 1
     }
     Else
