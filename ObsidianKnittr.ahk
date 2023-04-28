@@ -225,7 +225,7 @@ main()
     GeneralInfo.="Execution ObsidianHTML < " A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
     GeneralInfo.="`n " strreplace(strreplace(strreplace(t[3],"h"),"m"),"s") "`n`n"
     OutputDebug, % "`n`n" GeneralInfo
-    if RegExMatch(Ret["stdOut"], "md: (?<MDPath>.*)(\s*)", v) || FileExist(ret.OutputPath)
+    if RegExMatch(ret["stdOut"], "md: (?<MDPath>.*)(\s*)", v) || FileExist(ret.OutputPath)
     {
         if FileExist(ret.OutputPath){
             _:=SubStr(ret.OutputPath,-1)
@@ -256,7 +256,7 @@ main()
     }
     else
     {
-        if RegExMatch(Ret["stdOut"], "Created empty output folder path (?<MDPath>.*)(\s*)", v)
+        if RegExMatch(ret["stdOut"], "Created empty output folder path (?<MDPath>.*)(\s*)", v)
         {
             script.config.version.ObsidianHTML_Version:=ret.obsidianhtml_Version
             ObsidianHTML_Info:="`nObsidianHTML:`nVersion: " ret.obsidianHTML_Version "`nObsiidanHTML-Path:" ret.obsidianhtml_path "`nInput:`n" manuscriptpath "`nOutput Folder:`n" vMDPath "`nConfig:`n" obsidianhtml_configfile "`nCustom Config contents:`n" readObsidianHTML_Config(obsidianhtml_configfile).2 "`n---`n"
@@ -478,7 +478,7 @@ processAbstract(Contents)
             continue
         }
         if (!Instr(Rebuild,"abstract"))
-            Rebuild.=((Index=1)?Line:"`n" Line)
+            Rebuild.=((index=1)?Line:"`n" Line)
         else
             Rebuild.=((SubStr(Line,1,2)=" ")?A_Space LTrim(Line):"`n" Line)
     }
@@ -502,7 +502,7 @@ processTags(Contents,bRemoveHashTagFromTags)
                 Tags.=Line "`r`n"
             if SubStr(Line,1,2)="- "
                 OrigTags.=Line "`r`n"
-            if SubStr(LIne,1,3)="---"
+            if SubStr(Line,1,3)="---"
                 break
         }
         if (Tags="")
@@ -553,7 +553,7 @@ processTags(Contents,bRemoveHashTagFromTags)
                         continue
                     Contents:=Strreplace(Contents,Needle,Tag)
                     if Instr(Contents,Tag) && !Instr(Contents,Needle)
-                        Tags[Ind]:=""
+                        Tags[ind]:=""
                 }
                 else
                 {
@@ -561,7 +561,7 @@ processTags(Contents,bRemoveHashTagFromTags)
                         continue
                     Contents:=Strreplace(Contents,Needle,"#" Tag)
                     if Instr(Contents,"#" Tag)
-                        Tags[Ind]:=""
+                        Tags[ind]:=""
                 }
                 AlreadyReplaced.=Tag "`n"
             }
@@ -578,7 +578,7 @@ processTags(Contents,bRemoveHashTagFromTags)
             Contents:=StrReplace(Contents,"`r`n`r`n", "`r`n",,1)
         }
         Matches:=RegexMatchAll(Contents,"(?<IDStart>\{_obsidian_pattern_tag_)(?<Tag>.+)(?<IDEnd>}`)")
-        for _, match in matches {
+        for _, match in Matches {
             _match:=match[0]
             Contents:=strreplace(Contents,"``" _match "``",(bRemoveHashTagFromTags?"":"#") match[2])
         }
@@ -598,7 +598,7 @@ guiCreate()
     gui, add, text,xm ym, Choose output type:
     WideControlWidth:=330
     gui, add, listview, vvLV1 cWhite LV0x8 w%WideControlWidth% checked, % "Type"
-    for k,v in PotentialOutputs
+    for _,v in PotentialOutputs
     {
         Options:=((Instr(script.config.lastrun.last_output_type,v))?"Check":"-Check")
         LV_Add(Options,v)
@@ -607,7 +607,7 @@ guiCreate()
     for each, File in script.config.DDLHistory
     {
         SplitPath, % File, , OutDir, , FileName
-        SplitPath, % OutDir,OutFilename
+        SplitPath, % OutDir,OutFileName
         HistoryString.=((each=1)?"":"|") FileName "(" OutFileName ")" " -<>- " File
         if (each=1)
             HistoryString.="|"
@@ -837,7 +837,7 @@ chooseFile()
     for each, File in script.config.DDLHistory
     {
         SplitPath, % File, , OutDir, , FileName
-        SplitPath, % OutDir,OutFilename
+        SplitPath, % OutDir,OutFileName
         HistoryString.=((each=1)?"":"|") FileName "(" OutFileName ")" " -<>- " File
         if (each=1)
             HistoryString.="|"
