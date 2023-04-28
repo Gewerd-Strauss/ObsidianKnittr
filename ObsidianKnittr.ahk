@@ -307,7 +307,6 @@ main()
     NewContents:=processTags(NewContents,bRemoveHashTagFromTags)
     ttip("Processing Abstract",5)
     NewContents:=processAbstract(NewContents)
-    ; NewContents:=ProcessHorizontalBreaks(NewContents)
 
     writeFile(rmd_Path,Clipboard:=NewContents,"UTF-8",,true)
     ; FileAppend, % Clipboard:=NewContents,% rmd_Path
@@ -509,26 +508,6 @@ processAbstract(Contents)
     }
     return Rebuild
 }
-; processHorizontalBreaks(Contents)
-; {
-;     Rebuild:=""
-;     Clipboard:=Contents
-;     Lines:=strsplit(Contents,"`n")
-;     YAMLCount:=0
-;     for Index,Line in Lines
-;     {
-;         if (Line="---")
-;             YAMLCount++
-;         ; Len:=Len+StrLen(Line)
-;         if Lines[1]="---" && YAMLCount<2
-;         {
-;             Rebuild.=Line "`n"
-;             continue
-;         }
-;         Rebuild.=RegExReplace(Line,"^[-]{3,}","`n---`n") "`n"
-;     }
-;     return Rebuild
-; }
 processTags(Contents,bRemoveHashTagFromTags)
 {
     if (FileExist(Contents))
