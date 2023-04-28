@@ -1,6 +1,6 @@
 Class ot ;; output_type
 {
-    
+
     __New(Format:="",ConfigFile:="",DDL_ParamDelimiter:="-<>-",SkipGUI:=FALSE)
     {
         this.type:=Format
@@ -13,7 +13,7 @@ Class ot ;; output_type
         {
             ID:=-1
             this.Error:=this.Errors[ID] ;.String
-            MsgBox 0x40031,%  this.ClassName " > " A_ThisFunc "()" ,% (this.Errors.HasKey(ID)?this.Errors[ID].String:"Fatal: Undefined Error with ID '" ID "'") "'" ConfigFile "'" (this.Errors[ID].HasKey("EndString")?this.Errors[ID].EndString:"Fatal: Undefined Error with ID '" ID "'")
+            MsgBox 0x40031,% this.ClassName " > " A_ThisFunc "()" ,% (this.Errors.HasKey(ID)?this.Errors[ID].String:"Fatal: Undefined Error with ID '" ID "'") "'" ConfigFile "'" (this.Errors[ID].HasKey("EndString")?this.Errors[ID].EndString:"Fatal: Undefined Error with ID '" ID "'")
             ExitApp
             return
         }
@@ -27,7 +27,7 @@ Class ot ;; output_type
             this.Result:=this.type:=Format "()"
             ID:=+2
             this.Error:=this.Errors[ID] ;.String
-            MsgBox 0x40031,%  this.ClassName " > " A_ThisFunc "()" ,% (this.Errors.HasKey(ID)?this.Errors[ID].String:"Fatal: Undefined Error with ID '" ID "'")
+            MsgBox 0x40031,% this.ClassName " > " A_ThisFunc "()" ,% (this.Errors.HasKey(ID)?this.Errors[ID].String:"Fatal: Undefined Error with ID '" ID "'")
             return this
         }
         ;ttip(Lines)
@@ -36,7 +36,7 @@ Class ot ;; output_type
             Count:=1
             p := 1
             regex:="(?<Key>\w+\:)(?<Val>[^|]+)"
-            
+
             if (SubStr(Trim(Line),1,1)=";")
                 continue
             while (p := RegExMatch(Line, regex, match, p)) {
@@ -59,11 +59,11 @@ Class ot ;; output_type
     }
     __Init()
     {
-        this.Errors:={ ;; negative errors are hard failures, which will not let the program continue. positive errors are positive, and allow limited continuation. Functionality may be limited 
-            
-             -1:{String:"Provided Configfile does not exist:`n`n",EndString:"`n`n---`nExiting Script",Criticality:-100,ID:-1}
-             ,0:{String:"Gui got cancelled",EndString:"`n`n---`nReturning to General Selection",Criticality:0,ID:0}
-             ,+2:{String:"Format not defined.`nCheck your configfile.`n`nReturning default 'outputformat()'",Criticality:20,ID:+2}}
+        this.Errors:={ ;; negative errors are hard failures, which will not let the program continue. positive errors are positive, and allow limited continuation. Functionality may be limited
+
+            -1:{String:"Provided Configfile does not exist:`n`n",EndString:"`n`n---`nExiting Script",Criticality:-100,ID:-1}
+            ,0:{String:"Gui got cancelled",EndString:"`n`n---`nReturning to General Selection",Criticality:0,ID:0}
+            ,+2:{String:"Format not defined.`nCheck your configfile.`n`nReturning default 'outputformat()'",Criticality:20,ID:+2}}
         this.ClassName:="ot ("
         this.GUITitle:="Define output format - "
         this.Version:="0.1.a"
@@ -78,7 +78,7 @@ Class ot ;; output_type
         ret:={}
         for _,key in Param
         {
-         ret[key]:=this.Arguments[key].Value
+            ret[key]:=this.Arguments[key].Value
         }
         return ret
     }
@@ -130,10 +130,9 @@ Class ot ;; output_type
                     Value.Value:=DA_Quote(strreplace(Trim(ParamBackup,""""),"\","/"))
                 if !FileExist(Trim(Value.Value,"""")) && !FileExist(strreplace(ParamBackup,"\","/"))
                 {
-                    MsgBox 0x40031, % "output_type: " this.type " - faulty reference_docx", % "The given path to the reference docx-file`n'" Value.Value  "'`ndoes not exist. Returning."
+                    MsgBox 0x40031, % "output_type: " this.type " - faulty reference_docx", % "The given path to the reference docx-file`n'" Value.Value "'`ndoes not exist. Returning."
                     return
                 }
-
 
             }
             Str.= Parameter " = " Value.Value ",`n"
@@ -177,8 +176,8 @@ Class ot ;; output_type
                 V.Max:=v_Max+0
             if RegexMatch(V.Other,"Min\:(?<Min>\d*)",v_)
                 V.Min:=v_Min+0
-                if V.HasKey("Max")
-                    V.Value:=V.Max+0
+            if V.HasKey("Max")
+                V.Value:=V.Max+0
             if V.HasKey(Min) && V.Min>V.Value
                 V.Value:=V.Min+0
         }
@@ -202,7 +201,7 @@ Class ot ;; output_type
                 V.Default:=strreplace(V.Default,"""","")
             if (V.Value="")
             {
-                if  (V.Control="File")
+                if (V.Control="File")
                 {
                     if !FileExist(V.SearchPath V.Default)
                         MsgBox 0x40031, % "output_type: " this.type, % "The default File`n'" V.SearchPath V.Default "'`ndoes not exist. No default set."
@@ -222,6 +221,7 @@ Class ot ;; output_type
         gui, ParamsGUI:default
         SplitPath, % Chosen,,,,ChosenName
         if (Chosen!="")
+            ;@ahk-neko-ignore-fn 1 line; at 4/28/2023, 9:44:47 AM ; case sensitivity
             guicontrol,% "ParamsGUI:",v%VarName%, % ChosenName A_Space this.DDL_ParamDelimiter A_Space Chosen
     }
 
@@ -234,10 +234,9 @@ Class ot ;; output_type
     GenerateGUI(x:="",y:="")
     {
         ;static
-        global
-        ; if this.Has
+        global ;; this cannot be made static or this.SubmitDynamicArguments() will not receive modified values (aka it will always assemble the default)
         gui, ParamsGUI: destroy
-        if this.HasKey("Error") 
+        if this.HasKey("Error")
         {
             ID:=strsplit(this.Error,A_Space).2
             if !(SubStr(ID,1,1)="-")
@@ -337,15 +336,14 @@ Class ot ;; output_type
         WinWaitClose, % "ahk_PID" PID
         Gui +OwnDialogs
         OnMessage(0x44, "DA_OnMsgBox")
-        MsgBox 0x40044, %  this.ClassName " > " A_ThisFunc "()", You modified the configuration for this class.`nReload?
+        MsgBox 0x40044, % this.ClassName " > " A_ThisFunc "()", You modified the configuration for this class.`nReload?
         OnMessage(0x44, "")
 
         IfMsgBox Yes, {
             reload
         } Else IfMsgBox No, {
-            
-        }
 
+        }
 
     }
     SubmitDynamicArguments()
@@ -355,7 +353,8 @@ Class ot ;; output_type
         gui, ParamsGui: destroy
         for each,V in this.Arguments
         {
-            k=v%each%
+            ;@ahk-neko-ignore 1 line; at 4/28/2023, 9:49:42 AM ; https://github.com/CoffeeChaton/vscode-autohotkey-NekoHelp/blob/main/note/code107.md
+            k=v%each% ;; i know this is jank, but I can't seem to fix it. just don't touch for now?
             a:=%k%
             this["Arguments",each].Value:= a
         }
