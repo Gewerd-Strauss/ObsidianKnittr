@@ -144,42 +144,42 @@ Class ot ;; output_type
     }
     AdjustDDLs()
     {
-        for each, V in this.Arguments
+        for Parameter,Value in this.Arguments
         {
-            if (V.Control!="DDL") && (V.Control!="DropDownList")
+            if (Value.Control!="DDL") && (Value.Control!="DropDownList")
                 continue
         }
     }
     AdjustBools()
     {
-        for each, V in this.Arguments
+        for Parameter, Value in this.Arguments
         {
-            if (V.Type="Integer" || V.Type="Number" || V.Type="Boolean")
-                V.Value:=V.Value+0
-            if (V.Type="boolean")
-                V.Value:=(V.Value?"TRUE":"FALSE")
+            if (Value.Type="Integer" || Value.Type="Number" || Value.Type="Boolean")
+                Value.Value:=Value.Value+0
+            if (Value.Type="boolean")
+                Value.Value:=(Value.Value?"TRUE":"FALSE")
         }
     }
     AdjustIntegers()
     {
-        for each, V in this.Arguments
+        for Parameter, Value in this.Arguments
         {
-            if (V.Type="Integer")
-                V.Value:=Floor(V.Value)
+            if (Value.Type="Integer")
+                Value.Value:=Floor(Value.Value)
         }
     }
     AdjustMinMax()
     {
-        for each, V in this.Arguments
+        for Parameter, Value in this.Arguments
         {
-            if RegexMatch(V.Other,"Max\:(?<Max>\d*)",v_)
-                V.Max:=v_Max+0
-            if RegexMatch(V.Other,"Min\:(?<Min>\d*)",v_)
-                V.Min:=v_Min+0
-            if V.HasKey("Max")
-                V.Value:=V.Max+0
-            if V.HasKey(Min) && V.Min>V.Value
-                V.Value:=V.Min+0
+            if RegexMatch(Value.Other,"Max\:(?<Max>\d*)",v_)
+                Value.Max:=v_Max+0
+            if RegexMatch(Value.Other,"Min\:(?<Min>\d*)",v_)
+                Value.Min:=v_Min+0
+            if Value.HasKey("Max")
+                Value.Value:=Value.Max+0
+            if Value.HasKey(Min) && Value.Min>Value.Value
+                Value.Value:=Value.Min+0
         }
     }
     AdjustNulls()
