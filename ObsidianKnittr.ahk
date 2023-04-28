@@ -193,7 +193,7 @@ main()
     bKeepFilename:=out.3.4
     bRenderRMD:=out.3.5
     bRemoveHashTagFromTags:=out.3.6
-    bUseCustomTOC:=out.3.7
+    ;bUseCustomTOC:=out.3.7
     bForceFixPNGFiles:=out.3.8
     bInsertSetupChunk:=out.3.9
     bConvertInsteadofRun:=out.3.10
@@ -609,19 +609,18 @@ guiCreate()
     }
     Gui, add, button, gChooseFile, &Choose Manuscript
     DDLRows:=script.config.Config.HistoryLimit
-    gui, add, DDL, w%widecontrolwidth% vChosenFile hwndChsnFile r%DDLRows%, % HistoryString
-    ; gui, add, edit, w%widecontrolwidth% vChosenFile hwndChsnFile disabled
-    gui, add, checkbox, vbConvertInsteadofRun, !!Use verb 'Convert' for OHTML-call?
-    gui, add, checkbox, vbUseOwnOHTMLFork, !!!Use the personal fork? *CAUTION*
-    gui, add, checkbox, vbRemoveObsidianHTMLErrors, !Purge OHTML-Error-strings?
-    gui, add, checkbox, vbFullLogCheckbox, Full Log on successful execution?
-    gui, add, checkbox, vbVerboseCheckbox, Set OHTML's Verbose-Flag?
+    gui, add, DDL, w%WideControlWidth% vChosenFile hwndChsnFile r%DDLRows%, % HistoryString
+    gui, add, checkbox, vbConvertInsteadofRun, % "!!Use verb 'Convert' for OHTML-call?"
+    gui, add, checkbox, vbUseOwnOHTMLFork, % "!!!Use the personal fork? *CAUTION*"
+    gui, add, checkbox, vbRemoveObsidianHTMLErrors, % "!Purge OHTML-Error-strings?"
+    gui, add, checkbox, vbFullLogCheckbox, % "Full Log on successful execution?"
+    gui, add, checkbox, vbVerboseCheckbox, % "Set OHTML's Verbose-Flag?"
     Gui, Add, Text, w%WideControlWidth% h1 0x7 ;Horizontal Line > Black
     gui, add, checkbox, vbRemoveHashTagFromTags, % "Remove '#' from tags?"
-    gui, add, checkbox, vbInsertSetupChunk, !Insert Setup-Chunk?
-    gui, add, checkbox, vbForceFixPNGFiles, Double-convert png-files pre-conversion?
-    gui, add, checkbox, vbKeepFilename, Keep Filename?
-    gui, add, checkbox, vbRenderRMD, Render RMD to chosen outputs?
+    gui, add, checkbox, vbInsertSetupChunk, % "!Insert Setup-Chunk?"
+    gui, add, checkbox, vbForceFixPNGFiles, % "Double-convert png-files pre-conversion?"
+    gui, add, checkbox, vbKeepFilename, % "Keep Filename?"
+    gui, add, checkbox, vbRenderRMD, % "Render RMD to chosen outputs?"
     Gui, Font, s7 cWhite, Verdana
     gui, add, button, gGCSubmit, &Submit
     gui, add, button, gGCAutoSubmit yp xp+60, &Full Submit
