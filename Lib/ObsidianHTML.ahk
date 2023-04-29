@@ -151,7 +151,7 @@ createTemporaryObsidianHTML_Config(manuscriptpath, obsidianhtml_configfile,Conve
     }
     SplitPath, % manuscriptpath
 
-    writeFile_ObsidianHTML(configfile_path:=A_ScriptDir "\OHTMLconfig_temp.yaml",configfile_contents,,true)
+    writeFile_ObsidianHTML(configfile_path:=A_ScriptDir "\OHTMLconfig_temp.yaml",configfile_contents,,,true)
     return [(FileExist(configfile_path)?configfile_path:false),configfile_contents]
 }
 
