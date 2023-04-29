@@ -91,7 +91,6 @@
         OHTML_Output:=getObsidianHTML_WD(Clipboard:=data_modded)
     }
     return {"CMD":command2
-        ,"FullCMD":FullCMD
         ,"WorkDir":WorkDir_out
         ,"stdOut":data_out
         ,"obsidianhtml_version":ohtmlversion_out
