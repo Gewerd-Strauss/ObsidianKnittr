@@ -143,7 +143,7 @@ createTemporaryObsidianHTML_Config(manuscriptpath, obsidianhtml_configfile,Conve
             compile_html: False
         )"
         template:=fixYAMLSyntax(template)
-        writeFile_ObsidianHTML(script.configfolder "\OHTMLconfig_template.yaml",template,,,1)
+        writeFile_ObsidianHTML(script.configfolder "\OHTMLconfig_template.yaml",template,,,true)
         obsidianhtml_configfile:=script.configfolder "\OHTMLconfig_template.yaml"
     }
     FileRead, configfile_contents, % obsidianhtml_configfile
