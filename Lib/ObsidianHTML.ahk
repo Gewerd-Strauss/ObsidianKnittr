@@ -9,9 +9,11 @@
     }
 
     ;; get ObsidianHTML_Path
-    ComObj := ComObjCreate("WScript.Shell")
-    obsidianhtml_path:=Trim(ComObj.Exec("where obsidianhtml").stdOut.ReadAll()) ;; works
+    GetStdStreams_WithInput("where obsidianhtml",,obsidianhtml_path) ;; works
+    obsidianhtml_path:=Trim(obsidianhtml_path)
+
     obsidianhtml:=strreplace(obsidianhtml_path,"`r`n")
+    obsidianhtml:=strreplace(obsidianhtml_path,"`n")
     if (obsidianhtml="") {
         MsgBox 0x2010, script.name " - ObsidianHTML not found ", "The CLI-Utility ObsidianHTML could not be found via 'where obsidianhtml'.`nAs this script is not functional without it, it will exit now."
         return false
