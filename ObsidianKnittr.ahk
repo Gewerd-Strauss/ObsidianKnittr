@@ -566,10 +566,10 @@ guiCreate()
     gui, add, text,xm ym, Choose output type:
     WideControlWidth:=330
     gui, add, listview, vvLV1 cWhite LV0x8 w%WideControlWidth% checked, % "Type"
-    for _,v in PotentialOutputs
+    for _,output_type in PotentialOutputs
     {
-        Options:=((Instr(script.config.lastrun.last_output_type,v))?"Check":"-Check")
-        LV_Add(Options,v)
+        Options:=((Instr(script.config.lastrun.last_output_type,output_type))?"Check":"-Check")
+        LV_Add(Options,output_type)
     }
     HistoryString:=""
     for each, File in script.config.DDLHistory
@@ -722,11 +722,11 @@ guiSubmit()
     script.config.LastRun.UseOwnOHTMLFork:=bUseOwnOHTMLFork+0
     script.config.DDLHistory:=buildHistory(script.config.DDLHistory,script.config.Config.HistoryLimit,script.config.LastRun.manuscriptpath)
 
-    for k,v in sel
+    for each,output_type in sel
     {
 
-        script.config.LastRun.last_output_type.=v
-        if (k<sel.count())
+        script.config.LastRun.last_output_type.=output_type
+        if (each<sel.count())
             script.config.LastRun.last_output_type.=", "
 
     }
