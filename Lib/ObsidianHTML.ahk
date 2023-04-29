@@ -99,46 +99,22 @@
 
 getObsidianHTML_WD(String)
 {
-    ;needles:=["from (?<Path>.*obshtml_.*\/)","md: (?<Path>.*obshtml_.*(\/|\\)md)","md: (?<Path>.*\md)","\> COMPILING HTML FROM MARKDOWN CODE \((?<Path>.*\\md)\\index\.md\)","m)\> COMPILING HTML FROM MARKDOWN CODE \((?<Path>.*)\)","m)\> COMPILING HTML FROM MARKDOWN CODE \((?<Path>.+)\)+$","\> COMPILING HTML FROM MARKDOWN CODE \((?<Path>.+)\)+","md: (?<Path>.*\\md)"]
-    Regexmatch(String,"from (?<Path>.*obshtml_.*\/)",v)
-    if FileExist(vPath) {
-        return vPath
-    } else {
-        Regexmatch(String,"md: (?<Path>.*obshtml_.*(\/|\\)md)",v)
+    NeedleTxt:="
+    (LTRIM
+        from (?<Path>.*obshtml_.*\/)
+        md: (?<Path>.*obshtml_.*(\/|\\)md)
+        md: (?<Path>.*\md)
+        \> COMPILING HTML FROM MARKDOWN CODE \((?<Path>.*\\md)\\index\.md\)
+        m)\> COMPILING HTML FROM MARKDOWN CODE \((?<Path>.*)\)
+        m)\> COMPILING HTML FROM MARKDOWN CODE \((?<Path>.+)\)+$
+        \> COMPILING HTML FROM MARKDOWN CODE \((?<Path>.+)\)+
+        md: (?<Path>.*\\md)
+    )"
+    needles:=strsplit(NeedleTxt,"`n")
+    for _, needle in needles {
+        Regexmatch(String,needle,v)
         if FileExist(vPath) {
             return vPath
-        } else {
-            Regexmatch(String,"md: (?<Path>.*\md)",v)
-            if FileExist(vPath) {
-                return vPath
-            } else {
-                RegexMatch(String, "\> COMPILING HTML FROM MARKDOWN CODE \((?<Path>.*\\md)\\index\.md\)",v)
-                if FileExist(vPath) {
-                    return vPath
-                } else {
-                    RegexMatch(String, "m)\> COMPILING HTML FROM MARKDOWN CODE \((?<Path>.*)\)",v)
-                    if FileExist(vPath) {
-                        return vPath
-                    } else {
-                        RegexMatch(Clipboard:=String, "m)\> COMPILING HTML FROM MARKDOWN CODE \((?<Path>.+)\)+$",v)
-                        if FileExist(vPath) {
-                            return vPath
-                        } else {
-                            Regexmatch(String,"\> COMPILING HTML FROM MARKDOWN CODE \((?<Path>.+)\)+",v)
-                            if FileExist(vPath) {
-                                return vPath
-                            } else {
-                                Regexmatch(String,"md: (?<Path>.*\\md)",v)
-                                if FileExist(vPath) {
-                                    return vPath
-                                } else {
-                                    return String
-                                }
-                            }
-                        }
-                    }
-                }
-            }
         }
     }
     return String
