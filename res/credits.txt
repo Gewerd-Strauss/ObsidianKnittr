@@ -1,0 +1,13 @@
+
+
+Gewerd Strauss  -      main script
+tidbit et al    -      st_count										  - https://www.autohotkey.com/boards/viewtopic.php?t=53
+jNizM           -      HasVal                                                               - https://www.autohotkey.com/boards/viewtopic.php?p=109173&sid=e530e129dcf21e26636fec1865e3ee30#p109173
+SKAN            -      Base64PNG_to_HICON, regarding licensing                              - https://www.autohotkey.com/boards/viewtopic.php?f=6&t=36636, https://www.autohotkey.com/board/topic/75906-about-my-scripts-and-snippets/
+Gewerd Strauss  -      partial, self-written subset of ScriptObj                            - https://github.com/Gewerd-Strauss/ScriptObj/blob/master/ScriptObj.ahk
+SKAN, Goyyah    -      enableGuiDrag                                                        - http://autohotkey.com/board/topic/80594-how-to-enable-drag-for-a-gui-without-a-titlebar
+anonymous1184   -      Quote                                                                - https://www.reddit.com/r/AutoHotkey/comments/p2z9co/comment/h8oq1av/?utm_source=share&utm_medium=web2x&context=3
+anonymous1184   -      GetStdStreams_WithInput
+Gewerd Strauss  -      ttip                                                                 - https://gist.github.com/Gewerd-Strauss/fad218c28b8120ab1a3cadea1a8dea9b
+hi5             -      TF.ahk, license                                                      - https://github.com/hi5/TF, https://github.com/hi5/TF/blob/master/license.txt
+anonymous1184   -      support for various issues, reworks, providing input and generally being an awesome person. 
