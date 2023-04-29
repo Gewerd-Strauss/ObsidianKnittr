@@ -655,10 +655,6 @@ guiShow()
         ot.AssembleFormatString()
         Outputformats[format]:=ot
     }
-    if IsObject(ot.Errors) && ot.Errors.HasKey(-1)
-    {
-
-    }
     if (manuscriptpath!="") && !ot.bClosedNoSubmit
         return [sel,manuscriptpath,[bVerboseCheckbox + 0,bFullLogCheckbox + 0,bSRCConverterVersion + 0,bKeepFilename + 0,bRenderRMD + 0,bRemoveHashTagFromTags + 0,bUseCustomTOC + 0,bForceFixPNGFiles + 0, bInsertSetupChunk + 0, bConvertInsteadofRun + 0, bRemoveObsidianHTMLErrors + 0,bUseOwnOHTMLFork + 0],Outputformats]
     Else
