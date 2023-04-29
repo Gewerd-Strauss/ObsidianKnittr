@@ -262,7 +262,10 @@ main()
         }
     }
     ; 4
-
+    if !FileExist(md_Path) {
+        MsgBox 0x40010, % script.name " - Output could not be parsed.",% "The command line output of obsidianhtml does not contain the required information.`nThe output has been copied to the clipboard`, and written to file under '" A_ScriptDir "\Executionlog.txt" "'`n`nPlease use a different verb and see if the problem persists.`nThe script will exit now."
+        ExitApp
+    }
     ttip("Converting to .rmd-file",5)
     rmd_Path:=convertMDToRMD(md_Path,"index")
     ; 5, 6
