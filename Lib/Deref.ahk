@@ -35,9 +35,9 @@ Deref(String) {
     while (fpo := RegexMatch(String, "(%(.*?)%)|``(.)", m, spo)) {
         out .= SubStr(String, spo, fpo - spo)
         spo := fpo + StrLen(m)
-        if (m1)
+        if (m1) {
             out .= %m2%
-        else switch (m3) {
+        } else switch (m3) {
             case "a": out .= "`a"
             case "b": out .= "`b"
             case "f": out .= "`f"
