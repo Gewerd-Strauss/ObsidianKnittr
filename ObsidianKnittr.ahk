@@ -409,8 +409,10 @@ getOutputPath(Destination,manuscriptpath)
 }
 convertMDToRMD(md_Path,notename)
 {
-    FileCopy, % md_Path "\" notename ".md", % md_Path "\" notename ".rmd",true
-    return md_Path "\" notename ".rmd"
+    OldName:=md_Path "\" notename ".md"
+    NewName:=md_Path "\" notename ".rmd"
+    FileCopy, % OldName, % NewName, true
+    return NewName
 }
 removeTempDir(Path,RemoveParent:=TRUE)
 {
