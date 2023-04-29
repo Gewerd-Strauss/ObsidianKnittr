@@ -73,33 +73,6 @@ return
 main()
 {
 
-    /*
-        Steps:
-        Obsidian-Sided:
-        0. Load Config
-        1. Finish manuscript (must contain csl, bib, conforming includes/image formats) *
-        2. Insert `output: word_document|html_document|...` into the frontmatter and save
-        2.2 get manuscript's path
-
-        AHK-script sided:
-        3. run obsidianhtml (get manuscript's path) ;; TODO: check if 'max_note_depth' is correctly applied by making a chain of 20 notes including into each other.
-
-        loop, 20
-        FileAppend, % "![[" A_Index "]]", % "D:\Dokumente neu\Obsidian NoteTaking\The Universe\000 Start here\MaxInclusionTest\" A_Index ".md"
-        4. get output path from cmd-log ;; TODO: automate this step so I don't have to do the complicated clipboard stuff.
-        5. rename to .rmd
-        6. open r at that location
-        7. load BuildRScriptContent ;; TODO: automate properly, instead of using R Studio.
-        8. set pwd
-        9. BuildRScriptContent at location
-        10. Copy resulting output to predefined output folder
-        11. open output folder
-
-        * until https://github.com/obsidian-html/obsidian-html/issues/520 is not fixed
-
-    */
-    ; OnExit("fRemoveTempDir").Bind(md_path)
-    ; 0
     fTraySetup()
 
     erh:=Func("fonError").Bind(DEBUG)
