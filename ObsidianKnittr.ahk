@@ -414,8 +414,8 @@ convertMDToRMD(md_Path,notename)
 }
 removeTempDir(Path,RemoveParent:=TRUE)
 {
+    SplitPath, % Path,, OutDir
     if RemoveParent {
-        SplitPath, % Path,, OutDir
         FileRemoveDir, % OutDir,1
         if FileExist(OutDir)
         {
@@ -424,10 +424,10 @@ removeTempDir(Path,RemoveParent:=TRUE)
         }
     } else {
         FileRemoveDir, % Path,1
-        if FileExist(OutDir)
+        if FileExist(Path)
         {
-            MsgBox, % "Error occured - Directory '" OutDir "' could not be removed"
-            Run, % "explorer " OutDir
+            MsgBox, % "Error occured - Directory '" Path "' could not be removed"
+            Run, % "explorer " Path
         }
     }
     return
