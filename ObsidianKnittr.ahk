@@ -321,7 +321,9 @@ main()
         ttip("Opening RMD-File",5)
         SplitPath, % rmd_Path,, OutDir
         writeFile(OutDir "\build.R",script_contents,"UTF-8-RAW",,true)
-        run, % rmd_Path
+        if (!DEBUG) {
+            run, % rmd_Path
+        }
     }
     ttip("Building AHK-Starterscript",5)
     buildAHKScriptContent(rmd_Path,script.config.config.RScriptPath)
