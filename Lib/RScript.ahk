@@ -3,6 +3,10 @@ buildRScriptContent(Path,output_filename="",out="")
     SplitPath, % Path, , Path2, , Name
     RScriptFilePath:=strreplace(Path2,"\","\\")
         , RScriptFolder:=strreplace(Path2,"\","/")
+    OutputType_Print:=""
+    for _, output_type in out[1] {
+        OutputType_Print.="sprintf('" output_type "')`n"
+    }
     Str=
     (LTRIM
         getwd()
@@ -12,6 +16,8 @@ buildRScriptContent(Path,output_filename="",out="")
         getwd()
         }
         getwd()
+        sprintf('Chosen Output formats:')
+        %OutputType_Print%
 
     )
     if out.3.8
