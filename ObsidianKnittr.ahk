@@ -803,3 +803,4 @@ fTraySetup() {
 #Include, <Deref>
 #Include, <OnError>
 #Include, <OnExit>
+#Include, <Log>
