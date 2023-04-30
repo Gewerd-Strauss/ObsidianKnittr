@@ -230,7 +230,7 @@ main() {
     ttip("Moving to output folder",5)
     rmd_Path:=copyBack(rmd_Path,script.config.Destination,manuscriptpath)
     SplitPath, % rmd_Path,, OutDir
-    rawinputCopyLocation:=regexreplace(OutDir "\" manuscriptname "_vault.md ","\\{2,}","\")
+    rawinputCopyLocation:=regexreplace(OutDir "\" manuscriptName "_vault.md ","\\{2,}","\")
     EL.output_path
     EL.rawInputcopyLocation:=rawinputCopyLocation
     ; 7
