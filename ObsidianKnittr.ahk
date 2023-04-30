@@ -69,6 +69,7 @@ ExitApp,
 return
 
 main() {
+    global EL := new log(A_ScriptDir "\Executionlog.txt", true)
     fTraySetup()
     script.loadCredits(script.resfolder "\credits.txt")
     script.loadMetadata(script.resfolder "\meta.txt")
@@ -119,7 +120,7 @@ main() {
         writeFile(script.configfile,InitialSettings)
         script.load()
     }
-    script.version:=script.config.version.ObsidianKnittr_Version
+    EL.ObsidianKnittr_Version:=script.version:=script.config.version.ObsidianKnittr_Version
 
     ; 2.2
     out:=guiShow()
@@ -172,6 +173,19 @@ main() {
     bConvertInsteadofRun:=out.Settings.bConvertInsteadofRun
     bRemoveObsidianHTMLErrors:=out.Settings.bRemoveObsidianHTMLErrors
     bUseOwnOHTMLFork:=out.Settings.bUseOwnOHTMLFork
+    EL.formats:=SubStr(formats,1,StrLen(formats)-2)
+    EL.manuscriptpath:=out.manuscriptpath
+    EL.bVerboseCheckbox:=out.Settings.bVerboseCheckbox
+    EL.bFullLogCheckbox:=out.Settings.bFullLogCheckbox
+    EL.bSRCConverterVersion:=out.Settings.bSRCConverterVersion
+    EL.bKeepFilename:=out.Settings.bKeepFilename
+    EL.bRenderRMD:=out.Settings.bRenderRMD
+    EL.bRemoveHashTagFromTags:=out.Settings.bRemoveHashTagFromTags
+    EL.bForceFixPNGFiles:=out.Settings.bForceFixPNGFiles
+    EL.bInsertSetupChunk:=out.Settings.bInsertSetupChunk
+    EL.bConvertInsteadofRun:=out.Settings.bConvertInsteadofRun
+    EL.bRemoveObsidianHTMLErrors:=out.Settings.bRemoveObsidianHTMLErrors
+    EL.bUseOwnOHTMLFork:=out.Settings.bUseOwnOHTMLFork
 
     ; 3.
     if (output_type="") && (bVerboseCheckbox="") {
@@ -181,24 +195,30 @@ main() {
     SplitPath, % manuscriptpath,,,, manuscriptName
 
     tmpconfig:=createTemporaryObsidianHTML_Config(manuscriptpath, obsidianhtml_configfile,bConvertInsteadofRun)
-
+    EL.configtemplate_path:=obsidianhtml_configfile
+    EL.configfile_contents:=tmpconfig[2]
     ttip("Running ObsidianHTML",5)
     if (obsidianhtml_configfile="") {
         obsidianhtml_configfile:=script.config.config.obsidianhtml_configfile
     }
-    GeneralInfo:="Execution ObsidianHTML > " A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec "`n"
-    CodeTimer("Timing ComObjTime, Verb: " (bConvertInsteadofRun?"Convert":"Run"))
-    ObsidianKnittr_Info:=script.name ":`nVerbose:" bVerboseCheckbox "`nFull Log:" (script.config.config.FullLogOnSuccess || bFullLogCheckbox) "`nUsed Verb:'" ((tmpconfig[1] && bConvertInsteadofRun)?"Convert":"Run") "'`nSRC_Converter: " (bSRCConverterVersion?"V2 Conversion (no universal decoding employed, can output '' to "")":"V4 Conversion (should convert everything cleanly)") "`n" A_Tab "Document Settings`n"
+    EL.ObsidianHTML_Start:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
+    ATC1:=A_TickCount
+    CodeTimer_Log("Timing ComObjTime, Verb: " (bConvertInsteadofRun?"Convert":"Run"))
     OHTML_OutputDir:=Deref(script.config.config.OHTML_OutputDir)
     if (tmpconfig[1] && bConvertInsteadofRun) {
         ret:=ObsidianHtml(,tmpconfig[1],,bUseOwnOHTMLFork,bVerboseCheckbox,OHTML_OutputDir,WorkDir,WorkDir_OwnFork)
     } else {
         ret:=ObsidianHtml(manuscriptpath,tmpconfig[1],,bUseOwnOHTMLFork,bVerboseCheckbox,OHTML_OutputDir,WorkDir,WorkDir_OwnFork)
     }
-    t:=CodeTimer("Timing ComObjTime, Verb: " (bConvertInsteadofRun?"Convert":"Run"))
-    GeneralInfo.="Execution ObsidianHTML < " A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
-    GeneralInfo.="`n " strreplace(strreplace(strreplace(t[3],"h"),"m"),"s") "`n`n"
-    OutputDebug, % "`n`n" GeneralInfo
+    EL.ObsidianHTML_Duration:=CodeTimer_Log("")
+    EL.ObsidianHTML_End:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
+    EL.obsidianhtml_version:=strreplace(ret.obsidianhtml_version,"`n")
+    EL.obsidianhtml_path:=ret.obsidianhtml_path
+    EL.UsedVerb:=(bConvertInsteadofRun?"Convert":"Run")
+    EL.ObsidianHTMLWorkDir:=ret["WorkDir"]
+    EL.ObsidianHTMLOutputpath:=ret["Outputpath"]
+    EL.CMD:=ret["CMD"]
+    EL.data_out:=ret["stdOut"]
     if RegExMatch(ret["stdOut"], "md: (?<MDPath>.*)(\s*)", v) || FileExist(ret.OutputPath) {
         if FileExist(ret.OutputPath) {
             _:=SubStr(ret.OutputPath,-1)
@@ -210,58 +230,31 @@ main() {
         vMDPath:=RTrim(vMDPath)
         vMDPath:=strreplace(vMDPath,"`n")
         script.config.version.ObsidianHTML_Version:=strreplace(ret.obsidianhtml_Version,"`n")
-        ObsidianHTML_Info:="`nObsidianHTML:`nVersion: " ret.obsidianHTML_Version "`nObsiidanHTML-Path:" ret.obsidianhtml_path "`nInput:`n" manuscriptpath "`nOutput Folder:`n" vMDPath "`nConfig:`n" obsidianhtml_configfile "`nCustom Config contents:`n" readObsidianHTML_Config(obsidianhtml_configfile).2 "`n---`n"
-        if FileExist(vMDPath) {
-            ObsidianKnittr_Info.= "`nOutput Folder: " getOutputPath(script.config.Destination,manuscriptpath).1 "`nRaw input copy:" getOutputPath(script.config.Destination,manuscriptpath).2 "`n"
-            if (script.config.config.FullLogOnSuccess || bFullLogCheckbox) {
-                writeFile(vMDPath "\Executionlog.txt",GeneralInfo ObsidianKnittr_Info ObsidianHTML_Info "`n`nIssued Command (Execution time " t[3] "):`n" ret["CMD"] "`n---`n`nCommand Line output below:`n`n" ret["stdout"],,,true)
-            } else {
-                writeFile(vMDPath "\Executionlog.txt",GeneralInfo ObsidianKnittr_Info ObsidianHTML_Info "`n`nIssued Command (Execution time " t[3] "):`n" ret["CMD"] "`n---`n",,,true)
-            }
-            md_Path:=vMDPath
-        } Else {
-            writeFile(A_ScriptDir "\Executionlog.txt",GeneralInfo ObsidianKnittr_Info ObsidianHTML_Info "`n`nIssued Command (Execution time " t[3] "):`n" ret["CMD"] "`n---`n`nCommand Line output below:`n`n" ret["stdout"],,,true)
-            run, % A_ScriptDir "\Executionlog.txt"
+        if !FileExist(vMDPath) {
             MsgBox 0x40010, % script.name, % "File md_Path does not seem to exist. Please check manually."
         }
     } else {
         if RegExMatch(ret["stdOut"], "Created empty output folder path (?<MDPath>.*)(\s*)", v) {
-            script.config.version.ObsidianHTML_Version:=ret.obsidianhtml_Version
-            ObsidianHTML_Info:="`nObsidianHTML:`nVersion: " ret.obsidianHTML_Version "`nObsiidanHTML-Path:" ret.obsidianhtml_path "`nInput:`n" manuscriptpath "`nOutput Folder:`n" vMDPath "`nConfig:`n" obsidianhtml_configfile "`nCustom Config contents:`n" readObsidianHTML_Config(obsidianhtml_configfile).2 "`n---`n"
-
-            if FileExist(vMDPath) {
-                ObsidianKnittr_Info.= "`nOutput Folder: " getOutputPath(script.config.Destination,manuscriptpath).1 "`nRaw input copy:" getOutputPath(script.config.Destination,manuscriptpath).2 "`n"
-                if (script.config.config.FullLogOnSuccess || bFullLogCheckbox) {
-                    writeFile(vMDPath "\Executionlog.txt",GeneralInfo ObsidianKnittr_Info ObsidianHTML_Info "`n`nIssued Command (Execution time " t[3] "):`n" ret["CMD"] "`n---`n`nCommand Line output below:`n`n" ret["stdout"],,,true)
-                } else {
-                    writeFile(vMDPath "\Executionlog.txt",GeneralInfo ObsidianKnittr_Info ObsidianHTML_Info "`n`nIssued Command (Execution time " t[3] "):`n" ret["CMD"] "`n---`n",,,true)
-                }
-                md_Path:=vMDPath
-            } Else {
-                writeFile(A_ScriptDir "\Executionlog.txt",GeneralInfo ObsidianKnittr_Info ObsidianHTML_Info "`n`nIssued Command (Execution time " t[3] "):`n" ret["CMD"] "`n---`n`nCommand Line output below:`n`n" ret["stdout"],,,true)
-                run, % A_ScriptDir "\Executionlog.txt"
+            if !FileExist(vMDPath) {
                 MsgBox 0x40010, % script.name, % "File md_Path does not seem to exist. Please check manually."
             }
         } else {
-            script.config.version.ObsidianHTML_Version:=ret.obsidianhtml_Version
-            ObsidianKnittr_Info.= "`nOutput Folder: " getOutputPath(script.config.Destination,manuscriptpath).1 "`nRaw input copy:" getOutputPath(script.config.Destination,manuscriptpath).2 "`n"
-            ObsidianHTML_Info:="`nObsidianHTML:`nVersion: " ret.obsidianHTML_Version "`nObsiidanHTML-Path:" ret.obsidianhtml_path "`nInput:`n" manuscriptpath "`nOutput Folder:`n" vMDPath "`nConfig:`n" obsidianhtml_configfile "`n---`n"
-            writeFile(A_ScriptDir "\Executionlog.txt",GeneralInfo ObsidianKnittr_Info ObsidianHTML_Info "`n`nIssued Command (Execution time " t[3] "):`n" ret["CMD"] "`n---`n`nCommand Line output below:`n`n" ret["stdout"],,,true)
-            run, % A_ScriptDir "\Executionlog.txt"
             MsgBox, 0x40010, % script.name " - Output could not be parsed.", % "DO NOT CONTINUE WITHOUT FULLY READING THIS!`n`nThe command line output of obsidianhtml does not contain the required information.`nThe output has been copied to the clipboard, and written to file under '" A_ScriptDir "\Executionlog.txt" "'`n`nTo carry on, find the path of the md-file and copy it to your clipboard.`nONLY THEN close this window."
-            md_Path:=Clipboard
         }
     }
-    ; 4
-    if !FileExist(md_Path) {
-        MsgBox 0x40010, % script.name " - Output could not be parsed.",% "The command line output of obsidianhtml does not contain the required information.`nThe output has been copied to the clipboard`, and written to file under '" A_ScriptDir "\Executionlog.txt" "'`n`nPlease use a different verb and see if the problem persists.`nThe script will exit now."
-        ExitApp
-    }
+
+    ;; Intermediary
+    EL.Intermediary_Start:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
+    CodeTimer_Log("")
     ttip("Converting to .rmd-file",5)
-    rmd_Path:=convertMDToRMD(md_Path,"index")
+    rmd_Path:=convertMDToRMD(vMDPath,"index")
     ; 5, 6
     ttip("Moving to output folder",5)
     rmd_Path:=copyBack(rmd_Path,script.config.Destination,manuscriptpath)
+    SplitPath, % rmd_Path,, OutDir
+    rawinputCopyLocation:=regexreplace(OutDir "\" manuscriptname "_vault.md ","\\{2,}","\")
+    EL.output_path
+    EL.rawInputcopyLocation:=rawinputCopyLocation
     ; 7
     ttip("Converting Image SRC's")
     Clipboard:=NewContents:=ConvertSRC_SYNTAX_V4(rmd_Path,bDontInsertSetupChunk,bRemoveObsidianHTMLErrors)
@@ -269,8 +262,13 @@ main() {
     NewContents:=processTags(NewContents,bRemoveHashTagFromTags)
     ttip("Processing Abstract",5)
     NewContents:=processAbstract(NewContents)
+    EL.Intermediary_Duration:=CodeTimer_Log("Intermediary")
+    EL.Intermediary_End:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
 
-    writeFile(rmd_Path,Clipboard:=NewContents,"UTF-8",,true)
+    ;; R
+    EL.RScriptExecution_Start:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
+    CodeTimer_Log("")
+    writeFile(rmd_Path,NewContents,"UTF-8",,true)
     ttip("Creating R-BuildScript",5)
     if bKeepFilename {
         tmp:=buildRScriptContent(rmd_Path,manuscriptName,out)
@@ -279,31 +277,9 @@ main() {
     }
     script_contents:=tmp.1
     format:=tmp.2
-    if (format!="") {
-        SplitPath, % rmd_Path,, OutDir
-        if FileExist(ExecutionLog_Path:=OutDir "\ExecutionLog.txt") {
-            FileRead,ExecutionLog, % ExecutionLog_Path
-            ExecutionLog:=OK_TF_Replace(ExecutionLog,"Document Settings","Document Settings`n" A_Tab strreplace(format,"`n","`n" A_Tab A_Tab))
-            writeFile(ExecutionLog_Path,ExecutionLog,,,true)
-        }
-    }
     if bRenderRMD {
-        FileRead,ExecutionLog, % ExecutionLog_Path
-        t:=CodeTimer("Timing R-Script-Execution")
-        ExecutionLog:=OK_TF_Replace(ExecutionLog,"`n`nObsidianKnittr:`n","`nExecution RBuildScript > " A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec "`n`nObsidianKnittr:`n")
-        OutputDebug, % "`n`n" ExecutionLog
-
         ttip("Executing R-BuildScript",5)
         runRScript(rmd_Path,script_contents,script.config.config.RScriptPath)
-        t:=CodeTimer("Timing R-Script-Execution")
-        ExecutionLog:=OK_TF_Replace(ExecutionLog,"`n`nObsidianKnittr:`n","`nExecution RBuildScript < " A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec "`n " strreplace(strreplace(strreplace(t[3],"h"),"m"),"s") "`n`nObsidianKnittr:`n")
-        if DEBUG {
-            printed_ExecutionLog:=RegexReplace(ExecutionLog,"(Excluded.*)<","<")
-            Clipboard:=printed_ExecutionLog:=RegexReplace(printed_ExecutionLog,"> COMPILING MARKDOWN FROM OBSIDIAN CODE.*You can find your output at:","> COMPILING MARKDOWN FROM OBSIDIAN CODE`n< COMPILING MARKDOWN FROM OBSIDIAN CODE`n`nYou can find your output at:")
-            OutputDebug, % "`n`n"
-        }
-        writeFile(ExecutionLog_Path,ExecutionLog,,,true)
-        OutputDebug, % t[3]
     } Else {
         ttip("Opening RMD-File",5)
         SplitPath, % rmd_Path,, OutDir
@@ -312,11 +288,26 @@ main() {
             run, % rmd_Path
         }
     }
+    EL.DocumentSettings:=tmp[2]
+    EL.RScriptExecution_Duration:=CodeTimer_Log("")
+    EL.RScriptExecution_End:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
+    EL.getTotalDuration(ATC1,A_TickCount)
+
+    ;; final touches - ahk starter, moving shit to output folder
     ttip("Building AHK-Starterscript",5)
     buildAHKScriptContent(rmd_Path,script.config.config.RScriptPath)
+    SplitPath, % Path,, OutDir
+    SplitPath, % OutDir,, OutDir2
+    if script.config.config.OpenParentfolderInstead {
+        EL.output_path:=OutDir
+    } else {
+        EL.output_path:=OutDir2
+    }
     if !DEBUG {
         openFolder(rmd_Path)
     }
+    SplitPath, % rmd_Path, , OutDir
+    FileMove, % EL.__path, % OutDir "\Executionlog.txt",true
     removeTempDir(md_Path)
     removeTempDir(ret.OutputPath)
 
@@ -368,14 +359,13 @@ copyBack(Source,Destination,manuscriptpath) {
         }
         FileCopyDir, % Dir, % Output_Path:=Destination "\" manuscriptname "\", true
         writeFile(Output_Path "\index.md",Clipboard:=manuscriptcontent,,,true)
-        FileCopy, % manuscriptpath, % regexreplace(Output_Path "\" manuscriptname "_vault.md ","\\{2,}","\"), 1
+        FileCopy, % manuscriptpath, % rawinputCopyLocation, 1
     } Else {
         FileCopyDir, % Dir, % Output_Path:= A_Desktop "\TempTemporal\" manuscriptname "\" , true
         if Errorlevel {
-
             msgbox, % Errorlevel
         }
-        pd:=regexreplace(Output_Path "\" manuscriptname "_vault.md ","\\{2,}","\")
+        global pd:=regexreplace(Output_Path "\" manuscriptname "_vault.md ","\\{2,}","\")
         pd:=Trim(pd)
         FileCopy, % manuscriptpath, % pd, 1
     }
