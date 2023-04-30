@@ -124,25 +124,6 @@ main() {
 
     ; 2.2
     out:=guiShow()
-    /*
-        1 sel
-        2 manuscriptpath
-        3 Toggles
-            .1  Verbose
-            .2  FullLog
-            .3  SRCConverterVersion
-            .4  KeepFilename
-            .5  RenderRMD
-            .6  RemoveHashTagFromTags
-            .7  UseCustomTOC
-            .8  bForceFixPNGFiles
-            .9  bInsertSetupChunk
-            .10 bUseConvertInsteadOfRun
-            .11 bRemoveObsidianHTMLErrors
-            .12 bUseOwnOHTMLFork
-        4 Outputformats
-    */
-    ; [sel,manuscriptpath,[bVerboseCheckbox + 0,bFullLogCheckbox + 0,bSRCConverterVersion + 0,bKeepFilename + 0,bRenderRMD + 0,bRemoveHashTagFromTags + 0,bUseCustomTOC + 0],Outputformats]
     WorkDir := "C:\Users\Claudius Main\Desktop\TempTemporal"
     WorkDir_OwnFork := "D:\Dokumente neu\ObsidianPluginDev\obsidian-html"
     formats:=""
@@ -163,7 +144,7 @@ main() {
     manuscriptpath:=out.manuscriptpath
     bVerboseCheckbox:=out.Settings.bVerboseCheckbox
     bFullLogCheckbox:=out.Settings.bFullLogCheckbox
-    bSRCConverterVersion:=out.Settings.bSRCConverterVersion
+    ;bSRCConverterVersion:=out.Settings.bSRCConverterVersion
     bKeepFilename:=out.Settings.bKeepFilename
     bRenderRMD:=out.Settings.bRenderRMD
     bRemoveHashTagFromTags:=out.Settings.bRemoveHashTagFromTags
@@ -187,7 +168,6 @@ main() {
     EL.bRemoveObsidianHTMLErrors:=out.Settings.bRemoveObsidianHTMLErrors
     EL.bUseOwnOHTMLFork:=out.Settings.bUseOwnOHTMLFork
 
-    ; 3.
     if (output_type="") && (bVerboseCheckbox="") {
         reload
     }
