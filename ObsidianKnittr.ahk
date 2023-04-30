@@ -226,8 +226,6 @@ main() {
             vMDPath:=strreplace(vMDPath ,"/","\")
         }
         vMDPath:=Trim(vMDPath)
-        vMDPath:=LTrim(vMDPath)
-        vMDPath:=RTrim(vMDPath)
         vMDPath:=strreplace(vMDPath,"`n")
         script.config.version.ObsidianHTML_Version:=strreplace(ret.obsidianhtml_Version,"`n")
         if !FileExist(vMDPath) {
@@ -257,7 +255,7 @@ main() {
     EL.rawInputcopyLocation:=rawinputCopyLocation
     ; 7
     ttip("Converting Image SRC's")
-    Clipboard:=NewContents:=ConvertSRC_SYNTAX_V4(rmd_Path,bDontInsertSetupChunk,bRemoveObsidianHTMLErrors)
+    NewContents:=ConvertSRC_SYNTAX_V4(rmd_Path,bDontInsertSetupChunk,bRemoveObsidianHTMLErrors)
     ttip("Processing Tags",5)
     NewContents:=processTags(NewContents,bRemoveHashTagFromTags)
     ttip("Processing Abstract",5)
@@ -520,7 +518,7 @@ processTags(Contents,bRemoveHashTagFromTags) {
             Contents:=strreplace(Contents,"``" _match "``",(bRemoveHashTagFromTags?"":"#") match[2])
         }
     }
-    ;; #todo: regexreplaceall for these patterns: "`{_obsidian_pattern_tag_XXXX}", as they are not found in the frontmatter and thus are not replaced
+    ;;  TODO: regexreplaceall for these patterns: "`{_obsidian_pattern_tag_XXXX}", as they are not found in the frontmatter and thus are not replaced
     return Contents
 }
 guiCreate() {
