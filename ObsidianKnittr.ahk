@@ -144,32 +144,35 @@ main() {
     ; [sel,manuscriptpath,[bVerboseCheckbox + 0,bFullLogCheckbox + 0,bSRCConverterVersion + 0,bKeepFilename + 0,bRenderRMD + 0,bRemoveHashTagFromTags + 0,bUseCustomTOC + 0],Outputformats]
     WorkDir := "C:\Users\Claudius Main\Desktop\TempTemporal"
     WorkDir_OwnFork := "D:\Dokumente neu\ObsidianPluginDev\obsidian-html"
-    for _,format in out.4 {
+    formats:=""
+    for _,format in out.Outputformats {
         if format.HasKey("Error") && (format.Error.ID=0) {
             Reload
             ExitApp ;; fucking weird bug. DO NOT remove this exitapp below the reload-command. for some reason, removing it results in the script just ignoring the reload and continuing on as normal under certain situations
         }
+        formats.=_ ", "
     }
-    output_type:=out.1
+    output_type:=out.sel
     if (output_type="All") || HasVal(output_type,"All") {
         output_type:=["html_document" , "pdf_document" , "word_document" , "odt_document" , "rtf_document" , "md_document" , "powerpoint_presentation" , "ioslides_presentation" , "tufte::tufte_html" , "github_document"] ;; todo:: add bookdown format support
     }
     if (HasVal(output_type,"First in YAML")) {
         output_type:=""
     }
-    manuscriptpath:=out.2
-    bVerboseCheckbox:=out.3.1
-    bFullLogCheckbox:=out.3.2
-    bSRCConverterVersion:=out.3.3
-    bKeepFilename:=out.3.4
-    bRenderRMD:=out.3.5
-    bRemoveHashTagFromTags:=out.3.6
+    manuscriptpath:=out.manuscriptpath
+    bVerboseCheckbox:=out.Settings.bVerboseCheckbox
+    bFullLogCheckbox:=out.Settings.bFullLogCheckbox
+    bSRCConverterVersion:=out.Settings.bSRCConverterVersion
+    bKeepFilename:=out.Settings.bKeepFilename
+    bRenderRMD:=out.Settings.bRenderRMD
+    bRemoveHashTagFromTags:=out.Settings.bRemoveHashTagFromTags
     ;bUseCustomTOC:=out.3.7
-    bForceFixPNGFiles:=out.3.8
-    bInsertSetupChunk:=out.3.9
-    bConvertInsteadofRun:=out.3.10
-    bRemoveObsidianHTMLErrors:=out.3.11
-    bUseOwnOHTMLFork:=out.3.12
+    bForceFixPNGFiles:=out.Settings.bForceFixPNGFiles
+    bInsertSetupChunk:=out.Settings.bInsertSetupChunk
+    bConvertInsteadofRun:=out.Settings.bConvertInsteadofRun
+    bRemoveObsidianHTMLErrors:=out.Settings.bRemoveObsidianHTMLErrors
+    bUseOwnOHTMLFork:=out.Settings.bUseOwnOHTMLFork
+
     ; 3.
     if (output_type="") && (bVerboseCheckbox="") {
         reload
@@ -620,7 +623,21 @@ guiShow() {
         Outputformats[format]:=ot
     }
     if (manuscriptpath!="") && !ot.bClosedNoSubmit {
-        return [sel,manuscriptpath,[bVerboseCheckbox + 0,bFullLogCheckbox + 0,bSRCConverterVersion + 0,bKeepFilename + 0,bRenderRMD + 0,bRemoveHashTagFromTags + 0,bUseCustomTOC + 0,bForceFixPNGFiles + 0, bInsertSetupChunk + 0, bConvertInsteadofRun + 0, bRemoveObsidianHTMLErrors + 0,bUseOwnOHTMLFork + 0],Outputformats]
+        return {"sel":sel
+            ,"manuscriptpath":manuscriptpath
+            ,Settings:{"bVerboseCheckbox":bVerboseCheckbox + 0
+                ,"bFullLogCheckbox":bFullLogCheckbox + 0
+                ,"bSRCConverterVersion":bSRCConverterVersion + 0
+                ,"bKeepFilename":bKeepFilename + 0
+                ,"bRenderRMD":bRenderRMD + 0
+                ,"bRemoveHashTagFromTags":bRemoveHashTagFromTags + 0
+                ,"bUseCustomTOC":bUseCustomTOC + 0
+                ,"bForceFixPNGFiles":bForceFixPNGFiles + 0
+                ,"bInsertSetupChunk":bInsertSetupChunk + 0
+                ,"bConvertInsteadofRun":bConvertInsteadofRun + 0
+                ,"bRemoveObsidianHTMLErrors":bRemoveObsidianHTMLErrors + 0
+                ,"bUseOwnOHTMLFork":bUseOwnOHTMLFork + 0}
+            ,"Outputformats":Outputformats}
     } Else {
         ExitApp
     }

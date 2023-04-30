@@ -4,7 +4,7 @@ buildRScriptContent(Path,output_filename="",out="")
     RScriptFilePath:=strreplace(Path2,"\","\\")
         , RScriptFolder:=strreplace(Path2,"\","/")
     OutputType_Print:=""
-    for _, output_type in out[1] {
+    for _, output_type in out.sel {
         OutputType_Print.="sprintf('" output_type "')`n"
     }
     Str=
@@ -20,7 +20,7 @@ buildRScriptContent(Path,output_filename="",out="")
         %OutputType_Print%
 
     )
-    if out.3.8
+    if out.settings.bForceFixPNGFiles
     {
         Str2=
         (LTrim
@@ -43,7 +43,7 @@ buildRScriptContent(Path,output_filename="",out="")
         bFixPNGS:=false
     Name:=(output_filename!=""?output_filename:"index")
         , FormatOptions:=""
-    for _,Class in out[4]
+    for _,Class in out.Outputformats
     {
         format:=Class.AssembledFormatString
         if Instr(format,"pdf_document")
@@ -69,7 +69,7 @@ buildRScriptContent(Path,output_filename="",out="")
         Str.=Str2
         FormatOptions.= A_Tab strreplace(format,"`n",A_Tab "`n") "`n`n"
     }
-    for _, Class in Out[4]
+    for _, Class in Out.Outputformats
     {
         format:=Class.AssembledFormatString
         if !Instr(format,"pdf_document")
