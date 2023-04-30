@@ -260,7 +260,7 @@ CodeTimer_Log(Description,x:=500,y:=500,ClipboardFlag:=0)
         {
             Clipboard:=TimedDuration
         }
-        tooltip,% String:="Timer " Description "`n" TimedDuration " ms have elapsed!",% x,% y
+        tooltip,% "Timer " Description "`n" TimedDuration " ms have elapsed!",% x,% y
         time_withletters:=PrettyTickCount_Log(TimedDuration)
         time_withoutletters:=RegexReplace(time_withletters,"[hms]")
         Return time_withoutletters
