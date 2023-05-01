@@ -97,6 +97,7 @@ Output Folder             : `%output_path`%
 Raw Input Copy            : `%rawInputcopyLocation`%
 ObsidianHTML - Path       : `%obsidianHTML_path`% (either the path to the installed exe or the personal modded version)
 Config - Template         : `%configtemplate_path`%
+ObsidianHTMLCopy Dir      : `%ObsidianHTMLCopyDir`%
 ObsidianHTMLWorking Dir   : `%ObsidianHTMLWorkDir`%
 ObsidianHTMLOutputPath    : `%ObsidianHTMLOutputPath`%
 ___________________________________________________
