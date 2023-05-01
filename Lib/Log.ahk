@@ -254,10 +254,7 @@ CodeTimer_Log(Description,x:=500,y:=500,ClipboardFlag:=0) {
         FinishTimer := A_TickCount
         TimedDuration := FinishTimer - StartTimer
         StartTimer := ""
-        If (ClipboardFlag=1) {
-            Clipboard:=TimedDuration
-        }
-        tooltip % "Timer " Description "`n" TimedDuration " ms have elapsed!",% x,% y
+        ;tooltip % "Timer " Description "`n" TimedDuration " ms have elapsed!",% x,% y, 18
         time_withletters:=PrettyTickCount_Log(TimedDuration)
         time_withoutletters:=RegexReplace(time_withletters,"[hms]")
         Return time_withoutletters

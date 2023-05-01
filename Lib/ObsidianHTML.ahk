@@ -85,11 +85,11 @@
     OutputDebug % "`n`n" WorkDir_OwnFork "`n`n"
 
     if (data!="") {
-        OHTML_Output:=getObsidianHTML_WD(Clipboard:=data)
+        OHTML_Output:=getObsidianHTML_WD(data)
         ObsidianHTMLCopyDir:=getObsidianHTML_CopyDir(data)
     }
     if (data_modded!="") {
-        OHTML_Output:=getObsidianHTML_WD(Clipboard:=data_modded)
+        OHTML_Output:=getObsidianHTML_WD(data_modded)
         ObsidianHTMLCopyDir:=getObsidianHTML_CopyDir(data_modded)
     }
     return {"CMD":command2
