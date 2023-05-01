@@ -14,7 +14,7 @@ Class ot {
             return
         }
 
-        FileRead, Text, % ConfigFile
+        FileRead Text, % ConfigFile
         Lines:=strsplit(Text,Format "`r`n").2
         Lines:=strsplit(Lines,"`r`n`r`n").1
         Lines:=strsplit(Lines,"`r`n")
@@ -51,9 +51,9 @@ Class ot {
     __Init() {
         this.Errors:={ ;; negative errors are hard failures, which will not let the program continue. positive errors are positive, and allow limited continuation. Functionality may be limited
 
-            -1:{String:"Provided Configfile does not exist:`n`n",EndString:"`n`n---`nExiting Script",Criticality:-100,ID:-1}
-            ,0:{String:"Gui got cancelled",EndString:"`n`n---`nReturning to General Selection",Criticality:0,ID:0}
-            ,+2:{String:"Format not defined.`nCheck your configfile.`n`nReturning default 'outputformat()'",Criticality:20,ID:+2}}
+                -1:{String:"Provided Configfile does not exist:`n`n",EndString:"`n`n---`nExiting Script",Criticality:-100,ID:-1}
+                ,0:{String:"Gui got cancelled",EndString:"`n`n---`nReturning to General Selection",Criticality:0,ID:0}
+                ,+2:{String:"Format not defined.`nCheck your configfile.`n`nReturning default 'outputformat()'",Criticality:20,ID:+2}}
         this.ClassName:="ot ("
         this.GUITitle:="Define output format - "
         this.Version:="0.1.a"
@@ -200,24 +200,24 @@ Class ot {
     }
 
     ChooseFile(VarName) {
-        FileSelectFile, Chosen, 3,% this.Arguments[VarName].SearchPath,% this.Arguments[VarName].String
+        FileSelectFile Chosen, 3,% this.Arguments[VarName].SearchPath,% this.Arguments[VarName].String
         this.Arguments[VarName].Value:=Chosen
-        gui, ParamsGUI:default
-        SplitPath, % Chosen,,,,ChosenName
+        gui ParamsGUI:default
+        SplitPath % Chosen,,,,ChosenName
         if (Chosen!="") {
             ;@ahk-neko-ignore-fn 1 line; at 4/28/2023, 9:44:47 AM ; case sensitivity
-            guicontrol,% "ParamsGUI:",v%VarName%, % ChosenName A_Space this.DDL_ParamDelimiter A_Space Chosen
+            guicontrol % "ParamsGUI:",v%VarName%, % ChosenName A_Space this.DDL_ParamDelimiter A_Space Chosen
         }
     }
 
     OpenFileSelectionFolder(Path) {
-        SplitPath, % Path,, OutDir
-        run, % OutDir
+        SplitPath % Path,, OutDir
+        run % OutDir
     }
 
     GenerateGUI(x:="",y:="") {
         global ;; this cannot be made static or this.SubmitDynamicArguments() will not receive modified values (aka it will always assemble the default)
-        gui, ParamsGUI: destroy
+        gui ParamsGUI: destroy
         if this.HasKey("Error") {
             ID:=strsplit(this.Error,A_Space).2
             if !(SubStr(ID,1,1)="-") {
@@ -227,8 +227,8 @@ Class ot {
             return this
         }
 
-        gui, ParamsGUI: new, +AlwaysOnTop -SysMenu -ToolWindow +caption +Border +LabelotGUI_ +hwndotGUI_
-        gui, font, s8
+        gui ParamsGUI: new, +AlwaysOnTop -SysMenu -ToolWindow +caption +Border +LabelotGUI_ +hwndotGUI_
+        gui font, s8
 
         for Parameter,Value in this.Arguments {
             Control:=Value.Control
@@ -236,31 +236,31 @@ Class ot {
                 Options:=""
             }
             if (Value.Control="Edit") {
-                gui, ParamsGUI: add, text,, % Value.String
+                gui ParamsGUI: add, text,, % Value.String
                 if (Value.ctrlOptions="Number") {
                     if (Value.Max!="") && (Value.Min!="") {
                         Value.ctrlOptions.= A_Space
-                        Gui, ParamsGUI:Add, Edit
-                        gui, ParamsGUI:add, UpDown, % "h25 w80 Range" Value.Min "-" Value.Max " vv" Parameter, % Value.Default + 0
+                        Gui ParamsGUI:Add, Edit
+                        gui ParamsGUI:add, UpDown, % "h25 w80 Range" Value.Min "-" Value.Max " vv" Parameter, % Value.Default + 0
                         continue
                     }
                 }
                 if !RegexMatch(Value.ctrlOptions,"w\d*") {
                     Value.ctrlOptions.= " w120"
                 }
-                gui, ParamsGUI: add, % Value.Control, % Value.ctrlOptions " vv" Parameter, % (Value.Value="NULL"?:Value.Value)
+                gui ParamsGUI: add, % Value.Control, % Value.ctrlOptions " vv" Parameter, % (Value.Value="NULL"?:Value.Value)
             } else if (Value.Control="File") {
-                gui, ParamsGUI:Add, Text,, % Value.String
-                gui, ParamsGUI:Add, edit, % Value.ctrlOptions " vv" Parameter " disabled w200", % Value.Value
-                Gui, ParamsGUI:Add, button, hwndSelectFile, % "Select &File"
-                gui, ParamsGUI:add, button, yp xp+77 hwndOpenFileSelectionFolder, % "Open File Selection Folder"
+                gui ParamsGUI:Add, Text,, % Value.String
+                gui ParamsGUI:Add, edit, % Value.ctrlOptions " vv" Parameter " disabled w200", % Value.Value
+                Gui ParamsGUI:Add, button, hwndSelectFile, % "Select &File"
+                gui ParamsGUI:add, button, yp xp+77 hwndOpenFileSelectionFolder, % "Open File Selection Folder"
                 onOpenFileSelectionFolder:=ObjBindMethod(this, "OpenFileSelectionFolder", Value.SearchPath)
                 onSelectFile := ObjBindMethod(this, "ChooseFile",Parameter)
-                GuiControl, ParamsGUI:+g, %SelectFile%, % onSelectFile
-                GuiControl, ParamsGUI:+g, %OpenFileSelectionFolder%, % onOpenFileSelectionFolder
-                gui, ParamsGUI:add,text, w0 h0 yp+20 xp-77
+                GuiControl ParamsGUI:+g, %SelectFile%, % onSelectFile
+                GuiControl ParamsGUI:+g, %OpenFileSelectionFolder%, % onOpenFileSelectionFolder
+                gui ParamsGUI:add,text, w0 h0 yp+20 xp-77
             } else if (Value.Control="DDL") {
-                gui, ParamsGUI:Add, Text,, % Value.String
+                gui ParamsGUI:Add, Text,, % Value.String
                 if Instr(Value.ctrlOptions,",") && !Instr(Value.ctrlOptions,"|") {
                     Value.ctrlOptions:=strreplace(Value.ctrlOptions,",","|")
                 }
@@ -276,46 +276,46 @@ Class ot {
                 if !Instr(Value.ctrlOptions,Value.Default "||") {
                     Value.ctrlOptions:=strreplace(Value.ctrlOptions,Value.ctrlOptions "|")
                 }
-                gui, ParamsGUI:add, % Value.Control, % " vv" Parameter, % Value.ctrlOptions
+                gui ParamsGUI:add, % Value.Control, % " vv" Parameter, % Value.ctrlOptions
             } else {
-                gui, ParamsGUI:add, % Value.Control, % Value.ctrlOptions " vv" Parameter, % Value.String
+                gui ParamsGUI:add, % Value.Control, % Value.ctrlOptions " vv" Parameter, % Value.String
             }
             if (Value.Control="Checkbox") {
                 ;@ahk-neko-ignore-fn 1 line; at 4/28/2023, 9:49:09 AM ; case sensitivity
-                guicontrol,% "ParamsGUI:",v%Parameter%, % Value.Default
+                guicontrol % "ParamsGUI:",v%Parameter%, % Value.Default
             }
 
             if (Control="Edit") {
                 ; V.String:=tmp
             }
         }
-        gui, add, button,hwndSubmitButton,&Submit
+        gui add, button,hwndSubmitButton,&Submit
         onSubmit:=ObjBindMethod(this, "SubmitDynamicArguments")
-        GuiControl, ParamsGUI:+g,%SubmitButton%, % onSubmit
-        gui, add, button, yp xp+60 hwndEditConfig, Edit Configuration
+        GuiControl ParamsGUI:+g,%SubmitButton%, % onSubmit
+        gui add, button, yp xp+60 hwndEditConfig, Edit Configuration
         onEditConfig:=ObjBindMethod(this, "EditConfig")
-        GuiControl, ParamsGUI:+g,%EditConfig%, % onEditConfig
+        GuiControl ParamsGUI:+g,%EditConfig%, % onEditConfig
         onEscape:=ObjBindMethod(this,"otGUI_Escape2")
-        Hotkey, IfWinActive, % "ahk_id " otGUI_
-        Hotkey, Escape,% onEscape
+        Hotkey IfWinActive, % "ahk_id " otGUI_
+        Hotkey Escape,% onEscape
         if (x!="") && (y!="") {
-            gui, ParamsGUI:Show,x%x% y%y%,% GUIName:=this.GUITitle this.type
+            gui ParamsGUI:Show,x%x% y%y%,% GUIName:=this.GUITitle this.type
         } else {
-            gui, ParamsGUI:Show,,% GUIName:=this.GUITitle this.type
+            gui ParamsGUI:Show,,% GUIName:=this.GUITitle this.type
         }
-        WinWait, % GUIName
+        WinWait % GUIName
         if this.SkipGUI {
             this.SubmitDynamicArguments() ;; auto-submit the GUI
         } Else {
-            WinWaitClose, % GUIName
+            WinWaitClose % GUIName
         }
         return this
     }
     EditConfig() {
         static
-        gui, ParamsGUI: Submit, NoHide
-        RunWait, % this.ConfigFile,,,PID
-        WinWaitClose, % "ahk_PID" PID
+        gui ParamsGUI: Submit, NoHide
+        RunWait % this.ConfigFile,,,PID
+        WinWaitClose % "ahk_PID" PID
         Gui +OwnDialogs
         OnMessage(0x44, "DA_OnMsgBox")
         MsgBox 0x40044, % this.ClassName " > " A_ThisFunc "()", You modified the configuration for this class.`nReload?
@@ -330,8 +330,8 @@ Class ot {
     }
     SubmitDynamicArguments() {
         static ; global
-        gui, ParamsGui: Submit
-        gui, ParamsGui: destroy
+        gui ParamsGui: Submit
+        gui ParamsGui: destroy
         for Parameter,_ in this.Arguments {
             ;@ahk-neko-ignore 1 line; at 4/28/2023, 9:49:42 AM ; https://github.com/CoffeeChaton/vscode-autohotkey-NekoHelp/blob/main/note/code107.md
             k=v%Parameter% ;; i know this is jank, but I can't seem to fix it. just don't touch for now?
@@ -342,8 +342,8 @@ Class ot {
     }
     otGUI_Escape2() {
         static
-        gui, ParamsGUI: Submit
-        gui, ParamsGui: destroy
+        gui ParamsGUI: Submit
+        gui ParamsGui: destroy
         ID:=0
         this.Error:=this.Errors[ID]
         return this
@@ -386,8 +386,8 @@ DA_Quote(String) { ; u/anonymous1184 https://www.reddit.com/r/AutoHotkey/comment
 ; #endregion:DA_Quote (4179423054)
 
 DA_OnMsgBox() {
-    DetectHiddenWindows, On
-    Process, Exist
+    DetectHiddenWindows On
+    Process Exist
     If (WinExist("ahk_class #32770 ahk_pid " . ErrorLevel)) {
         ControlSetText Button1, Reload
         ControlSetText Button2, Continue with old

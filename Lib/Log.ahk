@@ -129,11 +129,11 @@ stdOut                    : `%data_out`%
         return this.__Cache := !!Set
     }
     close() {
-        OutputDebug, % this.content
+        OutputDebug % this.content
         this.__h.close()
     }
     handle() {
-        OutputDebug, % this.content
+        OutputDebug % this.content
         this.__h.handle()
     }
     getTotalDuration(atc1,atc2) {
@@ -142,7 +142,7 @@ stdOut                    : `%data_out`%
         this.TotalExecution_Duration:=RegExReplace(Time,"[hms]")
     }
     __Set(Key, Value) {
-        OutputDebug, % this.__h.tell()
+        OutputDebug % this.__h.tell()
         OldLength:=strLen(this.content)
         this.__h.Pos:=0 ; reset the pointer to the beginning of the file → this apparently still frameshifts?
         Key:="`%" Key "`%" ; prep the eky
@@ -196,7 +196,7 @@ stdOut                    : `%data_out`%
 writeFile_Log(Path, Content, Encoding := "", Flags := 0x2, bSafeOverwrite := false) {
 
     if (bSafeOverwrite && FileExist(Path)) ;; if we want to ensure nonexistance.
-        FileDelete, % Path
+        FileDelete % Path
     if (Encoding != "") {
         if (fObj := FileOpen(Path, Flags, Encoding)) {
             fObj.Write(Content) ;; insert contents
@@ -257,7 +257,7 @@ CodeTimer_Log(Description,x:=500,y:=500,ClipboardFlag:=0) {
         If (ClipboardFlag=1) {
             Clipboard:=TimedDuration
         }
-        tooltip,% "Timer " Description "`n" TimedDuration " ms have elapsed!",% x,% y
+        tooltip % "Timer " Description "`n" TimedDuration " ms have elapsed!",% x,% y
         time_withletters:=PrettyTickCount_Log(TimedDuration)
         time_withoutletters:=RegexReplace(time_withletters,"[hms]")
         Return time_withoutletters

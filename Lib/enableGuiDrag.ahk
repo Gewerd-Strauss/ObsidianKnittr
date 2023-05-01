@@ -81,7 +81,7 @@
 ; #region:Code
 enableGuiDrag(GuiLabel=1) {
    WinGetPos,,,A_w,A_h,A
-   Gui, %GuiLabel%:Add, Text, x0 y0 w%A_w% h%A_h% +BackgroundTrans gGUI_Drag
+   Gui %GuiLabel%:Add, Text, x0 y0 w%A_w% h%A_h% +BackgroundTrans gGUI_Drag
    return
 
    GUI_Drag:
