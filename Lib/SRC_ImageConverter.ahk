@@ -1,5 +1,3 @@
-;clipboard:=ConvertSRC_SYNTAX_V4("D:\Dokumente neu\000 AAA Dokumente\000 AAA HSRW\General\AHK scripts\Projects\Finished\ObsidianScripts\Test\index.md",true,true)
-return
 ConvertSRC_SYNTAX_V4(PathOrContent,bInsertSetupChunk,bRemoveObsidianHTMLErrors) {
     if (FileExist(PathOrContent))
     {
@@ -35,8 +33,6 @@ ConvertSRC_SYNTAX_V4(PathOrContent,bInsertSetupChunk,bRemoveObsidianHTMLErrors) 
         )
         buffer:=RegexReplace(buffer,"<figcaption>" Clean(match.alt) "</figcaption>","") ;; 09.03.2023 - required for removing the new figure syntax.
         buffer := StrReplace(buffer, match[0], tpl)
-        buffer:=RegexReplace(buffer,"<figcaption>" Clean(match.alt) "</figcaption>","") ;; 09.03.2023 - required for removing the new figure syntax.
-        buffer := StrReplace(buffer, match[0], tpl)
         p += StrLen(tpl)
     }
     buffer:=Regexreplace(buffer, "``````\{r setup(|.|\n)*``````","") ;; get rid of all potential r setup chunks
@@ -59,13 +55,16 @@ ConvertSRC_SYNTAX_V4(PathOrContent,bInsertSetupChunk,bRemoveObsidianHTMLErrors) 
             ned:=match[0]
             buffer:=StrReplace(buffer, ned) ;; why does this not work?
             if (Instr(buffer, ned)) {
-
-                m((Instr(buffer, ned)))
+                if DEBUG {
+                    msgbox, % (Instr(buffer, ned))
+                }
             }
         }
     }
-    if WinActive("ahk_exe code.exe")
+    if DEBUG {
+
         Clipboard:=buffer
+    }
     return buffer
 }
 
@@ -74,10 +73,6 @@ Clean(sText) {
     sText := StrReplace(sText, "'", "\'")
     return sText
 }
-
-; DecodeEntities(sText) {
-;     return _Decode(sText, 1)
-; }
 
 DecodeUriComponent(sText) {
     return _Decode(sText, 2)
