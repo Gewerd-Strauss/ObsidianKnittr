@@ -25,3 +25,4 @@ Lib/ObsidianHTML_Dev.ahk
 testrun.ahk
 Test/LOG_.txt
 Test/.Rhistory
+Test/RegexTests.ahk
