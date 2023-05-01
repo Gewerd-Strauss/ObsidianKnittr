@@ -52,6 +52,7 @@ ConvertSRC_SYNTAX_V4(PathOrContent,bInsertSetupChunk,bRemoveObsidianHTMLErrors) 
         buffer := RegExReplace(buffer, "\n---", "`n" tpl,,1,1) ;; 09.03.2023 - required for removing the new figure syntax
     buffer:=Regexreplace(buffer,"<figure>","") ;; 09.03.2023 - required for removing the new figure syntax
     buffer:=Regexreplace(buffer,"</figure>","") ;; 09.03.2023 - required for removing the new figure syntax
+    buffer:=Regexreplace(buffer,"\<figcaption\>.*<\/figcaption\>","") ;; 01.05.2023  bugfix for syntax '![[200 University/04/BE22 Bioinformatics/Task 7 Phylogenetic Tree/GuideTree (actual Phylotree).png|Phylogenetic Tree of the sequences mentioned in [Similar sequences] ]]' - required for removing the new figure syntax
     if (bRemoveObsidianHTMLErrors) {
         matches:=RegexMatchAll(buffer,"m)(((\<|\>)\s*\**obsidian-html error:\**.*)|(Obsidianhtml.*))$")
         for _, match in matches {
