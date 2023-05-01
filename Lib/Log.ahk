@@ -247,27 +247,24 @@ writeFile_Log(Path, Content, Encoding := "", Flags := 0x2, bSafeOverwrite := fal
 ; #endregion:Example
 
 ; #region:Code
-CodeTimer_Log(Description,x:=500,y:=500,ClipboardFlag:=0)
-{
+CodeTimer_Log(Description,x:=500,y:=500,ClipboardFlag:=0) {
 
     Global StartTimer
 
-    If (StartTimer != "")
-    {
+    If (StartTimer != "") {
         FinishTimer := A_TickCount
         TimedDuration := FinishTimer - StartTimer
         StartTimer := ""
-        If (ClipboardFlag=1)
-        {
+        If (ClipboardFlag=1) {
             Clipboard:=TimedDuration
         }
         tooltip,% "Timer " Description "`n" TimedDuration " ms have elapsed!",% x,% y
         time_withletters:=PrettyTickCount_Log(TimedDuration)
         time_withoutletters:=RegexReplace(time_withletters,"[hms]")
         Return time_withoutletters
-    }
-    Else
+    } Else {
         StartTimer := A_TickCount
+    }
 }
 ; #endregion:Code
 
