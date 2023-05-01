@@ -155,7 +155,7 @@ stdOut                    : `%data_out`%
             }
             L:=strLen(this.content)
             if (OldLength!=L) {
-                m("string improperly padded")
+                MsgBox 0x30, % "Log.__Set()", String written to fileobject was improperly padded.`n`nThis is not a catastrophic error`, just means your execution log is going to be ugly at the bottom.
             }
 
         }
