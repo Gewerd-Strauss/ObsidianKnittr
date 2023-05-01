@@ -23,18 +23,22 @@
         throw Exception("Couldn't create process.", -1, Format("{:04x}", lastError))
     }
     if (IsSet(InOut) && InOut != "") {
-        if (SubStr(InOut, 0) != "`n")
+        if (SubStr(InOut, 0) != "`n") {
             InOut .= "`n"
+        }
         FileOpen(hInputW, "h", "UTF-8").Write(InOut)
+
     }
     DllCall("CloseHandle", "Ptr", hInputW)
     cbAvail := 0, InOut := ""
     pipe := FileOpen(hOutputR, "h`n", "UTF-8")
     while (DllCall("PeekNamedPipe", "Ptr", hOutputR, "Ptr", 0, "UInt", 0, "Ptr", 0, "UInt*", cbAvail, "Ptr", 0)) {
-        if (cbAvail)
+        if (cbAvail) {
             InOut .= pipe.Read()
-        else
+        }
+        else {
             Sleep 10
+        }
     }
     DllCall("CloseHandle", "Ptr", hOutputR)
     hProcess := NumGet(processInformation, 0)
