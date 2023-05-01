@@ -1,9 +1,9 @@
 ConvertSRC_SYNTAX_V4(PathOrContent,bInsertSetupChunk,bRemoveObsidianHTMLErrors) {
     if (FileExist(PathOrContent)) {
         Current_FileEncoding:=A_FileEncoding
-        FileEncoding, UTF-8
+        FileEncoding UTF-8
         FileRead buffer, % PathOrContent
-        FileEncoding, % Current_FileEncoding
+        FileEncoding % Current_FileEncoding
     }
     else {
         buffer := PathOrContent
@@ -27,26 +27,26 @@ ConvertSRC_SYNTAX_V4(PathOrContent,bInsertSetupChunk,bRemoveObsidianHTMLErrors) 
             src:=StrReplace(src,"../")
         }
         tpl =
-        (LTrim
+            (LTrim
 
-            ``````{r, echo=FALSE, %options%}
-            knitr::include_graphics("%src%")
-            ``````
+                ``````{r, echo=FALSE, %options%}
+                knitr::include_graphics("%src%")
+                ``````
 
-        )
+            )
         buffer:=RegexReplace(buffer,"<figcaption>" Clean(match.alt) "</figcaption>","") ;; 09.03.2023 - required for removing the new figure syntax.
         buffer := StrReplace(buffer, match[0], tpl)
         p += StrLen(tpl)
     }
     buffer:=Regexreplace(buffer, "``````\{r setup(|.|\n)*``````","") ;; get rid of all potential r setup chunks
     tpl =
-    (LTrim
-        ---
-        ``````{r setup, include=FALSE}
-        knitr::opts_chunk$set(echo = FALSE)
-        ``````
+        (LTrim
+            ---
+            ``````{r setup, include=FALSE}
+            knitr::opts_chunk$set(echo = FALSE)
+            ``````
 
-    )
+        )
     if bInsertSetupChunk {
         buffer := RegExReplace(buffer, "\n---", "`n" tpl,,1,1) ;; 09.03.2023 - required for removing the new figure syntax
     }
@@ -60,7 +60,7 @@ ConvertSRC_SYNTAX_V4(PathOrContent,bInsertSetupChunk,bRemoveObsidianHTMLErrors) 
             buffer:=StrReplace(buffer, ned) ;; why does this not work?
             if (Instr(buffer, ned)) {
                 if DEBUG {
-                    msgbox, % (Instr(buffer, ned))
+                    msgbox % (Instr(buffer, ned))
                 }
             }
         }
@@ -89,14 +89,14 @@ _Decode(sText, nMode) {
         document.write("<meta http-equiv='X-UA-Compatible' content='IE=Edge'>")
     }
     switch (nMode) {
-    case 1:
-        document.write(sText)
-        txt := document.documentElement.innerText
-        document.close()
-    case 2:
-        txt := document.parentWindow.decodeURIComponent(sText)
-    default:
-        txt := "Unknown " A_ThisFunc "() mode."
+        case 1:
+            document.write(sText)
+            txt := document.documentElement.innerText
+            document.close()
+        case 2:
+            txt := document.parentWindow.decodeURIComponent(sText)
+        default:
+            txt := "Unknown " A_ThisFunc "() mode."
     }
     return txt
 }
@@ -277,11 +277,11 @@ class WinHttpRequest extends WinHttpRequest._Call {
 
     _Mime(Extension) {
         mime := {"7z": "application/x-7z-compressed"
-            , "gif": "image/gif"
-            , "jpg": "image/jpeg"
-            , "json": "application/json"
-            , "png": "image/png"
-            , "zip": "application/zip"}[Extension]
+                , "gif": "image/gif"
+                , "jpg": "image/jpeg"
+                , "json": "application/json"
+                , "png": "image/png"
+                , "zip": "application/zip"}[Extension]
         if (!mime)
             mime := "application/octet-stream"
         return mime
