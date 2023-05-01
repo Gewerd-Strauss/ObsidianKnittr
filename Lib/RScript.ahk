@@ -1,5 +1,4 @@
-buildRScriptContent(Path,output_filename="",out="")
-{
+buildRScriptContent(Path,output_filename="",out="") {
     SplitPath, % Path, , Path2, , Name
     RScriptFilePath:=strreplace(Path2,"\","\\")
         , RScriptFolder:=strreplace(Path2,"\","/")
@@ -109,7 +108,7 @@ runRScript(Path,script_contents,RScript_Path:="") {
     SplitPath, % Path,, OutDir
     writeFile(OutDir "\build.R",script_contents,"UTF-8-RAW",,true)
 
-    CMD:=quote(RScript_Path) A_Space quote(strreplace(OutDir "\build.R","\","\\")) ;; works with valid codefile (manually ensured no utf-corruption) from cmd, all three work for paths not containing umlaute with FileAppend
+    CMD:=quote(RScript_Path) A_Space quote(strreplace(OutDir "\build.R","\","\")) ;; works with valid codefile (manually ensured no utf-corruption) from cmd, all three work for paths not containing umlaute with FileAppend
     GetStdStreams_WithInput(CMD, OutDir, InOut)
     if !validateRExecution(InOut) {
         MsgBox 0x10,% script.name " - " A_ThisFunc "()", Error encountered`; the 'build.R'-script did not run to succession.`n`nBelow is the resulting error returned. For more information`, please execute the `build.R`-script via console or RStudio.`n`nThe script will continue to cleanup its working directories now.
