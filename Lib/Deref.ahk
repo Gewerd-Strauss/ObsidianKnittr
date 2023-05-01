@@ -38,14 +38,14 @@ Deref(String) {
         if (m1) {
             out .= %m2%
         } else switch (m3) {
-            case "a": out .= "`a"
-            case "b": out .= "`b"
-            case "f": out .= "`f"
-            case "n": out .= "`n"
-            case "r": out .= "`r"
-            case "t": out .= "`t"
-            case "v": out .= "`v"
-            default: out .= m3
+        case "a": out .= "`a"
+        case "b": out .= "`b"
+        case "f": out .= "`f"
+        case "n": out .= "`n"
+        case "r": out .= "`r"
+        case "t": out .= "`t"
+        case "v": out .= "`v"
+        default: out .= m3
         }
     }
     return out SubStr(String, spo)

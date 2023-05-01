@@ -21,7 +21,7 @@
 
     ;; ensure the Working Directory exists before running OHTML
     if (!FileExist(WD)) {
-        FileCreateDir, % WD
+        FileCreateDir % WD
     }
 
     ;; if no manuscript is provided, we must assume the config to contain it and use convert
@@ -32,7 +32,7 @@
         MsgBox 0x2010, script.name " - provided Config file does not exist ", % "The config-file provided to 'obsidianhtml convert - i <config_file> does not exist. Returning early."
         return false
     } else {
-        FileRead, config_contents, % config_path
+        FileRead config_contents, % config_path
         if !Instr(config_contents,"obsidian_entrypoint_path_str: '") && bUseConvert {
             MsgBox 0x2010
                 , % script.name " - config-field 'obsidian_entrypoint_path_str' not found "
@@ -80,9 +80,9 @@
         data_out:=data
         WorkDir_out:=WorkDir
     }
-    OutputDebug, % "`n`n" command2 "`n`n"
-    OutputDebug, % "`n`n" WorkDir "`n`n"
-    OutputDebug, % "`n`n" WorkDir_OwnFork "`n`n"
+    OutputDebug % "`n`n" command2 "`n`n"
+    OutputDebug % "`n`n" WorkDir "`n`n"
+    OutputDebug % "`n`n" WorkDir_OwnFork "`n`n"
 
     if (data!="") {
         OHTML_Output:=getObsidianHTML_WD(Clipboard:=data)
@@ -93,26 +93,26 @@
         ObsidianHTMLCopyDir:=getObsidianHTML_CopyDir(data_modded)
     }
     return {"CMD":command2
-        ,"WorkDir":WorkDir_out
-        ,"stdOut":data_out
-        ,"obsidianhtml_version":ohtmlversion_out
-        ,"obsidianhtml_path":obsidianhtml_path
-        ,"OutputPath":OHTML_Output
-        ,"ObsidianHTMLCopyDir":ObsidianHTMLCopyDir}
+            ,"WorkDir":WorkDir_out
+            ,"stdOut":data_out
+            ,"obsidianhtml_version":ohtmlversion_out
+            ,"obsidianhtml_path":obsidianhtml_path
+            ,"OutputPath":OHTML_Output
+            ,"ObsidianHTMLCopyDir":ObsidianHTMLCopyDir}
 }
 
 getObsidianHTML_WD(String) {
     NeedleTxt:="
-    (LTRIM
-        from (?<Path>.*obshtml_.*\/)
-        md: (?<Path>.*obshtml_.*(\/|\\)md)
-        md: (?<Path>.*\md)
-        \> COMPILING HTML FROM MARKDOWN CODE \((?<Path>.*\\md)\\index\.md\)
-        m)\> COMPILING HTML FROM MARKDOWN CODE \((?<Path>.*)\)
-        m)\> COMPILING HTML FROM MARKDOWN CODE \((?<Path>.+)\)+$
-        \> COMPILING HTML FROM MARKDOWN CODE \((?<Path>.+)\)+
-        md: (?<Path>.*\\md)
-    )"
+        (LTRIM
+            from (?<Path>.*obshtml_.*\/)
+            md: (?<Path>.*obshtml_.*(\/|\\)md)
+            md: (?<Path>.*\md)
+            \> COMPILING HTML FROM MARKDOWN CODE \((?<Path>.*\\md)\\index\.md\)
+            m)\> COMPILING HTML FROM MARKDOWN CODE \((?<Path>.*)\)
+            m)\> COMPILING HTML FROM MARKDOWN CODE \((?<Path>.+)\)+$
+            \> COMPILING HTML FROM MARKDOWN CODE \((?<Path>.+)\)+
+            md: (?<Path>.*\\md)
+        )"
     needles:=strsplit(NeedleTxt,"`n")
     for _, needle in needles {
         Regexmatch(String,needle,v)
@@ -123,13 +123,13 @@ getObsidianHTML_WD(String) {
     return String
 }
 getObsidianHTML_CopyDir(String) {
-    OutputDebug, % String
+    OutputDebug % String
     NeedleTxt:="
-    (LTrim
-        COPYING VAULT (?<d_>.*) TO (?<TempDir>.*)$
-        m)resolved:\s*(?<TempDir>.*)$
-        m)resolved \+ posix:\s*(?<TempDir>.*)$
-    )"
+        (LTrim
+            COPYING VAULT (?<d_>.*) TO (?<TempDir>.*)$
+            m)resolved:\s*(?<TempDir>.*)$
+            m)resolved \+ posix:\s*(?<TempDir>.*)$
+        )"
     needles:=strsplit(NeedleTxt,"`n")
     for _, needle in needles {
         matches:=Regexmatch(String, needle, v)
@@ -143,33 +143,33 @@ getObsidianHTML_CopyDir(String) {
 createTemporaryObsidianHTML_Config(manuscriptpath, obsidianhtml_configfile,Convert) {
     if !FileExist(obsidianhtml_configfile) || !InStr(obsidianhtml_configfile,A_ScriptDir) { ;; create a template in this folder
         template:="
-        (LTRIM
-            # Input and output path of markdown files
-            # This can be an absolute or a relative path (relative to the working directory when calling obsidianhtml)
-            # Use full path or relative path, but don't use ~/
-            # md_folder_path_str:  'output/md'
-            # Number of links a note can be removed from the entrypoint note
-            # -1 for no max depth
-            # 0 means only the entrypoint note is processed
-            # 1 means only direct children are processed (and the entrypoint of course)
-            # and so forth. NOTE: DOES NOT APPLY TO INCLUSIONS!
-            #obsidian_entrypoint_path_str: '`%obsidian_entrypoint_path_str`%'
-            max_note_depth: 15
-            # preserve_inline_tags: False
-            toggles:
-            # When true, Obsidianhtml will not add three spaces at the end of every line
-            strict_line_breaks: True
-            compile_html: False
-        )"
+            (LTRIM
+                # Input and output path of markdown files
+                # This can be an absolute or a relative path (relative to the working directory when calling obsidianhtml)
+                # Use full path or relative path, but don't use ~/
+                # md_folder_path_str:  'output/md'
+                # Number of links a note can be removed from the entrypoint note
+                # -1 for no max depth
+                # 0 means only the entrypoint note is processed
+                # 1 means only direct children are processed (and the entrypoint of course)
+                # and so forth. NOTE: DOES NOT APPLY TO INCLUSIONS!
+                #obsidian_entrypoint_path_str: '`%obsidian_entrypoint_path_str`%'
+                max_note_depth: 15
+                # preserve_inline_tags: False
+                toggles:
+                # When true, Obsidianhtml will not add three spaces at the end of every line
+                strict_line_breaks: True
+                compile_html: False
+            )"
         template:=fixYAMLSyntax(template)
         writeFile_ObsidianHTML(script.configfolder "\OHTMLconfig_template.yaml",template,,,true)
         obsidianhtml_configfile:=script.configfolder "\OHTMLconfig_template.yaml"
     }
-    FileRead, configfile_contents, % obsidianhtml_configfile
+    FileRead configfile_contents, % obsidianhtml_configfile
     if (Convert) {
         configfile_contents:=StrReplace(configfile_contents,"#obsidian_entrypoint_path_str: '%obsidian_entrypoint_path_str%'","obsidian_entrypoint_path_str: '" manuscriptpath "'")
     }
-    SplitPath, % manuscriptpath
+    SplitPath % manuscriptpath
 
     writeFile_ObsidianHTML(configfile_path:=A_ScriptDir "\OHTMLconfig_temp.yaml",configfile_contents,,,true)
     return [(FileExist(configfile_path)?configfile_path:false),configfile_contents]
@@ -178,7 +178,7 @@ createTemporaryObsidianHTML_Config(manuscriptpath, obsidianhtml_configfile,Conve
 readObsidianHTML_Config(configpath) {
     if !FileExist(configpath)
         return "E01: No config found"
-    FileRead, txt, % configpath
+    FileRead txt, % configpath
     if (txt="")
         return "E02: Empty config file"
     conf:=[]
@@ -231,19 +231,19 @@ fixYAMLSyntax(template) {
             }
         }
     }
-    OutputDebug, % out
+    OutputDebug % out
     return out
 }
 
 updateObsidianHTMLToLastRelease() {
-    RunWait, % A_Comspec " /k echo y | pip uninstall obsidianhtml", ,
-    RunWait, % A_Comspec " /k echo y | pip install obsidianhtml", ,
+    RunWait % A_Comspec " /k echo y | pip uninstall obsidianhtml", ,
+    RunWait % A_Comspec " /k echo y | pip install obsidianhtml", ,
     MsgBox,, % script.name, % "Successfully updated to last Release."
     return
 }
 updateObsidianHTMLToMaster() {
-    RunWait, % A_Comspec " /k echo y | pip uninstall obsidianhtml", ,
-    RunWait, % A_Comspec " /k echo y | pip install git+https://github.com/obsidian-html/obsidian-html.git", ,
+    RunWait % A_Comspec " /k echo y | pip uninstall obsidianhtml", ,
+    RunWait % A_Comspec " /k echo y | pip install git+https://github.com/obsidian-html/obsidian-html.git", ,
     MsgBox,, % script.name, % "Successfully updated to Master."
     return
 }
@@ -312,7 +312,7 @@ Quote_ObsidianHTML(String) { ; u/anonymous1184 https://www.reddit.com/r/AutoHotk
 ; #region:Code
 writeFile_ObsidianHTML(Path,Content,Encoding:="",Flags:=0x2,bSafeOverwrite:=false) {
     if (bSafeOverwrite && FileExist(Path)) {
-        FileDelete, % Path
+        FileDelete % Path
     } ;; if we want to ensure nonexistance.
     if (Encoding!="")
     {
