@@ -30,28 +30,26 @@
 
 ; #region:Code
 writeFile(Path,Content,Encoding:="",Flags:=0x2,bSafeOverwrite:=false) {
-
-    if (bSafeOverwrite && FileExist(Path)) ;; if we want to ensure nonexistance.
+    if (bSafeOverwrite && FileExist(Path)) {
+        ; if we want to ensure nonexistance.
         FileDelete, % Path
-    if (Encoding!="")
-    {
-        if (fObj:=FileOpen(Path,Flags,Encoding))
-        {
-            fObj.Write(Content) ;; insert contents
-            fObj.Close() ;; close file
-        }
-        else
-            throw Exception("File could not be opened. Flags:`n" Flags, -1, myFile)
     }
-    else
-    {
-        if (fObj:=FileOpen(Path,Flags))
-        {
+    if (Encoding!="") {
+        if (fObj:=FileOpen(Path,Flags,Encoding)) {
             fObj.Write(Content) ;; insert contents
             fObj.Close() ;; close file
         }
-        else
+        else {
+
             throw Exception("File could not be opened. Flags:`n" Flags, -1, myFile)
+        }
+    } else {
+        if (fObj:=FileOpen(Path,Flags)) {
+            fObj.Write(Content) ;; insert contents
+            fObj.Close() ;; close file
+        } else {
+            throw Exception("File could not be opened. Flags:`n" Flags, -1, myFile)
+        }
     }
     return
 }
