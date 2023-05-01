@@ -86,16 +86,19 @@
 
     if (data!="") {
         OHTML_Output:=getObsidianHTML_WD(Clipboard:=data)
+        ObsidianHTMLCopyDir:=getObsidianHTML_CopyDir(data)
     }
     if (data_modded!="") {
         OHTML_Output:=getObsidianHTML_WD(Clipboard:=data_modded)
+        ObsidianHTMLCopyDir:=getObsidianHTML_CopyDir(data_modded)
     }
     return {"CMD":command2
         ,"WorkDir":WorkDir_out
         ,"stdOut":data_out
         ,"obsidianhtml_version":ohtmlversion_out
         ,"obsidianhtml_path":obsidianhtml_path
-        ,"OutputPath":OHTML_Output}
+        ,"OutputPath":OHTML_Output
+        ,"ObsidianHTMLCopyDir":ObsidianHTMLCopyDir}
 }
 
 getObsidianHTML_WD(String) {
@@ -118,6 +121,24 @@ getObsidianHTML_WD(String) {
         }
     }
     return String
+}
+getObsidianHTML_CopyDir(String) {
+    OutputDebug, % String
+    NeedleTxt:="
+    (LTrim
+        COPYING VAULT (?<d_>.*) TO (?<TempDir>.*)$
+        m)resolved:\s*(?<TempDir>.*)$
+        m)resolved \+ posix:\s*(?<TempDir>.*)$
+    )"
+    needles:=strsplit(NeedleTxt,"`n")
+    for _, needle in needles {
+        matches:=Regexmatch(String, needle, v)
+        if (vTempDir!="") {
+            vTempDir:=strsplit(vTempDir,"`n",,2).1
+            return vTempDir
+        }
+    }
+    return
 }
 createTemporaryObsidianHTML_Config(manuscriptpath, obsidianhtml_configfile,Convert) {
     if !FileExist(obsidianhtml_configfile) || !InStr(obsidianhtml_configfile,A_ScriptDir) { ;; create a template in this folder

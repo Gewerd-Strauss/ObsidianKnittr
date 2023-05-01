@@ -197,6 +197,7 @@ main() {
     EL.UsedVerb:=(bConvertInsteadofRun?"Convert":"Run")
     EL.ObsidianHTMLWorkDir:=ret["WorkDir"]
     EL.ObsidianHTMLOutputpath:=ret["Outputpath"]
+    EL.ObsidianHTMLCopyDir:=ret["ObsidianHTMLCopyDir"]
     EL.CMD:=ret["CMD"]
     EL.data_out:=ret["stdOut"]
     if RegExMatch(ret["stdOut"], "md: (?<MDPath>.*)(\s*)", v) || FileExist(ret.OutputPath) {
