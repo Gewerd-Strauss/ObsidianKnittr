@@ -20,8 +20,7 @@ buildRScriptContent(Path,output_filename="",out="")
         %OutputType_Print%
 
     )
-    if out.settings.bForceFixPNGFiles
-    {
+    if out.settings.bForceFixPNGFiles {
         Str2=
         (LTrim
             files <- list.files(pattern="*.PNG",recursive = TRUE)
@@ -39,27 +38,23 @@ buildRScriptContent(Path,output_filename="",out="")
         Str.="`n" Str2
         bFixPNGS:=true
     }
-    else
+    else {
         bFixPNGS:=false
+    }
     Name:=(output_filename!=""?output_filename:"index")
         , FormatOptions:=""
-    for _,Class in out.Outputformats
-    {
+    for _,Class in out.Outputformats {
         format:=Class.AssembledFormatString
-        if Instr(format,"pdf_document")
-        {
+        if Instr(format,"pdf_document") {
             continue
         }
-        if (format="")
-        {
+        if (format="") {
             Str2=
             (LTRIM
 
                 rmarkdown::render(`"index.rmd`",NULL,`"%Name%"`)`n
             )
-        }
-        else
-        {
+        } else {
             Str2=
             (LTRIM
 
@@ -69,11 +64,12 @@ buildRScriptContent(Path,output_filename="",out="")
         Str.=Str2
         FormatOptions.= A_Tab strreplace(format,"`n",A_Tab "`n") "`n`n"
     }
-    for _, Class in Out.Outputformats
-    {
+    for _, Class in Out.Outputformats {
         format:=Class.AssembledFormatString
-        if !Instr(format,"pdf_document")
+        if !Instr(format,"pdf_document") {
+
             continue
+        }
         Str2=
         (LTrim
             files <- list.files(pattern="*.PNG",recursive = TRUE)
@@ -89,8 +85,7 @@ buildRScriptContent(Path,output_filename="",out="")
             })
             rmarkdown::render(`"index.rmd`",%format%,`"%Name%"`)`n
         )
-        if bFixPNGs
-        {
+        if bFixPNGs {
             Str2=
             (LTrim
 
@@ -104,8 +99,7 @@ buildRScriptContent(Path,output_filename="",out="")
 
 }
 
-runRScript(Path,script_contents,RScript_Path:="")
-{
+runRScript(Path,script_contents,RScript_Path:="") {
     SplitPath, % Path,, OutDir
     writeFile(OutDir "\build.R",script_contents,"UTF-8-RAW",,true)
 
