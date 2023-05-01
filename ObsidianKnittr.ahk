@@ -10,36 +10,12 @@ DetectHiddenWindows, On
 SetKeyDelay -1,-1
 SetBatchLines,-1
 SetTitleMatchMode, 2
-/*
-for creditsRaw, use "/" in the "URL"-field when the snippet is not published yet (e.g. for code you've written yourself and not published yet)
-space author, SnippetNameX and URLX out by spaces or tabs, and remember to include "-" inbetween both fields
-when 2+ snippets are located at the same url, concatenate them with "|" and treat them as a single one when putting together the URL's descriptor string
-finally, make sure toingest 'CreditsRaw' into the 'credits'-field of the template below.
-*/
-creditsRaw=
-(LTRIM
-    Gewerd Strauss   -      main script
-    tidbit et al - st_count - https://www.autohotkey.com/boards/viewtopic.php?t=53
-    jNizM   -   HasVal  - https://www.autohotkey.com/boards/viewtopic.php?p=109173&sid=e530e129dcf21e26636fec1865e3ee30#p109173
-    SKAN        - Base64PNG_to_HICON, regarding licensing             -   https://www.autohotkey.com/boards/viewtopic.php?f=6&t=36636, https://www.autohotkey.com/board/topic/75906-about-my-scripts-and-snippets/
-    author2,author3   -		 snippetName1		   		  			-	URL2,URL3
-    Gewerd Strauss      -   partial, self-written subset of ScriptObj						    - https://github.com/Gewerd-Strauss/ScriptObj/blob/master/ScriptObj.ahk
-    SKAN, Goyyah    - enableGuiDrag - http://autohotkey.com/board/topic/80594-how-to-enable-drag-for-a-gui-without-a-titlebar
-    anonymous1184 - Quote   - https://www.reddit.com/r/AutoHotkey/comments/p2z9co/comment/h8oq1av/?utm_source=share&utm_medium=web2x&context=3
-    Gewerd Strauss      - ttip      -   https://gist.github.com/Gewerd-Strauss/fad218c28b8120ab1a3cadea1a8dea9b
-    hi5 - TF.ahk, license   - https://github.com/hi5/TF, https://github.com/hi5/TF/blob/master/license.txt
-    anonymous1184, in request of help from Gewerd Strauss - SRC_ImageConverter
-)
+
 FileGetTime, ModDate,%A_ScriptFullPath%,M
 FileGetTime, CrtDate,%A_ScriptFullPath%,C
 CrtDate:=SubStr(CrtDate,7, 2) "." SubStr(CrtDate,5,2) "." SubStr(CrtDate,1,4)
 ModDate:=SubStr(ModDate,7, 2) "." SubStr(ModDate,5,2) "." SubStr(ModDate,1,4)
 global script := new script()
-
-; script := {base : script.base
-; ,vfile_local : A_ScriptDir "\version.ini"
-; ,DataFolder:	A_ScriptDir ""
-; ,configfolder : A_ScriptDir "\INI-Files"}
 
 script := {base : script.base
     , name : regexreplace(A_ScriptName, "\.\w+")
