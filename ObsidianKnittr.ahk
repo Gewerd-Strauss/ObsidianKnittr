@@ -309,7 +309,7 @@ copyBack(Source,Destination,manuscriptpath) {
             FileRemoveDir % Destination "\" manuscriptname "\", true
         }
         FileCopyDir % Dir, % Output_Path:=Destination "\" manuscriptname "\", true
-        writeFile(Output_Path "\index.md",Clipboard:=manuscriptcontent,,,true)
+        writeFile(Output_Path "\index.md",manuscriptcontent,,,true)
         FileCopy % manuscriptpath, % rawinputCopyLocation, 1
     } Else {
         FileCopyDir % Dir, % Output_Path:= A_Desktop "\TempTemporal\" manuscriptname "\" , true
