@@ -120,19 +120,6 @@ stdOut                    : `%data_out`%
         this.Cache(Cache)
         OnExit(this.close)
         OnError(this.close)
-        ; BUG: SOMETHING in this class's implementation results in the stdOutstream to partially overlap, resulting in this principle output in the log file:
-
-        /*
-        You can find your output at:
-        	md: D:\Dokumente neu\ObsidianPluginDev\obsidian-html\output\md
-
-        l\output\md
-
-        tml\output\md
-
-        */
-
-        ; where realistically it should have ended at the line below "You can find your output at:"
     }
     cache(Set := "") {
         ;; TODO: implement Cache (false by default, if true we don't close the fo inbetween calls? )
@@ -144,7 +131,6 @@ stdOut                    : `%data_out`%
     close() {
         OutputDebug, % this.content
         this.__h.close()
-
     }
     handle() {
         OutputDebug, % this.content
@@ -157,9 +143,22 @@ stdOut                    : `%data_out`%
     }
     __Set(Key, Value) {
         OutputDebug, % this.__h.tell()
+        OldLength:=strLen(this.content)
         this.__h.Pos:=0 ; reset the pointer to the beginning of the file → this apparently still frameshifts?
         Key:="`%" Key "`%" ; prep the eky
         this.content:=strreplace(this.content,Key, Value)
+        NewLength:=strLen(this.content)
+        if (NewLength<OldLength) {
+            Diff:=abs(NewLength-OldLength)
+            loop, % Diff {
+                this.content.=A_Space
+            }
+            L:=strLen(this.content)
+            if (OldLength!=L) {
+                m("string improperly padded")
+            }
+
+        }
         this.__h.write(this.content)
     }
 }
