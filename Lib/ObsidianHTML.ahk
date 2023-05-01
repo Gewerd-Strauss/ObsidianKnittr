@@ -98,8 +98,7 @@
         ,"OutputPath":OHTML_Output}
 }
 
-getObsidianHTML_WD(String)
-{
+getObsidianHTML_WD(String) {
     NeedleTxt:="
     (LTRIM
         from (?<Path>.*obshtml_.*\/)
@@ -120,8 +119,7 @@ getObsidianHTML_WD(String)
     }
     return String
 }
-createTemporaryObsidianHTML_Config(manuscriptpath, obsidianhtml_configfile,Convert)
-{
+createTemporaryObsidianHTML_Config(manuscriptpath, obsidianhtml_configfile,Convert) {
     if !FileExist(obsidianhtml_configfile) || !InStr(obsidianhtml_configfile,A_ScriptDir) { ;; create a template in this folder
         template:="
         (LTRIM
@@ -156,8 +154,7 @@ createTemporaryObsidianHTML_Config(manuscriptpath, obsidianhtml_configfile,Conve
     return [(FileExist(configfile_path)?configfile_path:false),configfile_contents]
 }
 
-readObsidianHTML_Config(configpath)
-{
+readObsidianHTML_Config(configpath) {
     if !FileExist(configpath)
         return "E01: No config found"
     FileRead, txt, % configpath
@@ -165,13 +162,12 @@ readObsidianHTML_Config(configpath)
         return "E02: Empty config file"
     conf:=[]
     confstr:=""
-    for _, Line in strsplit(txt,"`n")
-    {
+    for _, Line in strsplit(txt,"`n") {
         Line:=trim(Line)
-        if !Instr(Line, ":") && Instr(Line, "# ")
+        if !Instr(Line, ":") && Instr(Line, "# ") {
             continue
-        if RegExMatch(Line, "(?<Key>.*):(?<Value>.*)", v)
-        {
+        }
+        if RegExMatch(Line, "(?<Key>.*):(?<Value>.*)", v) {
             conf[vKey]:=vValue
             confstr.= vKey "=" vValue "`n"
         }
@@ -218,15 +214,13 @@ fixYAMLSyntax(template) {
     return out
 }
 
-updateObsidianHTMLToLastRelease()
-{
+updateObsidianHTMLToLastRelease() {
     RunWait, % A_Comspec " /k echo y | pip uninstall obsidianhtml", ,
     RunWait, % A_Comspec " /k echo y | pip install obsidianhtml", ,
     MsgBox,, % script.name, % "Successfully updated to last Release."
     return
 }
-updateObsidianHTMLToMaster()
-{
+updateObsidianHTMLToMaster() {
     RunWait, % A_Comspec " /k echo y | pip uninstall obsidianhtml", ,
     RunWait, % A_Comspec " /k echo y | pip install git+https://github.com/obsidian-html/obsidian-html.git", ,
     MsgBox,, % script.name, % "Successfully updated to Master."
@@ -259,8 +253,7 @@ updateObsidianHTMLToMaster()
 ; #endregion:Example
 
 ; #region:Code
-Quote_ObsidianHTML(String)
-{ ; u/anonymous1184 https://www.reddit.com/r/AutoHotkey/comments/p2z9co/comment/h8oq1av/?utm_source=share&utm_medium=web2x&context=3
+Quote_ObsidianHTML(String) { ; u/anonymous1184 https://www.reddit.com/r/AutoHotkey/comments/p2z9co/comment/h8oq1av/?utm_source=share&utm_medium=web2x&context=3
     return """" String """"
 }
 ; #endregion:Code
@@ -297,9 +290,9 @@ Quote_ObsidianHTML(String)
 
 ; #region:Code
 writeFile_ObsidianHTML(Path,Content,Encoding:="",Flags:=0x2,bSafeOverwrite:=false) {
-
-    if (bSafeOverwrite && FileExist(Path)) ;; if we want to ensure nonexistance.
+    if (bSafeOverwrite && FileExist(Path)) {
         FileDelete, % Path
+    } ;; if we want to ensure nonexistance.
     if (Encoding!="")
     {
         if (fObj:=FileOpen(Path,Flags,Encoding))
@@ -307,8 +300,9 @@ writeFile_ObsidianHTML(Path,Content,Encoding:="",Flags:=0x2,bSafeOverwrite:=fals
             fObj.Write(Content) ;; insert contents
             fObj.Close() ;; close file
         }
-        else
+        else {
             throw Exception("File could not be opened. Flags:`n" Flags, -1, myFile)
+        }
     }
     else
     {
@@ -317,8 +311,9 @@ writeFile_ObsidianHTML(Path,Content,Encoding:="",Flags:=0x2,bSafeOverwrite:=fals
             fObj.Write(Content) ;; insert contents
             fObj.Close() ;; close file
         }
-        else
+        else {
             throw Exception("File could not be opened. Flags:`n" Flags, -1, myFile)
+        }
     }
     return
 }
