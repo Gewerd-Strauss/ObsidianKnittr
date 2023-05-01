@@ -78,8 +78,8 @@ main() {
     exh:=Func("fonExit").Bind(DEBUG)
     onExit(exh)
     if !script.load() {
-        InputBox, given_obsidianhtml_configfile, % script.name " - Initiate settings","Please give the path of your configfile for obsidianhtml."
-        InputBox, given_searchroot, % script.name " - Initiate settings","Please give the path of your configfile for obsidianhtml."
+        ;InputBox, given_obsidianhtml_configfile, % script.name " - Initiate settings","Please give the path of your configfile for obsidianhtml."
+        InputBox, given_searchroot, % script.name " - Initiate settings","Please give the search root folder."
         InputBox, given_rscriptpath, % script.name,% "Please give the absolute path of your installed 'Rscript.exe'-file you wish to use.`nIf you don't want to use this step, leave this empty and continue.", , , , , , , , % "C:\Program Files\R\R-MAJORVERSION.MINORVERSION.PATCH\bin\Rscript.exe"
         InitialSettings=
         (LTrim
@@ -88,7 +88,7 @@ main() {
             Destination=0
             FullLogOnSuccess=0
             HistoryLimit=25
-            obsidianhtml_configfile=%given_obsidianhtml_configfile%
+            obsidianhtml_configfile=
             obsidianTagEndChars=():´
             OpenParentfolderInstead=1
             RScriptPath=%given_rscriptpath%
