@@ -1,24 +1,27 @@
 ConvertSRC_SYNTAX_V4(PathOrContent,bInsertSetupChunk,bRemoveObsidianHTMLErrors) {
-    if (FileExist(PathOrContent))
-    {
+    if (FileExist(PathOrContent)) {
         Current_FileEncoding:=A_FileEncoding
         FileEncoding, UTF-8
         FileRead buffer, % PathOrContent
         FileEncoding, % Current_FileEncoding
     }
-    else
+    else {
         buffer := PathOrContent
+    }
     p := 1
     regex = <img src="(?<SRC>.+)" width="(?<WIDTH>\d*)" alt="(?<ALT>.*)" title="(?<TITLE>.*)" \/>
     while (p := RegExMatch(buffer, "iOU)" regex, match, p)) {
         options := ""
         src := DecodeUriComponent(match.src)
-        if (match.width)
+        if (match.width) {
             options .= "out.width='" match.width "', "
-        if (match.alt)
+        }
+        if (match.alt) {
             options .= "fig.cap='" Clean(match.alt) "', "
-        if (match.title)
+        }
+        if (match.title) {
             options .= "fig.title='" Clean(match.title) "', "
+        }
         options := RTrim(options, ", ") ;; TODO: src and others may contain faulty strings when converting umlaute
         if InStr(src,"../") {
             src:=StrReplace(src,"../")
@@ -44,8 +47,9 @@ ConvertSRC_SYNTAX_V4(PathOrContent,bInsertSetupChunk,bRemoveObsidianHTMLErrors) 
         ``````
 
     )
-    if bInsertSetupChunk
+    if bInsertSetupChunk {
         buffer := RegExReplace(buffer, "\n---", "`n" tpl,,1,1) ;; 09.03.2023 - required for removing the new figure syntax
+    }
     buffer:=Regexreplace(buffer,"<figure>","") ;; 09.03.2023 - required for removing the new figure syntax
     buffer:=Regexreplace(buffer,"</figure>","") ;; 09.03.2023 - required for removing the new figure syntax
     buffer:=Regexreplace(buffer,"\<figcaption\>.*<\/figcaption\>","") ;; 01.05.2023  bugfix for syntax '![[200 University/04/BE22 Bioinformatics/Task 7 Phylogenetic Tree/GuideTree (actual Phylotree).png|Phylogenetic Tree of the sequences mentioned in [Similar sequences] ]]' - required for removing the new figure syntax
