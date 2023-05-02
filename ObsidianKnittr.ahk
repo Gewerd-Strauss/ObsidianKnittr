@@ -158,14 +158,14 @@ main() {
     }
     EL.ObsidianHTML_Start:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
     ATC1:=A_TickCount
-    CodeTimer_Log("Timing ComObjTime, Verb: " (bConvertInsteadofRun?"Convert":"Run"))
+    Codetimer_Log()
     OHTML_OutputDir:=Deref(script.config.config.OHTML_OutputDir)
     if (tmpconfig[1] && bConvertInsteadofRun) {
         ret:=ObsidianHtml(,tmpconfig[1],,bUseOwnOHTMLFork,bVerboseCheckbox,OHTML_OutputDir,WorkDir,WorkDir_OwnFork)
     } else {
         ret:=ObsidianHtml(manuscriptpath,tmpconfig[1],,bUseOwnOHTMLFork,bVerboseCheckbox,OHTML_OutputDir,WorkDir,WorkDir_OwnFork)
     }
-    EL.ObsidianHTML_Duration:=CodeTimer_Log("")
+    EL.ObsidianHTML_Duration:=Codetimer_Log()
     EL.ObsidianHTML_End:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
     EL.obsidianhtml_version:=strreplace(ret.obsidianhtml_version,"`n")
     EL.obsidianhtml_path:=ret.obsidianhtml_path
@@ -199,7 +199,7 @@ main() {
 
     ;; Intermediary
     EL.Intermediary_Start:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
-    CodeTimer_Log("")
+    Codetimer_Log()
     ttip("Converting to .rmd-file",5)
     rmd_Path:=convertMDToRMD(vMDPath,"index")
     ; 5, 6
@@ -216,12 +216,12 @@ main() {
     NewContents:=processTags(NewContents,bRemoveHashTagFromTags)
     ttip("Processing Abstract",5)
     NewContents:=processAbstract(NewContents)
-    EL.Intermediary_Duration:=CodeTimer_Log("Intermediary")
+    EL.Intermediary_Duration:=Codetimer_Log()
     EL.Intermediary_End:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
 
     ;; R
     EL.RScriptExecution_Start:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
-    CodeTimer_Log("")
+    Codetimer_Log()
     writeFile(rmd_Path,NewContents,"UTF-8",,true)
     ttip("Creating R-BuildScript",5)
     if bKeepFilename {
@@ -243,7 +243,7 @@ main() {
         }
     }
     EL.DocumentSettings:=tmp[2]
-    EL.RScriptExecution_Duration:=CodeTimer_Log("")
+    EL.RScriptExecution_Duration:=Codetimer_Log()
     EL.RScriptExecution_End:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
     EL.getTotalDuration(ATC1,A_TickCount)
 
