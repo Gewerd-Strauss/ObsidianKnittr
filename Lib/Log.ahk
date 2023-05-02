@@ -101,9 +101,13 @@ ObsidianHTMLCopy Dir      : `%ObsidianHTMLCopyDir`%
 ObsidianHTMLWorking Dir   : `%ObsidianHTMLWorkDir`%
 ObsidianHTMLOutputPath    : `%ObsidianHTMLOutputPath`%
 ___________________________________________________
-StdStreams:
+OHTML - StdStreams:
 Issued Command            : `%CMD`%
 stdOut                    : `%data_out`%
+___________________________________________________
+R - StdStreams:
+
+stdOut                    : `%Rdata_out`%
 
 )
         ObjRawSet(this, "tpl", tpl)

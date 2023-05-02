@@ -119,7 +119,7 @@ main() {
     manuscriptpath:=out.manuscriptpath
     bVerboseCheckbox:=out.Settings.bVerboseCheckbox
     bFullLogCheckbox:=out.Settings.bFullLogCheckbox
-    ;bSRCConverterVersion:=out.Settings.bSRCConverterVersion
+    Outputformats:=out.Outputformats
     bKeepFilename:=out.Settings.bKeepFilename
     bRenderRMD:=out.Settings.bRenderRMD
     bRemoveHashTagFromTags:=out.Settings.bRemoveHashTagFromTags
@@ -233,7 +233,8 @@ main() {
     format:=tmp.2
     if bRenderRMD {
         ttip("Executing R-BuildScript",5)
-        runRScript(rmd_Path,script_contents,script.config.config.RScriptPath)
+        Rdata_out:=runRScript(rmd_Path,script_contents,Outputformats,script.config.config.RScriptPath)
+        EL.Rdata_out:=Rdata_out
     } Else {
         ttip("Opening RMD-File",5)
         SplitPath % rmd_Path,, OutDir
