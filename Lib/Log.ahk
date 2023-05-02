@@ -1,11 +1,11 @@
-A:=CodeTimer_Log("Execution ObsidianHTML")
+A:=CodeTimer_Log()
 EL := new log(A_ScriptDir "\LOG_.txt", true)
 EL.UsedVerb:="DASd"
 Map := { obsidianhtml_version: "A:B:D:C", UsedVerb: "convert" }
 for key, value in Map
     EL[key] := value
 EL.ObsidianHTML_Start:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
-EL.ObsidianHTML_Duration:=CodeTimer_Log("")
+EL.ObsidianHTML_Duration:=CodeTimer_Log()
 EL.ObsidianHTML_End:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
 multiline=
 (
@@ -246,7 +246,7 @@ writeFile_Log(Path, Content, Encoding := "", Flags := 0x2, bSafeOverwrite := fal
 ; #endregion:Example
 
 ; #region:Code
-CodeTimer_Log(Description,x:=500,y:=500,ClipboardFlag:=0) {
+CodeTimer_Log() {
 
     Global StartTimer
 
