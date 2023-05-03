@@ -35,10 +35,10 @@ buildRScriptContent(Path,output_filename="",out="") {
                 })
             )
         Str.="`n" Str2
-        bFixPNGS:=true
+        bFixPNGs:=true
     }
     else {
-        bFixPNGS:=false
+        bFixPNGs:=false
     }
     Name:=(output_filename!=""?output_filename:"index")
         , FormatOptions:=""
@@ -63,7 +63,7 @@ buildRScriptContent(Path,output_filename="",out="") {
         Str.=Str2
         FormatOptions.= A_Tab strreplace(format,"`n",A_Tab "`n") "`n`n"
     }
-    for _, Class in Out.Outputformats {
+    for _, Class in out.Outputformats {
         format:=Class.AssembledFormatString
         if !Instr(format,"pdf_document") {
 
