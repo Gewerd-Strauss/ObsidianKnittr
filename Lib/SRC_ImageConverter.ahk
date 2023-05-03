@@ -22,7 +22,7 @@ ConvertSRC_SYNTAX_V4(PathOrContent,bInsertSetupChunk,bRemoveObsidianHTMLErrors) 
         if (match.title) {
             options .= "fig.title='" Clean(match.title) "', "
         }
-        options := RTrim(options, ", ") ;; TODO: src and others may contain faulty strings when converting umlaute
+        options := RTrim(options, ", ")
         if InStr(src,"../") {
             src:=StrReplace(src,"../")
         }
@@ -66,7 +66,6 @@ ConvertSRC_SYNTAX_V4(PathOrContent,bInsertSetupChunk,bRemoveObsidianHTMLErrors) 
         }
     }
     if DEBUG {
-
         Clipboard:=buffer
     }
     return buffer
