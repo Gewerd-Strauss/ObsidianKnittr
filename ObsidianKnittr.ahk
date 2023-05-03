@@ -109,6 +109,7 @@ main() {
         }
         formats.=_ ", "
     }
+    formats:=SubStr(formats,1,StrLen(formats)-2)
     output_type:=out.sel
     if (output_type="All") || HasVal(output_type,"All") {
         output_type:=["html_document" , "pdf_document" , "word_document" , "odt_document" , "rtf_document" , "md_document" , "powerpoint_presentation" , "ioslides_presentation" , "tufte::tufte_html" , "github_document"] ;; todo:: add bookdown format support
@@ -129,7 +130,7 @@ main() {
     bConvertInsteadofRun:=out.Settings.bConvertInsteadofRun
     bRemoveObsidianHTMLErrors:=out.Settings.bRemoveObsidianHTMLErrors
     bUseOwnOHTMLFork:=out.Settings.bUseOwnOHTMLFork
-    EL.formats:=SubStr(formats,1,StrLen(formats)-2)
+    EL.formats:=formats
     EL.manuscriptpath:=out.manuscriptpath
     EL.bVerboseCheckbox:=out.Settings.bVerboseCheckbox
     EL.bFullLogCheckbox:=out.Settings.bFullLogCheckbox
