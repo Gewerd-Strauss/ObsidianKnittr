@@ -295,7 +295,7 @@ buildAHKScriptContent(Path,RScript_Path:="") {
         AHK_Build=
             (Join`s LTRIM
                 #Requires AutoHotkey v1.1.36+
-                `nrun, `% Clipboard:=`"`"`"%RSCRIPT_PATH%"""
+                `nrun, `% `"`"`"%RSCRIPT_PATH%"""
                 A_Space """%BUILD_RPATH%"""
                 , `% "%OUTDIR_PATH%"
             )
