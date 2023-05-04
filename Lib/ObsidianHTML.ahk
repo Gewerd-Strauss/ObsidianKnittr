@@ -59,7 +59,7 @@
     if bUseOwnOHTMLFork {
         GetStdStreams_WithInput("python --version",,out)
         GetStdStreams_WithInput("python -m " command2_getversion,WorkDir_OwnFork,ohtmlversion_modded)
-        MsgBox 0x2034,% "Is the correct build version used?", % "Has the correct build version been used?`n" ohtmlversion_modded "`n`nCMD:`n" command2, 4
+        MsgBox 0x2034,% "Is the correct build version used?", % "Has the correct build version been used?`n" ohtmlversion_modded "`n`nCMD:`n" command2, 3
         IfMsgBox Yes, {
 
         } Else IfMsgBox No, {
