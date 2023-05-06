@@ -552,7 +552,43 @@ guiShow() {
     x:=(script.config.GuiPositioning.X!=""?script.config.GuiPositioning.X:200)
     y:=(script.config.GuiPositioning.Y!=""?script.config.GuiPositioning.Y:200)
     bAutoSubmitOTGUI:=false
-    gui 1: show,x%x% y%y%, % script.name " - Choose manuscript"
+    guiWidth:=WideControlWidth + 32
+    guiHeight:=755
+    currentMonitor:=MWAGetMonitor()+0
+    SysGet MonCount, MonitorCount
+    if (MonCount>1) {
+        SysGet Mon, Monitor,% currentMonitor
+        SysGet MonW,MonitorWorkArea, % currentMonitor
+    } else {
+        SysGet Mon, Monitor, 1
+        SysGet MonW,MonitorWorkArea, 1
+    }
+    MonWidth:=(MonLeft?MonLeft:MonRight)
+    MonWidth:=MonRight-MonLeft
+    if SubStr(MonWidth, 1,1)="-" {
+        MonWidth:=SubStr(MonWidth,2)
+    }
+    CoordModeMouse:=A_CoordModeMouse
+    CoordMode Mouse,Screen
+    MouseGetPos MouseX,MouseY
+    CoordMode Mouse, %CoordModeMouse%
+    ; guiHeight:=guiHeight+25
+    if ((MouseY+guiHeight)>MonWBottom) {
+        if ((MouseY-guiHeight)<MonWTop) {
+            y:=0
+        } Else {
+            y:=MonWBottom-guiHeight
+        }
+    } else {
+        y:=MouseY
+    }
+
+    if ((MouseX+guiWidth)>MonRight) {
+        x:=MonRight-guiWidth
+    } Else {
+        x:=MouseX
+    }
+    gui 1: show,x%x% y%y% w%guiWidth% h%guiHeight%, % script.name " - Choose manuscript"
     enableGuiDrag(1)
     WinWaitClose % script.name " - Choose manuscript"
     Outputformats:={}
