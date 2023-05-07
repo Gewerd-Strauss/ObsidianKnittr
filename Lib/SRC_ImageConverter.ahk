@@ -66,10 +66,10 @@ ConvertSRC_SYNTAX_V4(PathOrContent,bInsertSetupChunk,bRemoveObsidianHTMLErrors,b
         }
     }
     if (bStripLocalMarkdownLinks) {
-        matches:=RegexMatchAll(buffer,"\[(?<LinkName>[^\[]+)\](\(\S*\.(md|pdf|docx)(\S*)\))")
+        matches:=RegexMatchAll(buffer,"\[(?<LinkName>[^\[]+)\](\(\S*\.(md|docx|pdf)(\S*)\))")
         for _, match in matches {
             fullLink:=match[0]
-            ;LinkName:=match[1]
+            LinkName:=match[1]
             ;LinkURL:=match[2]
             if SubStr(fullLink,-1)="))" {
                 LinkName.=")"
