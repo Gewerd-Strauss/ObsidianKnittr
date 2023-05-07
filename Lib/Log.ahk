@@ -74,6 +74,7 @@ Used Verb                 : `%UsedVerb`%
 Used Personal Fork        : `%bUseOwnOHTMLFork`%
 Verbosity                 : `%bVerboseCheckbox`%
 Stripped OHTML - Errors   : `%bRemoveObsidianHTMLErrors`%
+Stripped Local MD-Links   : `%bStripLocalMarkdownLinks`%
 
 RMD:
 Render to Outputs         : `%bRenderRMD`%
