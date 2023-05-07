@@ -1,4 +1,4 @@
-ConvertSRC_SYNTAX_V4(PathOrContent,bInsertSetupChunk,bRemoveObsidianHTMLErrors) {
+ConvertSRC_SYNTAX_V4(PathOrContent,bInsertSetupChunk,bRemoveObsidianHTMLErrors,bStripLocalMarkdownLinks) {
     if (FileExist(PathOrContent)) {
         Current_FileEncoding:=A_FileEncoding
         FileEncoding UTF-8
@@ -61,6 +61,23 @@ ConvertSRC_SYNTAX_V4(PathOrContent,bInsertSetupChunk,bRemoveObsidianHTMLErrors) 
             if (Instr(buffer, ned)) {
                 if DEBUG {
                     msgbox % (Instr(buffer, ned))
+                }
+            }
+        }
+    }
+    if (bStripLocalMarkdownLinks) {
+        matches:=RegexMatchAll(buffer,"\[(?<LinkName>[^\[]+)\](\(\S*\.(md|pdf|docx)(\S*)\))")
+        for _, match in matches {
+            fullLink:=match[0]
+            ;LinkName:=match[1]
+            ;LinkURL:=match[2]
+            if SubStr(fullLink,-1)="))" {
+                LinkName.=")"
+            }
+            buffer:=StrReplace(buffer, fullLink,LinkName) ;; why does this not work?
+            if (Instr(buffer, fullLink)) {
+                if DEBUG {
+                    msgbox % (Instr(buffer, fullLink))
                 }
             }
         }

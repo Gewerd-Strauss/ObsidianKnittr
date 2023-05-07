@@ -129,6 +129,7 @@ main() {
     bInsertSetupChunk:=out.Settings.bInsertSetupChunk
     bConvertInsteadofRun:=out.Settings.bConvertInsteadofRun
     bRemoveObsidianHTMLErrors:=out.Settings.bRemoveObsidianHTMLErrors
+    bStripLocalMarkdownLinks:=out.Settings.bStripLocalMarkdownLinks
     bUseOwnOHTMLFork:=out.Settings.bUseOwnOHTMLFork
     EL.formats:=formats
     EL.manuscriptpath:=out.manuscriptpath
@@ -142,6 +143,7 @@ main() {
     EL.bInsertSetupChunk:=out.Settings.bInsertSetupChunk
     EL.bConvertInsteadofRun:=out.Settings.bConvertInsteadofRun
     EL.bRemoveObsidianHTMLErrors:=out.Settings.bRemoveObsidianHTMLErrors
+    EL.bStripLocalMarkdownLinks:=out.Settings.bStripLocalMarkdownLinks
     EL.bUseOwnOHTMLFork:=out.Settings.bUseOwnOHTMLFork
 
     if (output_type="") && (bVerboseCheckbox="") {
@@ -212,7 +214,7 @@ main() {
     EL.rawInputcopyLocation:=rawinputCopyLocation
     ; 7
     ttip("Converting Image SRC's")
-    NewContents:=ConvertSRC_SYNTAX_V4(rmd_Path,bDontInsertSetupChunk,bRemoveObsidianHTMLErrors)
+    NewContents:=ConvertSRC_SYNTAX_V4(rmd_Path,bDontInsertSetupChunk,bRemoveObsidianHTMLErrors,bStripLocalMarkdownLinks)
     ttip("Processing Tags",5)
     NewContents:=processTags(NewContents,bRemoveHashTagFromTags)
     ttip("Processing Abstract",5)
@@ -510,6 +512,7 @@ guiCreate() {
     gui add, checkbox, vbVerboseCheckbox, % "Set OHTML's Verbose-Flag?"
     Gui Add, Text, w%WideControlWidth% h1 0x7 ;Horizontal Line > Black
     gui add, checkbox, vbRemoveHashTagFromTags, % "Remove '#' from tags?"
+    gui add, checkbox, vbStripLocalMarkdownLinks, % "Strip local markdown links?"
     gui add, checkbox, vbInsertSetupChunk, % "!Insert Setup-Chunk?"
     gui add, checkbox, vbForceFixPNGFiles, % "Double-convert png-files pre-conversion?"
     gui add, checkbox, vbKeepFilename, % "Keep Filename?"
@@ -537,6 +540,7 @@ guiCreate() {
         guicontrol,, bInsertSetupChunk, % (script.config.LastRun.InsertSetupChunk)
         guicontrol,, bConvertInsteadofRun, % (script.config.LastRun.ConvertInsteadofRun)
         guicontrol,, bRemoveObsidianHTMLErrors, % (script.config.LastRun.RemoveObsidianHTMLErrors)
+        guicontrol,, bStripLocalMarkdownLinks, % (script.config.LastRun.bStripLocalMarkdownLinks)
         guicontrol,, bUseOwnOHTMLFork, % (script.config.LastRun.UseOwnOHTMLFork)
     }
     return
@@ -553,7 +557,7 @@ guiShow() {
     y:=(script.config.GuiPositioning.Y!=""?script.config.GuiPositioning.Y:200)
     bAutoSubmitOTGUI:=false
     guiWidth:=WideControlWidth + 32
-    guiHeight:=755
+    guiHeight:=791
     currentMonitor:=MWAGetMonitor()+0
     SysGet MonCount, MonitorCount
     if (MonCount>1) {
@@ -615,6 +619,7 @@ guiShow() {
                     ,"bInsertSetupChunk":bInsertSetupChunk + 0
                     ,"bConvertInsteadofRun":bConvertInsteadofRun + 0
                     ,"bRemoveObsidianHTMLErrors":bRemoveObsidianHTMLErrors + 0
+                    ,"bStripLocalMarkdownLinks":bStripLocalMarkdownLinks + 0
                     ,"bUseOwnOHTMLFork":bUseOwnOHTMLFork + 0}
                 ,"Outputformats":Outputformats}
     } Else {
@@ -678,6 +683,7 @@ guiSubmit() {
     script.config.LastRun.InsertSetupChunk:=bInsertSetupChunk+0
     script.config.LastRun.ConvertInsteadofRun:=bConvertInsteadofRun+0
     script.config.LastRun.RemoveObsidianHTMLErrors:=bRemoveObsidianHTMLErrors+0
+    script.config.LastRun.bStripLocalMarkdownLinks:=bStripLocalMarkdownLinks+0
     script.config.LastRun.UseOwnOHTMLFork:=bUseOwnOHTMLFork+0
     script.config.DDLHistory:=buildHistory(script.config.DDLHistory,script.config.Config.HistoryLimit,script.config.LastRun.manuscriptpath)
 
