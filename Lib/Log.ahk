@@ -259,7 +259,6 @@ CodeTimer_Log() {
         FinishTimer := A_TickCount
         TimedDuration := FinishTimer - StartTimer
         StartTimer := ""
-        ;tooltip % "Timer " Description "`n" TimedDuration " ms have elapsed!",% x,% y, 18
         time_withletters:=PrettyTickCount_Log(TimedDuration)
         time_withoutletters:=RegexReplace(time_withletters,"[hms]")
         Return time_withoutletters
