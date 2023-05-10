@@ -235,7 +235,12 @@ main() {
     script_contents:=tmp.1
     format:=tmp.2
     if bRenderRMD {
-        ttip("Executing R-BuildScript",5)
+        ;ttip(" ",5,,,,,,,16)
+        if bRenderRMD {
+
+            ttip(-1)
+            ttip("Executing R-BuildScript",5)
+        }
         Rdata_out:=runRScript(rmd_Path,script_contents,Outputformats,script.config.config.RScriptPath)
         EL.Rdata_out:=Rdata_out
     } Else {
