@@ -108,6 +108,10 @@ runRScript(Path,script_contents,Outputformats,RScript_Path:="") {
     SplitPath % Path,, OutDir
     writeFile(OutDir "\build.R",script_contents,"UTF-8-RAW",,true)
     CMD:=Quote_ObsidianHTML(RScript_Path) A_Space Quote_ObsidianHTML(strreplace(OutDir "\build.R","\","\")) ;; works with valid codefile (manually ensured no utf-corruption) from cmd, all three work for paths not containing umlaute with FileAppend
+    if DEBUG {
+
+        CLipboard:=CMD "`n" OutDir "`n`n`n`n" Quote_ObsidianHTML(InOut)
+    }
     GetStdStreams_WithInput(CMD, OutDir, InOut:="`n")
     if DEBUG {
         Clipboard:=InOut
