@@ -37,6 +37,7 @@ class log ;extends Object_Proxy
 ___________________________________________________
 Overview:
 
+Manuscript                : `%manuscriptname`%
 Used Verb                 : `%UsedVerb`%
 OHTML - Version           : `%obsidianhtml_version`%
 Used Personal Fork        : `%bUseOwnOHTMLFork`%

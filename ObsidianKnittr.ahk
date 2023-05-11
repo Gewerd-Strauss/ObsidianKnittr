@@ -117,6 +117,7 @@ main() {
     if (HasVal(output_type,"First in YAML")) {
         output_type:=""
     }
+    manuscriptname:=out.manuscriptname
     manuscriptpath:=out.manuscriptpath
     bVerboseCheckbox:=out.Settings.bVerboseCheckbox
     bFullLogCheckbox:=out.Settings.bFullLogCheckbox
@@ -132,6 +133,7 @@ main() {
     bStripLocalMarkdownLinks:=out.Settings.bStripLocalMarkdownLinks
     bUseOwnOHTMLFork:=out.Settings.bUseOwnOHTMLFork
     EL.formats:=formats
+    EL.manuscriptname:=out.manuscriptname
     EL.manuscriptpath:=out.manuscriptpath
     EL.bVerboseCheckbox:=out.Settings.bVerboseCheckbox
     EL.bFullLogCheckbox:=out.Settings.bFullLogCheckbox
@@ -150,7 +152,7 @@ main() {
         reload
     }
     obsidianhtml_configfile:=script.config.config.obsidianhtml_configfile
-    SplitPath % manuscriptpath,,,, manuscriptName
+
 
     tmpconfig:=createTemporaryObsidianHTML_Config(manuscriptpath, obsidianhtml_configfile,bConvertInsteadofRun)
     EL.configtemplate_path:=obsidianhtml_configfile
@@ -611,8 +613,10 @@ guiShow() {
         Outputformats[format]:=ot
     }
     if (manuscriptpath!="") && !ot.bClosedNoSubmit {
+        SplitPath % manuscriptpath,,,, manuscriptName
         return {"sel":sel
                 ,"manuscriptpath":manuscriptpath
+                ,"manuscriptname":manuscriptName
                 ,Settings:{"bVerboseCheckbox":bVerboseCheckbox + 0
                     ,"bFullLogCheckbox":bFullLogCheckbox + 0
                     ,"bSRCConverterVersion":bSRCConverterVersion + 0
