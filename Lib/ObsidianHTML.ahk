@@ -159,9 +159,13 @@ createTemporaryObsidianHTML_Config(manuscriptpath, obsidianhtml_configfile,Conve
                 toggles:
                 # When true, Obsidianhtml will not add three spaces at the end of every line
                 strict_line_breaks: True
-                compile_html: False
+                # compile_html: False
+                features:
+                %A_Space%%A_Space%embedded_note_titles:
+                %A_Space%%A_Space%%A_Space%%A_Space%enabled: False
             )"
-        template:=fixYAMLSyntax(template)
+        Clipboard:=template:=fixYAMLSyntax(template)
+        OutputDebug % template
         writeFile_ObsidianHTML(script.configfolder "\OHTMLconfig_template.yaml",template,,,true)
         obsidianhtml_configfile:=script.configfolder "\OHTMLconfig_template.yaml"
     }
@@ -231,6 +235,7 @@ fixYAMLSyntax(template) {
             }
         }
     }
+    out:=strreplace(out,"%A_Space%",A_Space)
     OutputDebug % out
     return out
 }
