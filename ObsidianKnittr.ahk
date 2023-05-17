@@ -124,6 +124,7 @@ main() {
     Outputformats:=out.Outputformats
     bKeepFilename:=out.Settings.bKeepFilename
     bRenderRMD:=out.Settings.bRenderRMD
+    bBackupOutput:=out.Settings.bBackupOutput
     bRemoveHashTagFromTags:=out.Settings.bRemoveHashTagFromTags
     ;bUseCustomTOC:=out.3.7
     bForceFixPNGFiles:=out.Settings.bForceFixPNGFiles
@@ -242,6 +243,12 @@ main() {
 
             ttip(-1)
             ttip("Executing R-BuildScript",5)
+        }
+        if bBackupOutput {
+            backupOutput(rmd_Path,manuscriptName,out)
+        }
+        if script.config.config.backupCount {
+            limitBackups(script.config.config.backupCount)
         }
         Rdata_out:=runRScript(rmd_Path,script_contents,Outputformats,script.config.config.RScriptPath)
         EL.Rdata_out:=Rdata_out
@@ -524,6 +531,7 @@ guiCreate() {
     gui add, checkbox, vbForceFixPNGFiles, % "Double-convert png-files pre-conversion?"
     gui add, checkbox, vbKeepFilename, % "Keep Filename?"
     gui add, checkbox, vbRenderRMD, % "Render RMD to chosen outputs?"
+    gui add, checkbox, vbBackupOutput, % "Backup Output files before knitting?"
     Gui Font, s7 cWhite, Verdana
     gui add, button, gGCSubmit, &Submit
     gui add, button, gGCAutoSubmit yp xp+60, &Full Submit
@@ -542,6 +550,7 @@ guiCreate() {
         guicontrol,, bSRCConverterVersion, % (script.config.LastRun.Conversion)
         guicontrol,, bKeepFilename, % (script.config.LastRun.KeepFileName)
         guicontrol,, bRenderRMD, % (script.config.LastRun.RenderRMD)
+        guicontrol,, bBackupOutput, % (script.config.LastRun.BackupOutput)
         guicontrol,, bRemoveHashTagFromTags, % (script.config.LastRun.RemoveHashTagFromTags)
         guicontrol,, bForceFixPNGFiles, % (script.config.LastRun.ForceFixPNGFiles)
         guicontrol,, bInsertSetupChunk, % (script.config.LastRun.InsertSetupChunk)
@@ -564,7 +573,7 @@ guiShow() {
     y:=(script.config.GuiPositioning.Y!=""?script.config.GuiPositioning.Y:200)
     bAutoSubmitOTGUI:=false
     guiWidth:=WideControlWidth + 32
-    guiHeight:=791
+    guiHeight:=827
     currentMonitor:=MWAGetMonitor()+0
     SysGet MonCount, MonitorCount
     if (MonCount>1) {
@@ -621,6 +630,7 @@ guiShow() {
                     ,"bFullLogCheckbox":bFullLogCheckbox + 0
                     ,"bSRCConverterVersion":bSRCConverterVersion + 0
                     ,"bKeepFilename":bKeepFilename + 0
+                    ,"bBackupOutput":bBackupOutput + 0
                     ,"bRenderRMD":bRenderRMD + 0
                     ,"bRemoveHashTagFromTags":bRemoveHashTagFromTags + 0
                     ,"bUseCustomTOC":bUseCustomTOC + 0
@@ -687,6 +697,7 @@ guiSubmit() {
     script.config.LastRun.Conversion:=bSRCConverterVersion+0
     script.config.LastRun.KeepFileName:=bKeepFilename+0
     script.config.LastRun.RenderRMD:=bRenderRMD+0
+    script.config.LastRun.BackupOutput:=bBackupOutput+0
     script.config.LastRun.RemoveHashTagFromTags:=bRemoveHashTagFromTags+0
     script.config.LastRun.ForceFixPNGFiles:=bForceFixPNGFiles+0
     script.config.LastRun.InsertSetupChunk:=bInsertSetupChunk+0
@@ -815,3 +826,4 @@ fTraySetup() {
 #Include <OnError>
 #Include <OnExit>
 #Include <Log>
+#Include <Outputbackup>
