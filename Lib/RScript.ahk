@@ -98,6 +98,10 @@ buildRScriptContent(Path,output_filename="",out="") {
         (LTRIM
 
             sprintf("'build.R' successfully finished running.")
+            sprintf("Total Time for codechunks:")
+            print(sum(as.numeric(all_times)))
+            sprintf("Timings for used codechunks:")
+            print(all_times)
         )
     Str.=Str2
     return [Str,FormatOptions]
@@ -123,6 +127,7 @@ runRScript(Path,script_contents,Outputformats,RScript_Path:="") {
 }
 
 validateRExecution(String,Formats) {
+    OutputDebug % String
     Expected:=Finished:=0
     Expected:=Formats.Count()
     Finished+=st_count(String,"Output created:")
