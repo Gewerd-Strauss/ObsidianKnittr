@@ -157,8 +157,7 @@ ttip_Obj2Str(Obj,FullPath:=1,BottomBlank:=0){
 				else
 					Blank.=FullPath "." a " =`n"
 			}
-		}
-	}
+		}}
 	return String Blank
 }
 
