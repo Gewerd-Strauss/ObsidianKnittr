@@ -217,7 +217,7 @@ main() {
     EL.rawInputcopyLocation:=rawinputCopyLocation
     ; 7
     ttip("Converting Image SRC's")
-    NewContents:=ConvertSRC_SYNTAX_V4(rmd_Path,bDontInsertSetupChunk,bRemoveObsidianHTMLErrors,bStripLocalMarkdownLinks)
+    NewContents:=ConvertSRC_SYNTAX_V4(rmd_Path,bInsertSetupChunk,bRemoveObsidianHTMLErrors,bStripLocalMarkdownLinks)
     ttip("Processing Tags",5)
     NewContents:=processTags(NewContents,bRemoveHashTagFromTags)
     ttip("Processing Abstract",5)
