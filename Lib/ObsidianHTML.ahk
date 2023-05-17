@@ -49,7 +49,7 @@
             MsgBox 0x2010, script.name " > " A_ThisFunc, No manuscript_path was provided to the run-verb execution. The script will reload. `n`nPlease provide a valid note-path or choose to convert.
             reload
         }
-        command2:= "obsidianhtml run -f " Quote_ObsidianHTML(Trim(manuscript_path)) " - i " Quote_ObsidianHTML(Trim(config_path))
+        command2:= "obsidianhtml run -f " Quote_ObsidianHTML(Trim(manuscript_path)) " -i " Quote_ObsidianHTML(Trim(config_path))
     }
     ;; Check Verbosity
     if bVerbose {
