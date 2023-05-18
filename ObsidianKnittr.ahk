@@ -95,7 +95,8 @@ main() {
         writeFile(script.configfile,InitialSettings)
         script.load()
     }
-    EL.ObsidianKnittr_Version:=script.version:=script.config.version.ObsidianKnittr_Version
+    FileRead ObsidianKnittr_Version, % A_ScriptDir "\INI-Files\ObsidianKnittr_Version.ini"
+    EL.ObsidianKnittr_Version:=script.version:=script.config.version.ObsidianKnittr_Version:=ObsidianKnittr_Version
 
     ; 2.2
     out:=guiShow()
@@ -539,7 +540,7 @@ guiCreate() {
     gui add, button, hwndOpenConfig yp xp+81, Edit General Config
     gui add, button, gGCAbout hwndAbout yp xp+122, &About
     GuiControl +g,%OpenConfig%, % onOpenConfig
-    Gui Add, Text,x15,% script.name " v." script.config.version.ObsidianKnittr_Version " | Obsidian-HTML v." strreplace(script.config.version.ObsidianHTML_Version,"commit:")
+    Gui Add, Text,x15,% script.name " v." regexreplace(script.config.version.ObsidianKnittr_Version,"\s*","") " | Obsidian-HTML v." strreplace(script.config.version.ObsidianHTML_Version,"commit:")
     script.version:=script.config.version.ObsidianKnittr_Version
 
     if (script.config.LastRun.manuscriptpath!="") && (script.config.LastRun.last_output_type!="") {
