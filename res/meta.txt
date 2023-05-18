@@ -1,0 +1,12 @@
+author          - Gewerd Strauss
+email           - 
+ghtext          - GitHub-Repository
+GH-Author       - Gewerd-Strauss
+GH-Repo         - github.com/Gewerd-Strauss/ObsidianScripts
+doctext         - Documentation
+Documentation   - github.com/Gewerd-Strauss/ObsidianScripts#readme
+donatelink      - 
+homepage        - google.com
+forum           - google.com
+Issues          - github.com/Gewerd-Strauss/ObsidianScripts/issues
+About           - Utility script for using the python CL-Tool ObsidianHTML to convert Obsidian.MD-notes to standard markdown, and then optionally use RMarkdown to convert to f.e. HTML, PDF or DOCX-output
