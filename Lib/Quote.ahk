@@ -1,30 +1,34 @@
-; --uID:4179423054
- ; Metadata:
-  ; Snippet: Quote  ;  (v.1)
-  ; --------------------------------------------------------------
-  ; Author: u/anonymous1184
-  ; Source: https://www.reddit.com/r/AutoHotkey/comments/p2z9co/comment/h8oq1av/?utm_source=share&utm_medium=web2x&context=3
-  ; 
-  ; --------------------------------------------------------------
-  ; Library: AHK-Rare
-  ; Section: 05 - String/Array/Text
-  ; Dependencies: /
-  ; AHK_Version: v1
-  ; --------------------------------------------------------------
-  ; Keywords: apostrophe
+; #region:Quote (4179423054)
 
- ;; Description:
-  ;; Quotes a string
+; #region:Metadata:
+; Snippet: Quote;  (v.1)
+; --------------------------------------------------------------
+; Author: u/anonymous1184
+; Source: https://www.reddit.com/r/AutoHotkey/comments/p2z9co/comment/h8oq1av/?utm_source=share&utm_medium=web2x&context=3
+; (11.11.2022)
+; --------------------------------------------------------------
+; Library: AHK-Rare
+; Section: 05 - String/Array/Text
+; Dependencies: /
+; AHK_Version: v1
+; --------------------------------------------------------------
+; Keywords: apostrophe
+; #endregion:Metadata
 
- ;;; Example:
-  ;;; Var:="Hello World"
-  ;;; msgbox, % Quote(Var . " Test")
-  ;;; 
+; #region:Description:
+; Quotes a string
+; #endregion:Description
 
-  Quote(String)
-  {
-      return """" String """"
-  }
+; #region:Example
+; Var:="Hello World"
+; msgbox, % Quote(Var . " Test")
+;
+; #endregion:Example
 
+; #region:Code
+Quote(String) {
+  return "" "" String "" ""
+}
+; #endregion:Code
 
-; --uID:4179423054
+; #endregion:Quote (4179423054)

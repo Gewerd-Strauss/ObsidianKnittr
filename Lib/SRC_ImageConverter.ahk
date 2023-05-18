@@ -1,70 +1,90 @@
-;clipboard:=ConvertSRC_SYNTAX_V4("D:\Dokumente neu\000 AAA Dokumente\000 AAA HSRW\General\AHK scripts\Projects\Finished\ObsidianScripts\Test\index.md",true,true)
-return
-ConvertSRC_SYNTAX_V4(PathOrContent,bInsertSetupChunk,bRemoveObsidianHTMLErrors) {
-    if (FileExist(PathOrContent))
-    {
+ConvertSRC_SYNTAX_V4(PathOrContent,bInsertSetupChunk,bRemoveObsidianHTMLErrors,bStripLocalMarkdownLinks) {
+    if (FileExist(PathOrContent)) {
         Current_FileEncoding:=A_FileEncoding
-        FileEncoding, UTF-8
+        FileEncoding UTF-8
         FileRead buffer, % PathOrContent
-        FileEncoding, % Current_FileEncoding
+        FileEncoding % Current_FileEncoding
     }
-    else
+    else {
         buffer := PathOrContent
+    }
     p := 1
     regex = <img src="(?<SRC>.+)" width="(?<WIDTH>\d*)" alt="(?<ALT>.*)" title="(?<TITLE>.*)" \/>
     while (p := RegExMatch(buffer, "iOU)" regex, match, p)) {
         options := ""
         src := DecodeUriComponent(match.src)
-        if (match.width)
+        if (match.width) {
             options .= "out.width='" match.width "', "
-        if (match.alt)
+        }
+        if (match.alt) {
             options .= "fig.cap='" Clean(match.alt) "', "
-        if (match.title)
+        }
+        if (match.title) {
             options .= "fig.title='" Clean(match.title) "', "
-        options := RTrim(options, ", ") ;; TODO: src and others may contain faulty strings when converting umlaute
+        }
+        options := RTrim(options, ", ")
         if InStr(src,"../") {
             src:=StrReplace(src,"../")
         }
         tpl =
-        (LTrim
+            (LTrim
 
-            ``````{r, echo=FALSE, %options%}
-            knitr::include_graphics("%src%")
-            ``````
+                ``````{r, echo=FALSE, %options%}
+                knitr::include_graphics("%src%")
+                ``````
 
-        )
-        buffer:=RegexReplace(buffer,"<figcaption>" Clean(match.alt) "</figcaption>","") ;; 09.03.2023 - required for removing the new figure syntax.
-        buffer := StrReplace(buffer, match[0], tpl)
+            )
         buffer:=RegexReplace(buffer,"<figcaption>" Clean(match.alt) "</figcaption>","") ;; 09.03.2023 - required for removing the new figure syntax.
         buffer := StrReplace(buffer, match[0], tpl)
         p += StrLen(tpl)
     }
     buffer:=Regexreplace(buffer, "``````\{r setup(|.|\n)*``````","") ;; get rid of all potential r setup chunks
     tpl =
-    (LTrim
-        ---
-        ``````{r setup, include=FALSE}
-        knitr::opts_chunk$set(echo = FALSE)
-        ``````
+        (LTrim
+            ---
+            ``````{r setup, include=FALSE}
+            knitr::opts_chunk$set(echo = FALSE)
+            ``````
 
-    )
-    if bInsertSetupChunk
+        )
+    if bInsertSetupChunk {
         buffer := RegExReplace(buffer, "\n---", "`n" tpl,,1,1) ;; 09.03.2023 - required for removing the new figure syntax
+    }
     buffer:=Regexreplace(buffer,"<figure>","") ;; 09.03.2023 - required for removing the new figure syntax
     buffer:=Regexreplace(buffer,"</figure>","") ;; 09.03.2023 - required for removing the new figure syntax
+    buffer:=Regexreplace(buffer,"\<figcaption\>.*<\/figcaption\>","") ;; 01.05.2023  bugfix for syntax '![[200 University/04/BE22 Bioinformatics/Task 7 Phylogenetic Tree/GuideTree (actual Phylotree).png|Phylogenetic Tree of the sequences mentioned in [Similar sequences] ]]' - required for removing the new figure syntax
     if (bRemoveObsidianHTMLErrors) {
         matches:=RegexMatchAll(buffer,"m)(((\<|\>)\s*\**obsidian-html error:\**.*)|(Obsidianhtml.*))$")
         for _, match in matches {
             ned:=match[0]
             buffer:=StrReplace(buffer, ned) ;; why does this not work?
             if (Instr(buffer, ned)) {
-
-                m((Instr(buffer, ned)))
+                if DEBUG {
+                    msgbox % (Instr(buffer, ned))
+                }
             }
         }
     }
-    if WinActive("ahk_exe code.exe")
+    if (bStripLocalMarkdownLinks) {
+        matches:=RegexMatchAll(buffer,"\[(?<LinkName>[^\[]+)\](\(\S*\.(md|docx|pdf)(\S*)\))")
+        for _, match in matches {
+            fullLink:=match[0]
+            LinkName:=match[1]
+            ;LinkURL:=match[2]
+            if SubStr(fullLink,-1)="))" {
+                LinkName.=")"
+            }
+            buffer:=StrReplace(buffer, fullLink,LinkName) ;; why does this not work?
+            if (Instr(buffer, fullLink)) {
+                if DEBUG {
+                    msgbox % (Instr(buffer, fullLink))
+                }
+            }
+        }
+    }
+    if DEBUG {
         Clipboard:=buffer
+    }
     return buffer
 }
 
@@ -73,10 +93,6 @@ Clean(sText) {
     sText := StrReplace(sText, "'", "\'")
     return sText
 }
-
-; DecodeEntities(sText) {
-;     return _Decode(sText, 1)
-; }
 
 DecodeUriComponent(sText) {
     return _Decode(sText, 2)
@@ -89,14 +105,14 @@ _Decode(sText, nMode) {
         document.write("<meta http-equiv='X-UA-Compatible' content='IE=Edge'>")
     }
     switch (nMode) {
-    case 1:
-        document.write(sText)
-        txt := document.documentElement.innerText
-        document.close()
-    case 2:
-        txt := document.parentWindow.decodeURIComponent(sText)
-    default:
-        txt := "Unknown " A_ThisFunc "() mode."
+        case 1:
+            document.write(sText)
+            txt := document.documentElement.innerText
+            document.close()
+        case 2:
+            txt := document.parentWindow.decodeURIComponent(sText)
+        default:
+            txt := "Unknown " A_ThisFunc "() mode."
     }
     return txt
 }
@@ -277,11 +293,11 @@ class WinHttpRequest extends WinHttpRequest._Call {
 
     _Mime(Extension) {
         mime := {"7z": "application/x-7z-compressed"
-            , "gif": "image/gif"
-            , "jpg": "image/jpeg"
-            , "json": "application/json"
-            , "png": "image/png"
-            , "zip": "application/zip"}[Extension]
+                , "gif": "image/gif"
+                , "jpg": "image/jpeg"
+                , "json": "application/json"
+                , "png": "image/png"
+                , "zip": "application/zip"}[Extension]
         if (!mime)
             mime := "application/octet-stream"
         return mime
