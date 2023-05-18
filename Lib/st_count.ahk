@@ -47,7 +47,7 @@
 ;;; ;; output: 4
 
 st_count(string, searchFor="`n") {
-   StringReplace, string, string, %searchFor%, %searchFor%, UseErrorLevel
+   StringReplace string, string, %searchFor%, %searchFor%, UseErrorLevel
    return ErrorLevel
 }
 
