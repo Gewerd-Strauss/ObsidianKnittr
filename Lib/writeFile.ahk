@@ -32,7 +32,7 @@
 writeFile(Path,Content,Encoding:="",Flags:=0x2,bSafeOverwrite:=false) {
     if (bSafeOverwrite && FileExist(Path)) {
         ; if we want to ensure nonexistance.
-        FileDelete, % Path
+        FileDelete % Path
     }
     if (Encoding!="") {
         if (fObj:=FileOpen(Path,Flags,Encoding)) {
