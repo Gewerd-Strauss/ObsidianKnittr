@@ -95,7 +95,8 @@ main() {
         writeFile(script.configfile,InitialSettings)
         script.load()
     }
-    EL.ObsidianKnittr_Version:=script.version:=script.config.version.ObsidianKnittr_Version
+    FileRead ObsidianKnittr_Version, % A_ScriptDir "\INI-Files\ObsidianKnittr_Version.ini"
+    EL.ObsidianKnittr_Version:=script.version:=script.config.version.ObsidianKnittr_Version:=ObsidianKnittr_Version
 
     ; 2.2
     out:=guiShow()
