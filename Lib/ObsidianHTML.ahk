@@ -154,6 +154,7 @@ createTemporaryObsidianHTML_Config(manuscriptpath, obsidianhtml_configfile,Conve
                 # 1 means only direct children are processed (and the entrypoint of course)
                 # and so forth. NOTE: DOES NOT APPLY TO INCLUSIONS!
                 #obsidian_entrypoint_path_str: '`%obsidian_entrypoint_path_str`%'
+                # module_data_folder: 'output/mod'
                 max_note_depth: 15
                 # preserve_inline_tags: False
                 copy_vault_to_tempdir: True
