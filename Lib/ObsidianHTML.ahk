@@ -156,12 +156,51 @@ createTemporaryObsidianHTML_Config(manuscriptpath, obsidianhtml_configfile,Conve
                 #obsidian_entrypoint_path_str: '`%obsidian_entrypoint_path_str`%'
                 max_note_depth: 15
                 # preserve_inline_tags: False
+                copy_vault_to_tempdir: True
+                exclude_subfolders:
+                %A_Space%%A_Space%- "".git""
+                %A_Space%%A_Space%- "".obsidian""
+                %A_Space%%A_Space%- "".trash""
+                %A_Space%%A_Space%- "".vscode""
+                %A_Space%%A_Space%- "".DS_Store""
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                 toggles:
                 # When true, Obsidianhtml will not add three spaces at the end of every line
                 strict_line_breaks: True
                 # compile_html: False
                 features:
                 %A_Space%%A_Space%embedded_note_titles:
+                %A_Space%%A_Space%%A_Space%%A_Space%enabled: False
+                # big css/js files to download + data to download 
+                # and read in that scales with the size of the site.
+                %A_Space%%A_Space%graph:
+                %A_Space%%A_Space%%A_Space%%A_Space%enabled: False
+                %A_Space%%A_Space%search:
+                %A_Space%%A_Space%%A_Space%%A_Space%enabled: False
+
+                # big css/js files to download.
+                %A_Space%%A_Space%mermaid_diagrams:
+                %A_Space%%A_Space%%A_Space%%A_Space%enabled: False
+                %A_Space%%A_Space%math_latex:
+                %A_Space%%A_Space%%A_Space%%A_Space%enabled: False
+
+                # small, css based features.
+                %A_Space%%A_Space%code_highlight:
+                %A_Space%%A_Space%%A_Space%%A_Space%enabled: False
+                %A_Space%%A_Space%callouts:
                 %A_Space%%A_Space%%A_Space%%A_Space%enabled: False
             )"
         Clipboard:=template:=fixYAMLSyntax(template)
