@@ -103,7 +103,11 @@ main() {
     WorkDir := "C:\Users\Claudius Main\Desktop\TempTemporal"
     WorkDir_OwnFork := "D:\Dokumente neu\ObsidianPluginDev\obsidian-html"
     formats:=""
+    bAutoSubmitOTGUI:=false
     for _,format in out.Outputformats {
+        if format.SkipGUI {
+            bAutoSubmitOTGUI:=format.SkipGUI
+        }
         if format.HasKey("Error") && (format.Error.ID=0) {
             Reload
             ExitApp ;; fucking weird bug. DO NOT remove this exitapp below the reload-command. for some reason, removing it results in the script just ignoring the reload and continuing on as normal under certain situations
@@ -170,7 +174,8 @@ main() {
     Codetimer_Log()
     OHTML_OutputDir:=Deref(script.config.config.OHTML_OutputDir)
     if (bRestrictOHTMLScope) {
-        OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(manuscriptpath)
+
+        OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(manuscriptpath,bAutoSubmitOTGUI)
     }
 
     if (tmpconfig[1] && bConvertInsteadofRun) {
