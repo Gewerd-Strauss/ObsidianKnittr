@@ -100,7 +100,7 @@ chooseTV_Element(TV_String,Graph,Level,bAutoSubmitOTGUI) {
     - TODO: add th
     */
     gui TOVR: new
-    gui TOVR: +hwndTOVRGUI
+    gui TOVR: +hwndTOVRGUI +LabelTOVR
     gui add, text,, % "Vault root: " Graph[2,arrc-1] "`nFolder containing chosen note: " manuscript_location
     Gui Add, TreeView, r%arrc% ImageList%ImageListID% checked w1200 r%arrc%
     Gui Add, Button, Default w70 gsubmitConfigFolder, Submit Folder
@@ -137,7 +137,7 @@ chooseTV_Element(TV_String,Graph,Level,bAutoSubmitOTGUI) {
         return {Path:Graph[1],IsVaultRoot:True}
     }
     if (temporary_obsidianconfig_path="") {
-        ;; user closed the GUI
+        ;; user closed the GUI - use default, do not flag for delete
         return {Path:Graph[1],IsVaultRoot:True}
     }
     ttip(FileExist(temporary_obsidianconfig_path))
@@ -153,6 +153,10 @@ chooseTV_Element(TV_String,Graph,Level,bAutoSubmitOTGUI) {
     ttip(FileExist(temporary_obsidianconfig_path))
     ;m(temporary_obsidianconfig_path)
     return {Path:temporary_obsidianconfig_path,IsVaultRoot:false} 
+}
+TOVREscape() {
+    gui TOVR: destroy
+    return
 }
 setTemporaryObsidianVaultRoot(Path) {
     /*
