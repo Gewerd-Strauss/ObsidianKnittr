@@ -1,24 +1,21 @@
-createTemporaryObsidianVaultRoot(manuscript_location) {
-    ;manuscript_location := A_ScriptDir "\Obsidian NoteTaking\The Universe\200 University\06 Interns and Unis\BE28 Internship Report\Submission\BE28 Internship Report.md"
+createTemporaryObsidianVaultRoot(manuscript_location,bAutoSubmitOTGUI) {
+    if (bAutoSubmitOTGUI) {
+        /*
+        TODO: add option to autosubmit the GUI
+        TODO: add config setting to auto-defined the vault-root as the N-th level relative below the manuscriptlocation.
+        */
+        if (script.config.Config.AutoRelativeLevel!="") && (script.config.Config.AutoRelativeLevel >0) {
+            Level:=script.config.Config.AutoRelativeLevel + 0
+        }
+
+    } else {
+        Level:=0
+    }
     Graph:=findObsidianVaultRootFromNote(manuscript_location,true)
     TV_String:=AssembleTV_String(Graph[2])
-    ret:=chooseTV_Element(TV_String,Graph)
-    ;ret2:=removeTemporaryObsidianVaultRoot(ret.Path,Graph)
+    ret:=chooseTV_Element(TV_String,Graph,Level,bAutoSubmitOTGUI)
     return {IsVaultRoot:ret.IsVaultRoot,Path:ret.Path,Graph:Graph}
 }
-
-ExitApp 
-/*
-1. TV:=getManuscriptDirectory(manuscript_path)
-2. Path:=chooseTV_Element(TV)
-3. REMOVEFLAG:=checkTemporaryObsidianVaultLocation(Path)
-TRUE: will be removed
-FALSE: will not be removed
-4. check if FileExist(Path)
-- FALSE: create `.obsidian`-folder at `Path`-Location
-- TRUE: go on
-5. IF REMOVEFLAG==TRUE:: set onexit cleanup which removes the temporary `.obsidian`-folder -> removeTemporaryObsidianVaultRoot(Path)
-*/
 
 AssembleTV_String(Array) {
     static str:="", reorder:={}
@@ -77,8 +74,7 @@ findObsidianVaultRootFromNote(path,reset:=false) {
     return -2 ;; unreachable and just here for my own OCD sake
 }
 
-
-chooseTV_Element(TV_String,Graph) {
+chooseTV_Element(TV_String,Graph,Level,bAutoSubmitOTGUI) {
     global
     /*
     1. render the TV_GUI (callback of main GUI or TV-subGUI, depending on implementation)
@@ -112,9 +108,30 @@ chooseTV_Element(TV_String,Graph) {
     ;Gui Add, Button, w70 yp xp+85 gSaveFile, Save File
     Gui +OwnDialogs
     TV_Delete()
+    if (Level) && (bAutoSubmitOTGUI) {
+        occurences:=st_count(TV_String,"Icon4 expand")
+        intended_level:=occurences-Level
+        Lines:=strsplit(TV_String,"`n")
+        OutputDebug % TV_String
+        TV_String:=""
+        for each, Line in Lines {
+            if (each=intended_level) {
+                Line:=strreplace(Line,"Icon4 expand","Icon4 check expand")
+            }
+            TV_String.=Line "`n"
+        }
+        OutputDebug % TV_String
+        ;; replace only the intended_level'th occurence with the modified string
+        TV_String:=strreplace(TV_String,"Icon4 expand","Icon4 expand Check1",,occurences)
+        TV_String:=strreplace(TV_String,"Icon4 expand Check1","Icon 4")
+    }
     CreateTreeView(TV_String)
     gui show, w600 Autosize, % script.name  " - Set limiting '.obsidian'-folder"
-    WinWaitClose % script.name  " - Set limiting '.obsidian'-folder"
+    if (Level) && (bAutoSubmitOTGUI) {
+        submitConfigFolder()
+    } else {
+        WinWaitClose % script.name  " - Set limiting '.obsidian'-folder"
+    }
     if (temporary_obsidianconfig_path=-1) {
         ;; user chose the vault root, so do not flag for delete
         return {Path:Graph[1],IsVaultRoot:True}
@@ -196,7 +213,7 @@ removeTemporaryObsidianVaultRoot(Path,Graph) {
     }
     return {Path:Path,IsVaultRoot:False,Removed:!bool}
 }
-submitConfigFolder() {
+submitConfigFolder(Level:="") {
     global
     gui TOVR: submit,
     arr:={}
