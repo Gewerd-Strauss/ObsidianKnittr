@@ -60,7 +60,11 @@ findObsidianVaultRootFromNote(path,reset:=false) {
         FoundLocation:=obsidianVaultCheckString
         C:=Arr[Arr.MaxIndex()]
         Cap:=OutDir "\" C
-        Arr[Arr.MaxIndex()]:=Cap
+        if (arr.Count()=0) {
+            arr.push(Cap)
+        } else {
+            arr[arr.MaxIndex()]:=Cap
+        }
         OutputDebug % "`n"
         return [FoundLocation,Arr] ;; collect and return the whole stack so far, this is the last call.
     } else {
