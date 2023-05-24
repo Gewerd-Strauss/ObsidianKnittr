@@ -1,9 +1,5 @@
 createTemporaryObsidianVaultRoot(manuscript_location,bAutoSubmitOTGUI) {
     if (bAutoSubmitOTGUI) {
-        /*
-        TODO: add option to autosubmit the GUI
-        TODO: add config setting to auto-defined the vault-root as the N-th level relative below the manuscriptlocation.
-        */
         if (script.config.Config.AutoRelativeLevel!="") && (script.config.Config.AutoRelativeLevel >0) {
             Level:=script.config.Config.AutoRelativeLevel + 0
         }
@@ -30,7 +26,7 @@ AssembleTV_String(Array) {
     }
     OutputDebug % str
     global reordered_arr:=reorder
-    return Str
+    return str
 }
 findObsidianVaultRootFromNote(path,reset:=false) {
     static FoundLocation:=OutFileName:=""
@@ -53,12 +49,12 @@ findObsidianVaultRootFromNote(path,reset:=false) {
     if !InStr(FileExist(path_orig),"D") { ;; path is a file, so use OutDir as path
 
     } else {
-        Arr.push(OutFileName)
+        arr.push(OutFileName)
     }
     if InStr(FileExist(obsidianVaultCheckString),"D") { ;; check if path contains ".obsidian"-folder
         OutputDebug % " found at`n" path
         FoundLocation:=obsidianVaultCheckString
-        C:=Arr[Arr.MaxIndex()]
+        C:=arr[arr.MaxIndex()]
         Cap:=OutDir "\" C
         if (arr.Count()=0) {
             arr.push(Cap)
@@ -66,10 +62,10 @@ findObsidianVaultRootFromNote(path,reset:=false) {
             arr[arr.MaxIndex()]:=Cap
         }
         OutputDebug % "`n"
-        return [FoundLocation,Arr] ;; collect and return the whole stack so far, this is the last call.
+        return [FoundLocation,arr] ;; collect and return the whole stack so far, this is the last call.
     } else {
         OutputDebug % " not found at`n" path
-        SplitPath % path_orig,OFN,OD
+        SplitPath % path_orig,,OD
         if (path_orig=OD) {
             return 0 ;; we have reached the disk's root, all further cals would only run towards the recursion limit. Better back out now and throw an error
         }
@@ -95,12 +91,9 @@ chooseTV_Element(TV_String,Graph,Level,bAutoSubmitOTGUI) {
     arrc++
 
     /*
-    TODO: split this out to conform to the scoping of 'DynamicObsidianVaultRoot.ahk'
     - TODO: style this GUI, color, font size, positioning, parent hwnd etc pp
     - TODO: give this GUI a a hwnd and guilabel, reformat the function names to be pr   e   eeeeoperly namespaced
-    - TODO: add Guiescape callbacks, add fallbacks for those callbacks (what to do if none provided? just go on without limitation, or do not allow if chosen in main gui or just return to main gui?)
     TODO: add a checkbox on the main GUI to forego using this feature (must be checked to use it, default is unchecked or lastUsage)
-    - TODO: adjust the log-template to contain this path if assigned
     - TODO: add th
     */
     gui TOVR: new
@@ -108,8 +101,6 @@ chooseTV_Element(TV_String,Graph,Level,bAutoSubmitOTGUI) {
     gui add, text,, % "Vault root: " Graph[2,arrc-1] "`nFolder containing chosen note: " manuscript_location
     Gui Add, TreeView, r%arrc% ImageList%ImageListID% checked w1200 r%arrc%
     Gui Add, Button, Default w70 gsubmitConfigFolder, Submit Folder
-    ;Gui Add, Button, w70 yp xp+85 gLoadFile, Load File
-    ;Gui Add, Button, w70 yp xp+85 gSaveFile, Save File
     Gui +OwnDialogs
     TV_Delete()
     if (Level) && (bAutoSubmitOTGUI) {
@@ -229,12 +220,10 @@ submitConfigFolder(Level:="") {
     Loop
     {
 
-        idp:=TV_GetParent(ItemID)
         idn:=TV_GetChild(ItemID)
-        TV_GetText(ItemText, idn)
         ItemID := TV_GetNext(idn, "Checked")  ; Replace "Full" with "Checked" to find all checkmarked items.
-        TV_GetText(PathText, ItemID)
-        if (PathText!="") {
+        TV_GetText(pathText, ItemID)
+        if (pathText!="") {
             arr.push(pathText)
         }
         if not ItemID  ; No more items in tree.
