@@ -1,4 +1,4 @@
-﻿ObsidianHtml(manuscript_path:="",config_path:="",bUseConvert:=true,bUseOwnOHTMLFork:=false,bVerbose:=false,WD="",WorkDir:="",WorkDir_OwnFork:="") {
+﻿ObsidianHtml(manuscript_path:="",config_path:="",bUseConvert:=true,bUseOwnOHTMLFork:=false,bVerbose:=false,WD="",WorkDir:="",WorkDir_OwnFork:="",ScopeRestrictorObject:="") {
 
     if (WorkDir="") {
         WorkDir:= A_Desktop "\ObsidianHTMLOutput"
@@ -63,6 +63,9 @@
         IfMsgBox Yes, {
 
         } Else IfMsgBox No, {
+            if (FileExist(ScopeRestrictorObject.Path) && !ScopeRestrictorObject.IsVaultRoot) {
+                FileRemoveDir % ScopeRestrictorObject.Path
+            }
             reload
         }
     }
