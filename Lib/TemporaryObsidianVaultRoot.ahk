@@ -140,7 +140,6 @@ chooseTV_Element(TV_String,Graph,Level,bAutoSubmitOTGUI) {
         Key:="^" A_Index-1
         Hotkey % Key, % objTOVRHK_Handler
     }
-    Hotkey ^m, % objTOVRHK_Handler
     Hotkey IfWinActive
     if (Level) && (bAutoSubmitOTGUI) {
         submitConfigFolder()
@@ -155,7 +154,6 @@ chooseTV_Element(TV_String,Graph,Level,bAutoSubmitOTGUI) {
         ;; user closed the GUI - use default, do not flag for delete
         return {Path:Graph[1],IsVaultRoot:True}
     }
-    ttip(FileExist(temporary_obsidianconfig_path))
     ret:=checkTemporaryObsidianVaultLocation(temporary_obsidianconfig_path)
     if !ret.isVaultRoot {
         FileCreateDir % temporary_obsidianconfig_path "\"
@@ -165,8 +163,6 @@ chooseTV_Element(TV_String,Graph,Level,bAutoSubmitOTGUI) {
     } else {
         return false
     }
-    ttip(FileExist(temporary_obsidianconfig_path))
-    ;m(temporary_obsidianconfig_path)
     return {Path:temporary_obsidianconfig_path,IsVaultRoot:false} 
 }
 TOVREscape() {
@@ -260,7 +256,7 @@ removeTemporaryObsidianVaultRoot(Path,Graph) {
     }
     return {Path:Path,IsVaultRoot:False,Removed:!bool}
 }
-submitConfigFolder(Level:="") {
+submitConfigFolder() {
     global
     gui TOVR: submit,
     arr:={}
