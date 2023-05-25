@@ -60,21 +60,27 @@ main() {
         InitialSettings=
             (LTrim
                 [Config]
-                bundleAHKRecompileStarter=0
+                backupCount=250
+                bundleAHKStarter=1
+                defaultRelativeLevel=2
                 Destination=0
+                FullLogOnSuccess=0
                 HistoryLimit=25
                 obsidianhtml_configfile=
-                obsidianTagEndChars=():´
+                obsidianTagEndChars=():'
+                OHTML_OutputDir=%A_Desktop%\TempTemporal\
                 OpenParentfolderInstead=1
                 RScriptPath=%given_rscriptpath%
                 searchroot=%given_searchroot%
                 SetSearchRootToLastRunManuscriptFolder=1
-                OHTML_OutputDir=%A_Desktop%\TempTemporal
                 [Version]
                 ObsidianHTML_Version=3.4.1
-                ObsidianKnittr_Version=2.1.3
+                ObsidianKnittr_Version=3.1.3
                 [LastRun]
+                BackupOutput=1
+                bStripLocalMarkdownLinks=0
                 Conversion=
+                ConvertInsteadofRun=1
                 ForceFixPNGFiles=0
                 FullLog=0
                 InsertSetupChunk=0
@@ -82,8 +88,11 @@ main() {
                 last_output_type=
                 manuscriptpath=
                 RemoveHashTagFromTags=1
-                RenderRMD=1
+                RemoveObsidianHTMLErrors=0
+                RenderRMD=0
+                RestrictOHTMLScope=0
                 UseCustomTOC=0
+                UseOwnOHTMLFork=0
                 Verbose=0
                 [GuiPositioning]
                 H=
