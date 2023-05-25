@@ -100,7 +100,7 @@ chooseTV_Element(TV_String,Graph,Level,bAutoSubmitOTGUI) {
     gui TOVR: +hwndTOVRGUI +LabelTOVR
     gui add, text,, % "Vault root: " Graph[2,arrc-1] "`nFolder containing chosen note: " manuscript_location
     Gui Add, TreeView, r%arrc% ImageList%ImageListID% checked w1200 r%arrc%
-    Gui Add, Button, Default w70 gsubmitConfigFolder, Submit Folder
+    Gui Add, Button, Default w70 gsubmitConfigFolder, &Submit Folder
     Gui +OwnDialogs
     TV_Delete()
     if (Level) && (bAutoSubmitOTGUI) {
