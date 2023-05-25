@@ -305,7 +305,11 @@ main() {
     EL.RScriptExecution_Duration:=Codetimer_Log()
     EL.RScriptExecution_End:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
     EL.getTotalDuration(ATC1,A_TickCount)
-
+    if InStr(Rdata_out,"[1] ""Total Time for codechunks:""") {
+        t:=StrSplit(Rdata_out,"[1] ""Total Time for codechunks:""")
+        t2:=StrSplit(t[2],"`n",,3).2
+        EL.RCodeChunkExecutionTime:=Round(SubStr(t2,5),3)
+    }
     ;; final touches - ahk starter, moving shit to output folder
     ttip("Building AHK-Starterscript",5)
     buildAHKScriptContent(rmd_Path,script.config.config.RScriptPath)
