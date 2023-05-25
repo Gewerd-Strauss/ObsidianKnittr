@@ -24,6 +24,7 @@ intermediary Processing < `%Intermediary_End`%
                                        `%Intermediary_Duration`%
 R                       > `%RScriptExecution_Start`%
 R                       < `%RScriptExecution_End`%
+                          Codechunks -       `%RCodeChunkExecutionTime`%
                                        `%RScriptExecution_Duration`%
 
 Total (not ms-precise)                 `%TotalExecution_Duration`%
