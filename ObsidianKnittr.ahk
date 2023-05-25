@@ -105,7 +105,7 @@ main() {
         script.load()
     }
     FileRead ObsidianKnittr_Version, % A_ScriptDir "\INI-Files\ObsidianKnittr_Version.ini"
-    EL.ObsidianKnittr_Version:=script.version:=script.config.version.ObsidianKnittr_Version:=ObsidianKnittr_Version
+    EL.ObsidianKnittr_Version:=script.version:=script.config.version.ObsidianKnittr_Version:=Regexreplace(ObsidianKnittr_Version,"\s*")
 
     ; 2.2
     out:=guiShow()
