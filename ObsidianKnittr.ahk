@@ -60,21 +60,27 @@ main() {
         InitialSettings=
             (LTrim
                 [Config]
-                bundleAHKRecompileStarter=0
+                backupCount=250
+                bundleAHKStarter=1
+                defaultRelativeLevel=2
                 Destination=0
+                FullLogOnSuccess=0
                 HistoryLimit=25
                 obsidianhtml_configfile=
-                obsidianTagEndChars=():´
+                obsidianTagEndChars=():'
+                OHTML_OutputDir=%A_Desktop%\TempTemporal\
                 OpenParentfolderInstead=1
                 RScriptPath=%given_rscriptpath%
                 searchroot=%given_searchroot%
                 SetSearchRootToLastRunManuscriptFolder=1
-                OHTML_OutputDir=%A_Desktop%\TempTemporal
                 [Version]
                 ObsidianHTML_Version=3.4.1
-                ObsidianKnittr_Version=2.1.3
+                ObsidianKnittr_Version=3.1.3
                 [LastRun]
+                BackupOutput=1
+                bStripLocalMarkdownLinks=0
                 Conversion=
+                ConvertInsteadofRun=1
                 ForceFixPNGFiles=0
                 FullLog=0
                 InsertSetupChunk=0
@@ -82,8 +88,11 @@ main() {
                 last_output_type=
                 manuscriptpath=
                 RemoveHashTagFromTags=1
-                RenderRMD=1
+                RemoveObsidianHTMLErrors=0
+                RenderRMD=0
+                RestrictOHTMLScope=0
                 UseCustomTOC=0
+                UseOwnOHTMLFork=0
                 Verbose=0
                 [GuiPositioning]
                 H=
@@ -103,7 +112,11 @@ main() {
     WorkDir := "C:\Users\Claudius Main\Desktop\TempTemporal"
     WorkDir_OwnFork := "D:\Dokumente neu\ObsidianPluginDev\obsidian-html"
     formats:=""
+    bAutoSubmitOTGUI:=false
     for _,format in out.Outputformats {
+        if format.SkipGUI {
+            bAutoSubmitOTGUI:=format.SkipGUI
+        }
         if format.HasKey("Error") && (format.Error.ID=0) {
             Reload
             ExitApp ;; fucking weird bug. DO NOT remove this exitapp below the reload-command. for some reason, removing it results in the script just ignoring the reload and continuing on as normal under certain situations
@@ -134,6 +147,7 @@ main() {
     bRemoveObsidianHTMLErrors:=out.Settings.bRemoveObsidianHTMLErrors
     bStripLocalMarkdownLinks:=out.Settings.bStripLocalMarkdownLinks
     bUseOwnOHTMLFork:=out.Settings.bUseOwnOHTMLFork
+    bRestrictOHTMLScope:=out.Settings.bRestrictOHTMLScope
     EL.formats:=formats
     EL.manuscriptname:=out.manuscriptname
     EL.manuscriptpath:=out.manuscriptpath
@@ -149,6 +163,7 @@ main() {
     EL.bRemoveObsidianHTMLErrors:=out.Settings.bRemoveObsidianHTMLErrors
     EL.bStripLocalMarkdownLinks:=out.Settings.bStripLocalMarkdownLinks
     EL.bUseOwnOHTMLFork:=out.Settings.bUseOwnOHTMLFork
+    EL.bRestrictOHTMLScope:=out.Settings.bRestrictOHTMLScope
 
     if (output_type="") && (bVerboseCheckbox="") {
         reload
@@ -167,10 +182,34 @@ main() {
     ATC1:=A_TickCount
     Codetimer_Log()
     OHTML_OutputDir:=Deref(script.config.config.OHTML_OutputDir)
+    if (bRestrictOHTMLScope) {
+
+        OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(manuscriptpath,bAutoSubmitOTGUI)
+    }
+
     if (tmpconfig[1] && bConvertInsteadofRun) {
-        ret:=ObsidianHtml(,tmpconfig[1],,bUseOwnOHTMLFork,bVerboseCheckbox,OHTML_OutputDir,WorkDir,WorkDir_OwnFork)
+        ret:=ObsidianHtml(,tmpconfig[1],,bUseOwnOHTMLFork,bVerboseCheckbox,OHTML_OutputDir,WorkDir,WorkDir_OwnFork,OHTMLScopeRestrictor_Object)
     } else {
-        ret:=ObsidianHtml(manuscriptpath,tmpconfig[1],,bUseOwnOHTMLFork,bVerboseCheckbox,OHTML_OutputDir,WorkDir,WorkDir_OwnFork)
+        ret:=ObsidianHtml(manuscriptpath,tmpconfig[1],,bUseOwnOHTMLFork,bVerboseCheckbox,OHTML_OutputDir,WorkDir,WorkDir_OwnFork,OHTMLScopeRestrictor_Object)
+    }
+    if (bRestrictOHTMLScope) {
+        tempOVaultRoot:=removeTemporaryObsidianVaultRoot(OHTMLScopeRestrictor_Object.Path,OHTMLScopeRestrictor_Object.Graph)
+        if tempOVaultRoot.Removed {
+            EL.temporaryVaultpath:=OHTMLScopeRestrictor_Object.Path 
+            EL.temporaryVaultpathRemoved:="Yes"
+
+        } else {
+            if tempOVaultRoot.IsVaultRoot {
+
+                EL.temporaryVaultpath:=OHTMLScopeRestrictor_Object.Path
+                EL.temporaryVaultpathRemoved:="No - vault root"
+            } else {
+
+            }
+            EL.temporaryVaultpath:=OHTMLScopeRestrictor_Object.Path
+            EL.temporaryVaultpathRemoved:="No - not removed, but not vault root"
+
+        }
     }
     EL.ObsidianHTML_Duration:=Codetimer_Log()
     EL.ObsidianHTML_End:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
@@ -525,6 +564,7 @@ guiCreate() {
     gui add, checkbox, vbRemoveObsidianHTMLErrors, % "!Purge OHTML-Error-strings?"
     gui add, checkbox, vbFullLogCheckbox, % "Full Log on successful execution?"
     gui add, checkbox, vbVerboseCheckbox, % "Set OHTML's Verbose-Flag?"
+    gui add, checkbox, vbRestrictOHTMLScope, % "Limit scope of OHTML?"
     Gui Add, Text, w%WideControlWidth% h1 0x7 ;Horizontal Line > Black
     gui add, checkbox, vbRemoveHashTagFromTags, % "Remove '#' from tags?"
     gui add, checkbox, vbStripLocalMarkdownLinks, % "Strip local markdown links?"
@@ -547,6 +587,7 @@ guiCreate() {
         SplitPath % script.config.lastrun.manuscriptpath, , OutDir
         SplitPath % OutDir, OutFileName, OutDir,
         guicontrol,, bVerboseCheckbox, % (script.config.LastRun.Verbose)
+        guicontrol,, bRestrictOHTMLScope, % (script.config.LastRun.RestrictOHTMLScope)
         guicontrol,, bFullLogCheckbox, % (script.config.LastRun.FullLog)
         guicontrol,, bSRCConverterVersion, % (script.config.LastRun.Conversion)
         guicontrol,, bKeepFilename, % (script.config.LastRun.KeepFileName)
@@ -574,7 +615,7 @@ guiShow() {
     y:=(script.config.GuiPositioning.Y!=""?script.config.GuiPositioning.Y:200)
     bAutoSubmitOTGUI:=false
     guiWidth:=WideControlWidth + 32
-    guiHeight:=827
+    guiHeight:=863
     currentMonitor:=MWAGetMonitor()+0
     SysGet MonCount, MonitorCount
     if (MonCount>1) {
@@ -639,6 +680,7 @@ guiShow() {
                     ,"bInsertSetupChunk":bInsertSetupChunk + 0
                     ,"bConvertInsteadofRun":bConvertInsteadofRun + 0
                     ,"bRemoveObsidianHTMLErrors":bRemoveObsidianHTMLErrors + 0
+                    ,"bRestrictOHTMLScope":bRestrictOHTMLScope + 0
                     ,"bStripLocalMarkdownLinks":bStripLocalMarkdownLinks + 0
                     ,"bUseOwnOHTMLFork":bUseOwnOHTMLFork + 0}
                 ,"Outputformats":Outputformats}
@@ -694,6 +736,7 @@ guiSubmit() {
     script.config.LastRun.manuscriptpath:=manuscriptpath
     script.config.LastRun.last_output_type:=""
     script.config.LastRun.Verbose:=bVerboseCheckbox+0
+    script.config.LastRun.RestrictOHTMLScope:=bRestrictOHTMLScope+0
     script.config.LastRun.FullLog:=bFullLogCheckbox+0
     script.config.LastRun.Conversion:=bSRCConverterVersion+0
     script.config.LastRun.KeepFileName:=bKeepFilename+0
@@ -828,3 +871,4 @@ fTraySetup() {
 #Include <OnExit>
 #Include <Log>
 #Include <Outputbackup>
+#Include <TemporaryObsidianVaultRoot>
