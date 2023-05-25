@@ -76,6 +76,7 @@ Used Personal Fork        : `%bUseOwnOHTMLFork`%
 Verbosity                 : `%bVerboseCheckbox`%
 Stripped OHTML - Errors   : `%bRemoveObsidianHTMLErrors`%
 Stripped Local MD-Links   : `%bStripLocalMarkdownLinks`%
+Vault Limited             : `%bRestrictOHTMLScope`%
 
 RMD:
 Render to Outputs         : `%bRenderRMD`%
@@ -95,6 +96,8 @@ RMarkdown Document Settings:
 ___________________________________________________
 Paths:
 manuscriptlocation        : `%manuscriptpath`%
+Vault limited to childs of: `%temporaryVaultpath`%
+Vault-Limiter removed     : `%temporaryVaultpathRemoved`%
 Output Folder             : `%output_path`%
 Raw Input Copy            : `%rawInputcopyLocation`%
 ObsidianHTML - Path       : `%obsidianHTML_path`% (either the path to the installed exe or the personal modded version)
