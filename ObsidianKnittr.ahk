@@ -105,7 +105,7 @@ main() {
         script.load()
     }
     FileRead ObsidianKnittr_Version, % A_ScriptDir "\INI-Files\ObsidianKnittr_Version.ini"
-    EL.ObsidianKnittr_Version:=script.version:=script.config.version.ObsidianKnittr_Version:=ObsidianKnittr_Version
+    EL.ObsidianKnittr_Version:=script.version:=script.config.version.ObsidianKnittr_Version:=Regexreplace(ObsidianKnittr_Version,"\s*")
 
     ; 2.2
     out:=guiShow()
@@ -270,6 +270,7 @@ main() {
     Codetimer_Log()
     writeFile(rmd_Path,NewContents,"UTF-8",,true)
     ttip("Creating R-BuildScript",5)
+    sleep 200
     if bKeepFilename {
         tmp:=buildRScriptContent(rmd_Path,manuscriptName,out)
     } else {
@@ -304,7 +305,11 @@ main() {
     EL.RScriptExecution_Duration:=Codetimer_Log()
     EL.RScriptExecution_End:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
     EL.getTotalDuration(ATC1,A_TickCount)
-
+    if InStr(Rdata_out,"[1] ""Total Time for codechunks:""") {
+        t:=StrSplit(Rdata_out,"[1] ""Total Time for codechunks:""")
+        t2:=StrSplit(t[2],"`n",,3).2
+        EL.RCodeChunkExecutionTime:=Round(SubStr(t2,5),3)
+    }
     ;; final touches - ahk starter, moving shit to output folder
     ttip("Building AHK-Starterscript",5)
     buildAHKScriptContent(rmd_Path,script.config.config.RScriptPath)
