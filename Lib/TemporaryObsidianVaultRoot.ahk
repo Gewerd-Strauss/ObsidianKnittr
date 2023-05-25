@@ -120,8 +120,28 @@ chooseTV_Element(TV_String,Graph,Level,bAutoSubmitOTGUI) {
         TV_String:=strreplace(TV_String,"Icon4 expand","Icon4 expand Check1",,occurences)
         TV_String:=strreplace(TV_String,"Icon4 expand Check1","Icon 4")
     }
-    CreateTreeView(TV_String)
+    TVIDs:=CreateTreeView(TV_String)
+    if (Level) && !(bAutoSubmitOTGUI) {
+        loop, % TVIDs.Count() - Level {
+            Key:="Level" A_Index
+        }
+        for each, ID in TVIDs {
+            if (each=Key) {
+                r:=TV_Modify(ID,"Check") ;; check selected
+            } else {
+                r2:=TV_Modify(ID,"-Check") ;; uncheck the rest just in case
+            }
+        }
+    }
     gui show, w600 Autosize, % script.name  " - Set limiting '.obsidian'-folder"
+    objTOVRHK_Handler:=Func("TOVRHK_Handler").Bind(TVIDs)
+    Hotkey ifWinActive, % "ahk_id " TOVRGUI
+    loop, 9 {
+        Key:="^" A_Index-1
+        Hotkey % Key, % objTOVRHK_Handler
+    }
+    Hotkey ^m, % objTOVRHK_Handler
+    Hotkey IfWinActive
     if (Level) && (bAutoSubmitOTGUI) {
         submitConfigFolder()
     } else {
@@ -151,6 +171,34 @@ chooseTV_Element(TV_String,Graph,Level,bAutoSubmitOTGUI) {
 }
 TOVREscape() {
     gui TOVR: destroy
+    return
+}
+TOVRHK_Handler(TVIDs:="") {
+    /*
+    if Instr athishotkey, number
+    tvids entry at number
+    guicontrol check entry id
+    return
+    */
+    dfg:=A_DefaultGUI
+    gui TOVR: default
+    if RegexMatch(A_ThisHotkey,"(?<Count>\d+)",v) {
+        loop, % vCount {
+            Key:="Level" A_Index
+        }
+        for each, ID in TVIDs {
+            if (each=Key) {
+                r:=TV_Modify(ID,"Check") ;; check selected
+            } else {
+                r2:=TV_Modify(ID,"-Check") ;; uncheck the rest just in case
+            }
+        }
+        ;ID:=TVIDs[Key]
+        ;TV_Modify(ID,"Check") ;; recheck the intended oned
+    } else {
+
+    }
+    ;gui % dfg ":" default
     return
 }
 setTemporaryObsidianVaultRoot(Path) {
@@ -266,6 +314,7 @@ CreateTreeView(TreeViewDefinitionString) {	; by Learning one
         else
             IDs["Level" Level] := TV_Add("(" A_Index ") " match1, IDs["Level" Level-1], match3)
     }
+    return IDs
 }	; http://www.autohotkey.com/board/topic/92863-fu
 
 
