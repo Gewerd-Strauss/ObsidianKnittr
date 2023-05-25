@@ -1,11 +1,11 @@
 createTemporaryObsidianVaultRoot(manuscript_location,bAutoSubmitOTGUI) {
     if (bAutoSubmitOTGUI) {
-        if (script.config.Config.AutoRelativeLevel!="") && (script.config.Config.AutoRelativeLevel >0) {
-            Level:=script.config.Config.AutoRelativeLevel + 0
+        if (script.config.Config.defaultRelativeLevel!="") && (script.config.Config.defaultRelativeLevel >0) {
+            Level:=script.config.Config.defaultRelativeLevel + 0
         }
 
     } else {
-        Level:=0
+        Level:=script.config.Config.defaultRelativeLevel + 0
     }
     Graph:=findObsidianVaultRootFromNote(manuscript_location,true)
     TV_String:=AssembleTV_String(Graph[2])
