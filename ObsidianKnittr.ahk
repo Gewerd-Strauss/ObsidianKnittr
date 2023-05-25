@@ -270,6 +270,7 @@ main() {
     Codetimer_Log()
     writeFile(rmd_Path,NewContents,"UTF-8",,true)
     ttip("Creating R-BuildScript",5)
+    sleep 200
     if bKeepFilename {
         tmp:=buildRScriptContent(rmd_Path,manuscriptName,out)
     } else {
