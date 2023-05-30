@@ -80,7 +80,11 @@ Class ot {
         return This
     }
     AssembleFormatString() {
-        Str:="rmarkdown::" this.type "(`n" ;; start string
+        if InStr(this.type,"::") { ;; start string
+            Str:=this.type "(`n" ;; check if format is from a specific package or not
+        } else {
+            Str:="rmarkdown::" this.type "(`n"  ;; assume rmarkdown-package if not the case
+        }
         this._Adjust()
         for Parameter, Value in this.Arguments {
             if (Parameter="toc_depth" && !this.Arguments["toc"].Value) {
