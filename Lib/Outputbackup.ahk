@@ -28,14 +28,33 @@ backupOutput(Path, manuscriptName, out) {
         Output_Log_Dest:=BackupDirectory "\" MT "\" Name "_Log.txt"
         FileMove % Output_Log_Source, % Output_Log_Dest,1
     }
-    return
+    return BackupDirectory
 }
-limitBackups(Count) {
+limitBackups(BackupDirectory,Limit) {
+    backupCount:=0
+    Arr:={}
+    Loop, Files, % BackupDirectory "\*", D 
+    {
+        backupCount++
+        Arr[A_LoopFileName]:=A_LoopFileFullPath
+    }
+    Arr2:={}
+    for _, Path in Arr {
+        Arr2.push(Path)
+    }
+    if Arr2.Count()>Limit {
+        Diff:=Arr2.Count()-Limit
+        loop, % Diff {
+            FileRemoveDir % Arr2[A_Index] "\",% true
+        }
+
+    }
     /*
     1. get number of backup subfolders 
     2. if number greater 'Count', get the remainder
     3. Get the 'remainder' number of oldest subfolders and 'FileRemoveDir' them
     */
+    return
 }
 
 ; #region:FindFreeFileName() (1452864709)
