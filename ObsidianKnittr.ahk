@@ -540,16 +540,23 @@ processTags(Contents,bRemoveHashTagFromTags) {
 guiCreate() {
     global
     gui destroy
-    PotentialOutputs:=["First in YAML" , "html_document" , "pdf_document" , "word_document" , "odt_document" , "rtf_document" , "md_document" , "powerpoint_presentation" , "ioslides_presentation" , "tufte::tufte_html" , "github_document" , "All"]
+    PotentialOutputs:=["bookdown::html_document2", "html_document", "bookdown::word_document2", "word_document", "pdf_document", "bookdown::pdf_document2", "First in YAML", "odt_document", "rtf_document", "md_document", "powerpoint_presentation", "ioslides_presentation", "tufte::tufte_html", "github_document", "All"]
     Gui Margin, 16, 16
     Gui +AlwaysOnTop -SysMenu -ToolWindow -caption +Border +LabelGC +hwndOKGui
     Gui Color, 1d1f21, 373b41,
     Gui Font, s11 cWhite, Segoe UI
     gui add, text,xm ym, Choose output type:
     WideControlWidth:=330
-    gui add, listview, vvLV1 cWhite LV0x8 w%WideControlWidth% checked, % "Type"
-    for _,output_type in PotentialOutputs {
-        Options:=((Instr(script.config.lastrun.last_output_type,output_type))?"Check":"-Check")
+    gui add, listview, vvLV1 cWhite LV0x8 w%WideControlWidth% r6 checked, % "Type"
+    last_output:=script.config.LastRun.last_output_type
+    for _,output_type in PotentialOutputs { ; TODO: rework this to differentiate "word_document" from "bookdown::word_document2" -> maybe check for next char? If comma or end of string, this would be a base rmd format, if a "2" it would be bookdown
+        Cond:=Instr(last_output,output_type)
+        if Cond {
+            Options:="Check"
+            last_output:=strreplace(last_output,output_type)
+        } else {
+            Options:="-Check"
+        }
         LV_Add(Options,output_type)
     }
     HistoryString:=""
@@ -620,7 +627,7 @@ guiShow() {
     y:=(script.config.GuiPositioning.Y!=""?script.config.GuiPositioning.Y:200)
     bAutoSubmitOTGUI:=false
     guiWidth:=WideControlWidth + 32
-    guiHeight:=863
+    guiHeight:=879
     currentMonitor:=MWAGetMonitor()+0
     SysGet MonCount, MonitorCount
     if (MonCount>1) {
