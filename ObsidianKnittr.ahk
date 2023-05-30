@@ -285,10 +285,10 @@ main() {
             ttip("Executing R-BuildScript",5)
         }
         if bBackupOutput {
-            backupOutput(rmd_Path,manuscriptName,out)
+            BackupDirectory:=backupOutput(rmd_Path,manuscriptName,out)
         }
         if script.config.config.backupCount {
-            limitBackups(script.config.config.backupCount)
+            limitBackups(BackupDirectory,script.config.config.backupCount)
         }
         Rdata_out:=runRScript(rmd_Path,script_contents,Outputformats,script.config.config.RScriptPath)
         EL.Rdata_out:=Rdata_out
