@@ -59,7 +59,7 @@
     if bUseOwnOHTMLFork {
         GetStdStreams_WithInput("python --version",,out)
         GetStdStreams_WithInput("python -m " command2_getversion,WorkDir_OwnFork,ohtmlversion_modded)
-        MsgBox 0x2034,% "Is the correct build version used?", % "Has the correct build version been used?`n" ohtmlversion_modded "`n`nCMD:`n" command2, 3
+        MsgBox 0x2034,% "Is the correct build version used?", % "Has the correct build version been used?`n" ohtmlversion_modded "`n`nCMD:`n" command2, 1 ;; TODO: add config option to skip this, and add option to potentially also or never skip this when debugging.
         IfMsgBox Yes, {
 
         } Else IfMsgBox No, {

@@ -1,34 +1,4 @@
-A:=CodeTimer_Log()
-EL := new log(A_ScriptDir "\LOG_.txt", true)
-EL.UsedVerb:="DASd"
-Map := { obsidianhtml_version: "A:B:D:C", UsedVerb: "convert" }
-for key, value in Map
-    EL[key] := value
-EL.ObsidianHTML_Start:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
-EL.ObsidianHTML_Duration:=CodeTimer_Log()
-EL.ObsidianHTML_End:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
-multiline=
-(
-    	Document Settings
-		rmarkdown::html_document`(
-            df_print = "kable",
-            fig_caption = TRUE,
-            fig_height = 6,
-            fig_width = 8,
-		highlight = "tango",
-		keep_md = FALSE,
-		number_sections = TRUE,
-		pandoc_args = ,
-		toc = TRUE,
-		toc_depth = 5,
-		toc_float = TRUE
-		`)
-        )
-EL.DocumentSettings:=multiline
-EL.handle()
-return
-
-class log ;extends Object_Proxy
+class log
 {
     __Init() {
         tpl=
@@ -54,6 +24,7 @@ intermediary Processing < `%Intermediary_End`%
                                        `%Intermediary_Duration`%
 R                       > `%RScriptExecution_Start`%
 R                       < `%RScriptExecution_End`%
+                          Codechunks -       `%RCodeChunkExecutionTime`%
                                        `%RScriptExecution_Duration`%
 
 Total (not ms-precise)                 `%TotalExecution_Duration`%
