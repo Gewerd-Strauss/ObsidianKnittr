@@ -3,10 +3,14 @@ backupOutput(Path, manuscriptName, out) {
     Name:=(manuscriptName!=""?manuscriptName:"index")
     Copied:=0
     for _, output_type in out.sel {
+        if InStr(output_type,"word_document") {
+            FileSuffix:="docx"
+        } else {
         FileSuffix:=strsplit(output_type,"_").1
         if InStr(FileSuffix,"::") {
 
             FileSuffix:=strsplit(FileSuffix,"::").2
+        }
         }
         Output_File:=OutputRoot "\" Name "." FileSuffix
         BackupDirectory:=OutputRoot "\Old_Versions"
