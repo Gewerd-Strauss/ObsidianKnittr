@@ -20,11 +20,20 @@ backupOutput(Path, manuscriptName, out) {
         }
         bOutputExists:=FileExist(Output_File)
         if (bOutputExists!="") {
+            if (MT="") {
             FileGetTime MT,% Output_File,M
             FileGetTime CT,% Output_File,C
             FormatTime CT,%CT%,yyyy-MM-dd HHmmss
             FormatTime MT,%MT%,yyyy-MM-dd HHmmss
+            }
+            bOutputFolderExists:=FileExist(BackupDirectory "\" MT)
+            if (bOutputFolderExists="") {
+                FileCreateDir % BackupDirectory "\" MT
+            } else {
+                if (bOutputFolderExists!="D") { ;; directory exists
             FileCreateDir % BackupDirectory "\" MT
+                }
+            }
             FileCopy % Output_File, % BackupDirectory "\" MT "\" Name "." FileSuffix
             Copied++
         } else {
