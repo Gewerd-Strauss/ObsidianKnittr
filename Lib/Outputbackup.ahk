@@ -3,10 +3,14 @@ backupOutput(Path, manuscriptName, out) {
     Name:=(manuscriptName!=""?manuscriptName:"index")
     Copied:=0
     for _, output_type in out.sel {
-        FileSuffix:=strsplit(output_type,"_").1
-        if InStr(FileSuffix,"::") {
+        if InStr(output_type,"word_document") {
+            FileSuffix:="docx"
+        } else {
+            FileSuffix:=strsplit(output_type,"_").1
+            if InStr(FileSuffix,"::") {
 
-            FileSuffix:=strsplit(FileSuffix,"::").2
+                FileSuffix:=strsplit(FileSuffix,"::").2
+            }
         }
         Output_File:=OutputRoot "\" Name "." FileSuffix
         BackupDirectory:=OutputRoot "\Old_Versions"
@@ -16,11 +20,20 @@ backupOutput(Path, manuscriptName, out) {
         }
         bOutputExists:=FileExist(Output_File)
         if (bOutputExists!="") {
-            FileGetTime MT,% Output_File,M
-            FileGetTime CT,% Output_File,C
-            FormatTime CT,%CT%,yyyy-MM-dd HHmmss
-            FormatTime MT,%MT%,yyyy-MM-dd HHmmss
-            FileCreateDir % BackupDirectory "\" MT
+            if (MT="") {
+                FileGetTime MT,% Output_File,M
+                FileGetTime CT,% Output_File,C
+                FormatTime CT,%CT%,yyyy-MM-dd HHmmss
+                FormatTime MT,%MT%,yyyy-MM-dd HHmmss
+            }
+            bOutputFolderExists:=FileExist(BackupDirectory "\" MT)
+            if (bOutputFolderExists="") {
+                FileCreateDir % BackupDirectory "\" MT
+            } else {
+                if (bOutputFolderExists!="D") { ;; directory exists
+                    FileCreateDir % BackupDirectory "\" MT
+                }
+            }
             FileCopy % Output_File, % BackupDirectory "\" MT "\" Name "." FileSuffix
             Copied++
         } else {
