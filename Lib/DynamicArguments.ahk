@@ -34,15 +34,19 @@ Class ot {
             }
             while (p := RegExMatch(Line, regex, match, p)) {
                 ; do stuff
-                matchKey:=SubStr(matchKey,1,StrLen(matchKey)-1) ;; remove the doublepoint.
-                if (Count<2) { ;; initiate Parameter-Object
-                    CurrentParam:=matchKey
-                    ObjRawSet(This.Arguments,matchKey,{})
-                    ObjRawSet(This.Arguments[CurrentParam],"Control",matchVal)
+                if !InStr(Line,"|") { ;; not a parameter being defined. This occurs on lines like `bookdown::word_document2` which should define a new output format instead
+                    p+=StrLen(Match)
+                } else {
+                    matchKey:=SubStr(matchKey,1,StrLen(matchKey)-1) ;; remove the doublepoint.
+                    if (Count<2) { ;; initiate Parameter-Object
+                        CurrentParam:=matchKey
+                        ObjRawSet(This.Arguments,matchKey,{})
+                        ObjRawSet(This.Arguments[CurrentParam],"Control",matchVal)
+                    }
+                    ObjRawSet(This.Arguments[CurrentParam],matchKey,matchVal) ;; there ought to be a simpler method than ObjRawSet that I am utterly missing, or tested with bad data and assumed faulty...
+                    p+=StrLen(Match)
+                    Count++
                 }
-                ObjRawSet(This.Arguments[CurrentParam],matchKey,matchVal) ;; there ought to be a simpler method than ObjRawSet that I am utterly missing, or tested with bad data and assumed faulty...
-                p+=StrLen(Match)
-                Count++
             }
         }
         this.AssumeDefaults()
