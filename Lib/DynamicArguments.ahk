@@ -32,21 +32,25 @@ Class ot {
             if (SubStr(Trim(Line),1,1)=";") {
                 continue
             }
-            while (p := RegExMatch(Line, regex, match, p)) {
-                ; do stuff
-                if !InStr(Line,"|") { ;; not a parameter being defined. This occurs on lines like `bookdown::word_document2` which should define a new output format instead
-                    p+=StrLen(Match)
-                } else {
-                    matchKey:=SubStr(matchKey,1,StrLen(matchKey)-1) ;; remove the doublepoint.
-                    if (Count<2) { ;; initiate Parameter-Object
-                        CurrentParam:=matchKey
-                        ObjRawSet(This.Arguments,matchKey,{})
-                        ObjRawSet(This.Arguments[CurrentParam],"Control",matchVal)
+            if (RegexMatch(Line,"^\s+\S+")) {
+                while (p := RegExMatch(Line, regex, match, p)) {
+                    ; do stuff
+                    if !InStr(Line,"|") { ;; not a parameter being defined. This occurs on lines like `bookdown::word_document2` which should define a new output format instead
+                        p+=StrLen(Match)
+                    } else {
+                        matchKey:=SubStr(matchKey,1,StrLen(matchKey)-1) ;; remove the doublepoint.
+                        if (Count<2) { ;; initiate Parameter-Object
+                            CurrentParam:=matchKey
+                            ObjRawSet(This.Arguments,matchKey,{})
+                            ObjRawSet(This.Arguments[CurrentParam],"Control",matchVal)
+                        }
+                        ObjRawSet(This.Arguments[CurrentParam],matchKey,matchVal) ;; there ought to be a simpler method than ObjRawSet that I am utterly missing, or tested with bad data and assumed faulty...
+                        p+=StrLen(Match)
+                        Count++
                     }
-                    ObjRawSet(This.Arguments[CurrentParam],matchKey,matchVal) ;; there ought to be a simpler method than ObjRawSet that I am utterly missing, or tested with bad data and assumed faulty...
-                    p+=StrLen(Match)
-                    Count++
                 }
+            } else { ;; we reached the first line of the next output format, indicated by its `package::format`-line
+                break
             }
         }
         this.AssumeDefaults()
