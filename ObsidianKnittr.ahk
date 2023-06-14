@@ -540,7 +540,7 @@ processTags(Contents,bRemoveHashTagFromTags) {
 guiCreate() {
     global
     gui destroy
-    PotentialOutputs:=["bookdown::html_document2", "html_document", "bookdown::word_document2", "word_document", "pdf_document", "bookdown::pdf_document2", "First in YAML", "odt_document", "rtf_document", "md_document", "powerpoint_presentation", "ioslides_presentation", "tufte::tufte_html", "github_document", "All"]
+    PotentialOutputs:=getDefinedOutputFormats(A_ScriptDir "\INI-Files\DynamicArguments.ini")
     Gui Margin, 16, 16
     Gui +AlwaysOnTop -SysMenu -ToolWindow -caption +Border +LabelGC +hwndOKGui
     Gui Color, 1d1f21, 373b41,
@@ -614,6 +614,36 @@ guiCreate() {
         guicontrol,, bUseOwnOHTMLFork, % (script.config.LastRun.UseOwnOHTMLFork)
     }
     return
+}
+getDefinedOutputFormats(Path) {
+    PotentialOutputs:=["bookdown::word_document2", "html_document", "bookdown::html_document2", "word_document", "pdf_document", "bookdown::pdf_document2", "First in YAML", "odt_document", "rtf_document", "md_document", "powerpoint_presentation", "ioslides_presentation", "tufte::tufte_html", "github_document", "All"]
+    Arr:=[]
+    if !FileExist(Path) {
+        Gui +OwnDialogs
+        MsgBox 0x40010, % script.name " - File not found",% "A required file containing the GUI definitions for the output formats does not exist under `n`n'" Path "`n`nThis script will only use the default options for any format not found in this file"
+        Arr:=PotentialOutputs ;; fallback to hardcoded default
+    } else {
+        FileRead FileString, % Path
+        Lines:=strsplit(FileString,"`r`n")
+        for _, Line in Lines {
+            if SubStr(LTrim(Line),1,1)=";" {
+                continue
+            }
+            if (Line="") {
+                continue
+            } else {
+                if (RegexMatch(Line,"m)^\S")) {
+                    Pos:=HasVal(PotentialOutputs,Line)
+                    PotentialOutputs.RemoveAt(Pos,1)
+                    Arr.push(Line)
+                }
+            }
+        }
+        for _, output_type in PotentialOutputs {
+            Arr.push(output_type)
+        }
+    }
+    return Arr
 }
 GCAutoSubmit() {
     global bAutoSubmitOTGUI:=True
