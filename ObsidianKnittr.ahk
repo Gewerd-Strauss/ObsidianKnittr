@@ -262,6 +262,7 @@ main() {
     NewContents:=processTags(NewContents,bRemoveHashTagFromTags)
     ttip("Processing Abstract",5)
     NewContents:=processAbstract(NewContents)
+    NewContents:=cleanLatexEnvironmentsforRMarkdown(NewContents)
     EL.Intermediary_Duration:=Codetimer_Log()
     EL.Intermediary_End:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
 
@@ -907,6 +908,7 @@ fTraySetup() {
 #Include <ObsidianHTML>
 #Include <writeFile>
 #Include <RScript>
+#Include <RMarkdown>
 #Include <RegexMatchAll>
 #Include <Deref>
 #Include <OnError>
