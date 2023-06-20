@@ -21,9 +21,9 @@ cleanLatexEnvironmentsforRMarkdown(String) {
         if (environment = "") {
             continue
         }
-        needle1 := "(?<TopFence>\${2,}\n*\\begin\{" environment "\*+\})[^\S\r\n]*"    ;; star, top                             works
+        needle1 := "(?<TopFence>\${2,}\s*\n*\\begin\{" environment "\*+\})[^\S\r\n]*"    ;; star, top                             works
         needle2 := "\\end\{" environment "\*+}(\n|\s)*(?<BotFence>\${2,})"                ;; star, bottom                      works
-        needle3 := "(?<TopFence>\${2,}\n*\\begin\{" environment "\})[^\S\r\n]*"       ;; no star, top                          works
+        needle3 := "(?<TopFence>\${2,}\s*\n*\\begin\{" environment "\})[^\S\r\n]*"       ;; no star, top                          works
         needle4 := "\\end\{" environment "\}(\n|\s)*(?<BotFence>\${2,})"                   ;; no star, bottom                  works
 
         Matches1 := RegexMatchAll(String, "im)" needle1)
