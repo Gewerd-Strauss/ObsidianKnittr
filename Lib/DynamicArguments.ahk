@@ -310,10 +310,36 @@ Class ot {
         onEscape:=ObjBindMethod(this,"otGUI_Escape2")
         Hotkey IfWinActive, % "ahk_id " otGUI_
         Hotkey Escape,% onEscape
-        if (x!="") && (y!="") {
-            gui ParamsGUI:Show,x%x% y%y%,% GUIName:=this.GUITitle this.type
+        guiWidth:=404
+        ;if (!x || (x="")) {
+        currentMonitor:=MWAGetMonitor()+0
+        SysGet MonCount, MonitorCount
+        if (MonCount>1) {
+            SysGet Mon, Monitor,% currentMonitor
+            SysGet MonW,MonitorWorkArea, % currentMonitor
         } else {
-            gui ParamsGUI:Show,,% GUIName:=this.GUITitle this.type
+            SysGet Mon, Monitor, 1
+            SysGet MonW,MonitorWorkArea, 1
+        }
+        MonWidth:=(MonLeft?MonLeft:MonRight)
+        MonWidth:=MonRight-MonLeft
+        if SubStr(MonWidth, 1,1)="-" {
+            MonWidth:=SubStr(MonWidth,2)
+        }
+        CoordModeMouse:=A_CoordModeMouse
+        CoordMode Mouse,Screen
+        MouseGetPos MouseX
+        CoordMode Mouse, %CoordModeMouse%
+        if ((x+guiWidth)>MonRight) {
+            x:=MonRight-guiWidth
+        } Else {
+            x:=MouseX
+        }
+        ;  }
+        if (x!="") && (y!="") {
+            gui ParamsGUI:Show,x%x% y%y% w%guiWidth%,% GUIName:=this.GUITitle this.type
+        } else {
+            gui ParamsGUI:Show,w%guiWidth%,% GUIName:=this.GUITitle this.type
         }
         WinWait % GUIName
         if this.SkipGUI {
