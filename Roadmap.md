@@ -8,3 +8,4 @@ FIXME: ObsidianHTML.ahk -> createTemporaryObsidianHTML_Config() -> Make the excl
 - [ ] add module to generate dynamic `.obsidian`-folders in an arbitrary root of the manuscript to speed up OHTML runtime
 - [ ] clean up todo list
 - [X] module for cleaning latex blocks to conform to RMD's janky standards.
+- [x] no TOC by default in word and word2 output as they take SO MUCH SPACE
