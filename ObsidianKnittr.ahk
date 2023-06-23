@@ -562,15 +562,20 @@ guiCreate() {
     }
     HistoryString:=""
     for each, File in script.config.DDLHistory {
-        SplitPath % File, , OutDir, , FileName
-        SplitPath % OutDir,OutFileName
-        HistoryString.=((each=1)?"":"|") FileName "(" OutFileName ")" " -<>- " File
-        if (each=1) {
-            HistoryString.="|"
+        if (FileExist(File)) {
+
+            SplitPath % File, , OutDir, , FileName
+            SplitPath % OutDir,OutFileName
+            HistoryString.=((each=1)?"":"|") FileName "(" OutFileName ")" " -<>- " File
+            if (each=1) {
+                HistoryString.="|"
+            }
+        } else {
+            script.config.DDLHistory.RemoveAt(each,1)
         }
     }
     Gui add, button, gChooseFile, &Choose Manuscript
-    DDLRows:=script.config.Config.HistoryLimit
+    DDLRows:=(script.config.Config.HistoryLimit>25?25:script.config.Config.HistoryLimit)
     gui add, DDL, w%WideControlWidth% vChosenFile hwndChsnFile r%DDLRows%, % HistoryString
     gui add, checkbox, vbConvertInsteadofRun, % "!!Use verb 'Convert' for OHTML-call?"
     gui add, checkbox, vbUseOwnOHTMLFork, % "!!!Use the personal fork? *CAUTION*"
