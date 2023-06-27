@@ -47,20 +47,14 @@ buildRScriptContent(Path,output_filename="",out="") {
         if Instr(format,"pdf_document") {
             continue
         }
+        Str3:=LTrim(Class.renderingpackage)
         if (format="") {
-            Str2=
-                (LTRIM
-
-                    rmarkdown::render(`"index.rmd`",NULL,`"%Name%"`)`n
-                )
+            Str3:=Strreplace(Str3,"%format%","NULL")
         } else {
-            Str2=
-                (LTRIM
-
-                    rmarkdown::render(`"index.rmd`",%format%,`"%Name%"`)`n
-                )
+            Str3:=Strreplace(Str3,"%format%",format)
         }
-        Str.=Str2
+        Str3:=Strreplace(Str3,"%Name%",Name)
+        Str.="`n`n" Str3
         FormatOptions.= A_Tab strreplace(format,"`n",A_Tab "`n") "`n`n"
     }
     for _, Class in out.Outputformats {
@@ -69,6 +63,13 @@ buildRScriptContent(Path,output_filename="",out="") {
 
             continue
         }
+        Str3:="`n" LTrim(Class.renderingpackage)
+        if (format="") {
+            Str3:=Strreplace(Str3,"%format%","NULL")
+        } else {
+            Str3:=Strreplace(Str3,"%format%",format)
+        }
+        Str3:=Strreplace(Str3,"%Name%",Name)
         Str2=
             (LTrim
                 files <- list.files(pattern="*.PNG",recursive = TRUE)
@@ -85,13 +86,9 @@ buildRScriptContent(Path,output_filename="",out="") {
                 rmarkdown::render(`"index.rmd`",%format%,`"%Name%"`)`n
             )
         if bFixPNGs {
-            Str2=
-                (LTrim
-
-                    rmarkdown::render(`"index.rmd`",%format%,`"%Name%"`)`n
-                )
+            ;Str2:="`n" Str3 "`n"
         }
-        Str.=Str2
+        Str.=Str3
         FormatOptions.= A_Tab strreplace(format,"`n",A_Tab "`n") "`n`n"
     }
     Str2=
