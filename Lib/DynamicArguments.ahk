@@ -176,7 +176,8 @@ Class ot {
             if Value.HasKey("Max") {
                 Value.Value:=Value.Max+0
             }
-            if Value.HasKey(Min) && Value.Min>Value.Value {
+            if Value.HasKey("Min") && Value.Min>Value.Value 
+            {
                 Value.Value:=Value.Min+0
             }
         }
