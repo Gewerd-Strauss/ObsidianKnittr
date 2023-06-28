@@ -113,6 +113,11 @@ Class ot {
         }
         this._Adjust()
         for Parameter, Value in this.Arguments {
+            if InStr(Parameter,"___") {
+                Parameter:="'" StrReplace(Parameter,"___", "-") "'"
+            } else if InStr(Parameter,"-") {
+                Parameter:="'" Parameter "'"
+            }
             if (Parameter="toc_depth" && !this.Arguments["toc"].Value) {
                 continue
             }
@@ -289,6 +294,9 @@ Class ot {
             gui Tab, % Tab,, Exact
             GuiControl Choose, vTab3, % Tab
             for Parameter, Value in this.Arguments {
+                if InStr(Parameter,"-") {
+                    Parameter:=strreplace(Parameter,"-","___") ;; fix "toc-depth"-like formatted parameters for quarto syntax when displaying. Three underscores are used to differentiate it from valid syntax for other packages.
+                }
                 if InStr(Parameter,"pandoc") {
 
 
