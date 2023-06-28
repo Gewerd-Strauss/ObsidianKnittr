@@ -28,7 +28,8 @@ Class ot {
         for _, Line in Lines {
             Count:=1
             p := 1
-            regex:="(?<Key>\w+\:)(?<Val>[^|]+)"
+            regex:="(?<Key>\w+\:)(?<Val>[^|]+)" ;; does not support keys a la 'toc-depth' (as required by quarto)
+            regex:="(?<Key>(\-|\w)+\:)(?<Val>[^|]+)"
             if (SubStr(Trim(Line),1,1)=";") {
                 continue
             }
@@ -41,7 +42,7 @@ Class ot {
                         matchKey:=SubStr(matchKey,1,StrLen(matchKey)-1) ;; remove the doublepoint.
                         if (Count<2) { ;; initiate Parameter-Object
                             if (InStr(Line,"renderingpackage")) {
-                                This.renderingpackage:=StrSplit(Line,"Value:").2
+                                This[matchKey]:=StrSplit(Line,"Value:").2
                                 p+=StrLen(Match)
                                 Count++
                                 continue
@@ -97,10 +98,18 @@ Class ot {
         return This
     }
     AssembleFormatString() {
-        if InStr(this.type,"::") { ;; start string
-            Str:=this.type "(`n" ;; check if format is from a specific package or not
+        if this.HasKey("renderingpackage_start") {
+            if !this.HasKey("renderingpackage_end") {
+                MsgBox 0x40031, % "output_type: " this.type " - faulty meta parameter", % "The meta parameter`n'renderingpackage_end'`ndoes not exist. Exiting. Please refer to documentation and fix the file 'DynamicArguments.ini'."
+            }
+            Str:=this.renderingpackage_start
         } else {
-            Str:="rmarkdown::" this.type "(`n"  ;; assume rmarkdown-package if not the case
+
+            if InStr(this.type,"::") { ;; start string
+                Str:=this.type "(`n" ;; check if format is from a specific package or not
+            } else {
+                Str:="rmarkdown::" this.type "(`n"  ;; assume rmarkdown-package if not the case
+            }
         }
         this._Adjust()
         for Parameter, Value in this.Arguments {
@@ -146,8 +155,11 @@ Class ot {
         }
         Str:=SubStr(Str,1,StrLen(Str)-2)
         Str.=(Instr(Str,"`n")?"`n)":"")
+        if InStr(Str,this.renderingpackage_start) {
+            Str:=strreplace(Str,"`n)",this.renderingpackage_end)
+        }
         this.AssembledFormatString:=Str
-        return Str
+        return
     }
 
     AdjustDDLs() {
@@ -349,7 +361,10 @@ Class ot {
                         if !Instr(Value.ctrlOptions,Value.Default "||") {
                             Value.ctrlOptions:=strreplace(Value.ctrlOptions,Value.ctrlOptions "|")
                         }
-                        gui ParamsGUI:add, % Value.Control, % " h30 vv" Parameter, % Value.ctrlOptions
+                        Threshold:=5
+                        Count:=st_count(Value.ctrlOptions,"|")-1
+                        shown_rows:=(Count>Threshold)?Threshold:st_count(Value.ctrlOptions,"|")-1
+                        gui ParamsGUI:add, % Value.Control, % "  vv" Parameter " r" shown_rows , % Value.ctrlOptions
                         ControlHeight+=75
                     } else {
                         gui ParamsGUI:add, % Value.Control, % Value.ctrlOptions " h30 vv" Parameter, % Value.String
@@ -523,7 +538,9 @@ Class ot {
         gui ParamsGui: destroy
         for Parameter,_ in this.Arguments {
             ;@ahk-neko-ignore 1 line; at 4/28/2023, 9:49:42 AM ; https://github.com/CoffeeChaton/vscode-autohotkey-NekoHelp/blob/main/note/code107.md
+            parameter:=strreplace(parameter,"-","___")
             k=v%Parameter% ;; i know this is jank, but I can't seem to fix it. just don't touch for now?
+            parameter:=strreplace(parameter,"___","-")
             a:=%k%
             this["Arguments",Parameter].Value:=a
         }
