@@ -288,7 +288,7 @@ Class ot {
             }
         }
         gui add, Tab3, vvTab3 h900 w400, % Tab3String
-        gui show, % "y0 x" A_ScreenWidth-500
+        ;gui show, % "y0 x" A_ScreenWidth-500
         for Tab, Object in TabHeaders {
             TabHeight:=0
             gui Tab, % Tab,, Exact
@@ -319,7 +319,7 @@ Class ot {
                                 GuiControl Move, vTab3, % "h" TabHeight + ControlHeight + 16
                                 TabHeight+=ControlHeight
                                 GuiControl Move, vTab3, % "h" TabHeight + 16
-                                gui show
+                                ;gui show
                                 continue
                             }
                         }
@@ -393,17 +393,17 @@ Class ot {
 
                         GuiControl Move, vTab3, % "h" TabHeight + ControlHeight + 16
                     }
-                    TabHeight+=ControlHeight
+                    TabHeight+=ControlHeight + 3
                 }
                 GuiControl Move, vTab3, % "h" TabHeight + 32
-                gui show
+                ;gui show
             }
             TabHeaders[Tab].Height+=TabHeight+=32
         }
         maxTabHeight:=0
         for _, Tab in TabHeaders {
             if (Tab.Height>maxTabHeight) {
-                maxTabHeight:=Tab.Height
+                maxTabHeight:=Tab.Height + 16
             }
         }
         /*
@@ -471,7 +471,7 @@ Class ot {
         ;guicontrol hide,vTab3
         ttip(maxTabHeight)
         maxTabHeight+=25
-        gui show,
+        ;gui show,
         GuiControl Choose, vTab3, 1
         gui Tab
         gui add, button,y%maxTabHeight% xp hwndSubmitButton,&Submit
