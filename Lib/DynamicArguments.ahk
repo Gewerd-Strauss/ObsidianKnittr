@@ -251,67 +251,207 @@ Class ot {
 
         gui ParamsGUI: new, +AlwaysOnTop -SysMenu -ToolWindow +caption +Border +LabelotGUI_ +hwndotGUI_
         gui font, s8
+        TabHeaders:={}
+        for Parameter, Value in this.Arguments {
+            if Value.HasKey("Tab3Parent") {
 
-        for Parameter,Value in this.Arguments {
-            Control:=Value.Control
-            if (Options="") {
-                Options:=""
-            }
-            if (Value.Control="Edit") {
-                gui ParamsGUI: add, text,, % Value.String
-                if (Value.ctrlOptions="Number") {
-                    if (Value.Max!="") && (Value.Min!="") {
-                        Value.ctrlOptions.= A_Space
-                        Gui ParamsGUI:Add, Edit
-                        gui ParamsGUI:add, UpDown, % "h25 w80 Range" Value.Min "-" Value.Max " vv" Parameter, % Value.Default + 0
-                        continue
-                    }
-                }
-                if !RegexMatch(Value.ctrlOptions,"w\d*") {
-                    Value.ctrlOptions.= " w120"
-                }
-                gui ParamsGUI: add, % Value.Control, % Value.ctrlOptions " vv" Parameter, % (Value.Value="NULL"?:Value.Value)
-            } else if (Value.Control="File") {
-                gui ParamsGUI:Add, Text,, % Value.String
-                gui ParamsGUI:Add, edit, % Value.ctrlOptions " vv" Parameter " disabled w200", % Value.Value
-                Gui ParamsGUI:Add, button, hwndSelectFile, % "Select &File"
-                gui ParamsGUI:add, button, yp xp+77 hwndOpenFileSelectionFolder, % "Open File Selection Folder"
-                onOpenFileSelectionFolder:=ObjBindMethod(this, "OpenFileSelectionFolder", Value.SearchPath)
-                onSelectFile := ObjBindMethod(this, "ChooseFile",Parameter)
-                GuiControl ParamsGUI:+g, %SelectFile%, % onSelectFile
-                GuiControl ParamsGUI:+g, %OpenFileSelectionFolder%, % onOpenFileSelectionFolder
-                gui ParamsGUI:add,text, w0 h0 yp+20 xp-77
-            } else if (Value.Control="DDL") {
-                gui ParamsGUI:Add, Text,, % Value.String
-                if Instr(Value.ctrlOptions,",") && !Instr(Value.ctrlOptions,"|") {
-                    Value.ctrlOptions:=strreplace(Value.ctrlOptions,",","|")
-                }
-                if !Instr(Value.ctrlOptions,Value.Default) {
-                    Value.ctrlOptions.=((SubStr(Value.ctrlOptions,-1)="|")?"":"|") Value.Default
-                }
-                if !Instr(Value.ctrlOptions,Value.Default "|") {
-                    Value.ctrlOptions:=strreplace(Value.ctrlOptions,Value.Default,Value.Default "|")
-                }
-                if !Instr(Value.ctrlOptions,Value.Default "||") {
-                    Value.ctrlOptions:=strreplace(Value.ctrlOptions,Value.Default,Value.Default "|")
-                }
-                if !Instr(Value.ctrlOptions,Value.Default "||") {
-                    Value.ctrlOptions:=strreplace(Value.ctrlOptions,Value.ctrlOptions "|")
-                }
-                gui ParamsGUI:add, % Value.Control, % " vv" Parameter, % Value.ctrlOptions
+                TabHeaders[Value.Tab3Parent]:={Height:0}
             } else {
-                gui ParamsGUI:add, % Value.Control, % Value.ctrlOptions " vv" Parameter, % Value.String
-            }
-            if (Value.Control="Checkbox") {
-                ;@ahk-neko-ignore-fn 1 line; at 4/28/2023, 9:49:09 AM ; case sensitivity
-                guicontrol % "ParamsGUI:",v%Parameter%, % Value.Default
-            }
-
-            if (Control="Edit") {
-                ; V.String:=tmp
+                this.Arguments[Parameter,"Tab3Parent"]:="Other"
+                TabHeaders[Value.Tab3Parent]:={Height:0}
             }
         }
-        gui add, button,hwndSubmitButton,&Submit
+        Tab3String:=""
+        ind:=0
+        for Header,_  in TabHeaders {
+            Tab3String.=Header
+            ind++
+            if (ind<TabHeaders.Count()) || (ind=1) {
+                Tab3String.="|"
+            }
+        }
+        gui add, Tab3, vvTab3 h900 w400, % Tab3String
+        gui show, % "y0 x" A_ScreenWidth-500
+        for Tab, Object in TabHeaders {
+            TabHeight:=0
+            gui Tab, % Tab,, Exact
+            GuiControl Choose, vTab3, % Tab
+            for Parameter, Value in this.Arguments {
+                if InStr(Parameter,"pandoc") {
+
+
+                }
+                ControlHeight:=0
+                if (Tab=Value.Tab3Parent) {
+                    Control:=Value.Control
+                    if (Options="") {
+                        Options:=""
+                    }
+                    if (Value.Control="Edit") {
+                        gui ParamsGUI: add, text,h20, % Value.String
+                        ControlHeight+=20
+                        if (Value.ctrlOptions="Number") {
+                            if (Value.Max!="") && (Value.Min!="") {
+                                Value.ctrlOptions.= A_Space
+                                Gui ParamsGUI:Add, Edit,
+                                gui ParamsGUI:add, UpDown, % "h20 w80 Range" Value.Min "-" Value.Max " vv" Parameter, % Value.Default + 0
+                                ControlHeight+=20
+                                GuiControl Move, vTab3, % "h" TabHeight + ControlHeight + 16
+                                TabHeight+=ControlHeight
+                                GuiControl Move, vTab3, % "h" TabHeight + 16
+                                gui show
+                                continue
+                            }
+                        }
+                        if !RegexMatch(Value.ctrlOptions,"w\d*") {
+                            Value.ctrlOptions.= " w120"
+                        }
+                        if RegexMatch(Value.ctrlOptions,"h(?<vH>\d*)",v) {
+                            ControlHeight+=vvH + 15
+                        } else if !RegexMatch(Value.ctrlOptions,"h(?<vH>\d*)",v) {
+                            Value.ctrlOptions.= " h35"
+                            ControlHeight+=35
+                        }
+                        gui ParamsGUI: add, % Value.Control, % Value.ctrlOptions " vv" Parameter, % (Value.Value="NULL"?:Value.Value)
+                        ;GuiControl Move, vTab3, % "h" TabHeight
+                    } else if (Value.Control="File") {
+                        gui ParamsGUI:Add, Text,TabHeight+20, % Value.String
+                        ControlHeight+=20
+                        ;GuiControl Move, vTab3, % "h" TabHeight + ControlHeight
+                        gui ParamsGUI:Add, edit, % Value.ctrlOptions " vv" Parameter " disabled w200 yp+30 h60", % Value.Value
+                        ControlHeight+=90
+                        ;GuiControl Move, vTab3, % "h" TabHeight + ControlHeight
+                        Gui ParamsGUI:Add, button, yp+70 hwndSelectFile, % "Select &File"
+                        ControlHeight+=30
+                        ;GuiControl Move, vTab3, % "h" TabHeight + ControlHeight
+                        gui ParamsGUI:add, button, yp xp+77 hwndOpenFileSelectionFolder, % "Open File Selection Folder"
+                        onOpenFileSelectionFolder:=ObjBindMethod(this, "OpenFileSelectionFolder", Value.SearchPath)
+                        onSelectFile := ObjBindMethod(this, "ChooseFile",Parameter)
+                        GuiControl ParamsGUI:+g, %SelectFile%, % onSelectFile
+                        GuiControl ParamsGUI:+g, %OpenFileSelectionFolder%, % onOpenFileSelectionFolder
+                        gui ParamsGUI:add,text, w0 h0 yp+20 xp-77
+                        ControlHeight+=20
+                        GuiControl Move, vTab3, % "h" TabHeight + ControlHeight
+                    } else if (Value.Control="DDL") {
+                        gui ParamsGUI:Add, Text,h20, % Value.String
+                        if Instr(Value.ctrlOptions,",") && !Instr(Value.ctrlOptions,"|") {
+                            Value.ctrlOptions:=strreplace(Value.ctrlOptions,",","|")
+                        }
+                        if !Instr(Value.ctrlOptions,Value.Default) {
+                            Value.ctrlOptions.=((SubStr(Value.ctrlOptions,-1)="|")?"":"|") Value.Default
+                        }
+                        if !Instr(Value.ctrlOptions,Value.Default "|") {
+                            Value.ctrlOptions:=strreplace(Value.ctrlOptions,Value.Default,Value.Default "|")
+                        }
+                        if !Instr(Value.ctrlOptions,Value.Default "||") {
+                            Value.ctrlOptions:=strreplace(Value.ctrlOptions,Value.Default,Value.Default "|")
+                        }
+                        if !Instr(Value.ctrlOptions,Value.Default "||") {
+                            Value.ctrlOptions:=strreplace(Value.ctrlOptions,Value.ctrlOptions "|")
+                        }
+                        gui ParamsGUI:add, % Value.Control, % " h30 vv" Parameter, % Value.ctrlOptions
+                        ControlHeight+=75
+                    } else {
+                        gui ParamsGUI:add, % Value.Control, % Value.ctrlOptions " h30 vv" Parameter, % Value.String
+                        ControlHeight+=30
+                    }
+                    if (Value.Control="Checkbox") {
+                        ;@ahk-neko-ignore-fn 1 line; at 4/28/2023, 9:49:09 AM ; case sensitivity
+                        guicontrol % "ParamsGUI:",v%Parameter%, % Value.Default
+                    }
+
+                    if (Control="Edit") {
+                        ; V.String:=tmp
+                    }
+                    if InStr(Parameter,"pandoc") {
+                        GuiControl Move, vTab3, % "h" TabHeight + ControlHeight
+
+                    } else {
+
+                        GuiControl Move, vTab3, % "h" TabHeight + ControlHeight + 16
+                    }
+                    TabHeight+=ControlHeight
+                }
+                GuiControl Move, vTab3, % "h" TabHeight + 32
+                gui show
+            }
+            TabHeaders[Tab].Height+=TabHeight+=32
+        }
+        maxTabHeight:=0
+        for _, Tab in TabHeaders {
+            if (Tab.Height>maxTabHeight) {
+                maxTabHeight:=Tab.Height
+            }
+        }
+        /*
+        for Parameter,Value in this.Arguments {
+        Control:=Value.Control
+        if (Options="") {
+        Options:=""
+        }
+        if (Value.Control="Edit") {
+        gui ParamsGUI: add, text,, % Value.String
+        if (Value.ctrlOptions="Number") {
+        if (Value.Max!="") && (Value.Min!="") {
+        Value.ctrlOptions.= A_Space
+        Gui ParamsGUI:Add, Edit
+        gui ParamsGUI:add, UpDown, % "h25 w80 Range" Value.Min "-" Value.Max " vv" Parameter, % Value.Default + 0
+        continue
+        }
+        }
+        if !RegexMatch(Value.ctrlOptions,"w\d*") {
+        Value.ctrlOptions.= " w120"
+        }
+        gui ParamsGUI: add, % Value.Control, % Value.ctrlOptions " vv" Parameter, % (Value.Value="NULL"?:Value.Value)
+        } else if (Value.Control="File") {
+        gui ParamsGUI:Add, Text,, % Value.String
+        gui ParamsGUI:Add, edit, % Value.ctrlOptions " vv" Parameter " disabled w200", % Value.Value
+        Gui ParamsGUI:Add, button, hwndSelectFile, % "Select &File"
+        gui ParamsGUI:add, button, yp xp+77 hwndOpenFileSelectionFolder, % "Open File Selection Folder"
+        onOpenFileSelectionFolder:=ObjBindMethod(this, "OpenFileSelectionFolder", Value.SearchPath)
+        onSelectFile := ObjBindMethod(this, "ChooseFile",Parameter)
+        GuiControl ParamsGUI:+g, %SelectFile%, % onSelectFile
+        GuiControl ParamsGUI:+g, %OpenFileSelectionFolder%, % onOpenFileSelectionFolder
+        gui ParamsGUI:add,text, w0 h0 yp+20 xp-77
+        } else if (Value.Control="DDL") {
+        gui ParamsGUI:Add, Text,, % Value.String
+        if Instr(Value.ctrlOptions,",") && !Instr(Value.ctrlOptions,"|") {
+        Value.ctrlOptions:=strreplace(Value.ctrlOptions,",","|")
+        }
+        if !Instr(Value.ctrlOptions,Value.Default) {
+        Value.ctrlOptions.=((SubStr(Value.ctrlOptions,-1)="|")?"":"|") Value.Default
+        }
+        if !Instr(Value.ctrlOptions,Value.Default "|") {
+        Value.ctrlOptions:=strreplace(Value.ctrlOptions,Value.Default,Value.Default "|")
+        }
+        if !Instr(Value.ctrlOptions,Value.Default "||") {
+        Value.ctrlOptions:=strreplace(Value.ctrlOptions,Value.Default,Value.Default "|")
+        }
+        if !Instr(Value.ctrlOptions,Value.Default "||") {
+        Value.ctrlOptions:=strreplace(Value.ctrlOptions,Value.ctrlOptions "|")
+        }
+        gui ParamsGUI:add, % Value.Control, % " vv" Parameter, % Value.ctrlOptions
+        } else {
+        gui ParamsGUI:add, % Value.Control, % Value.ctrlOptions " vv" Parameter, % Value.String
+        }
+        if (Value.Control="Checkbox") {
+        ;@ahk-neko-ignore-fn 1 line; at 4/28/2023, 9:49:09 AM ; case sensitivity
+        guicontrol % "ParamsGUI:",v%Parameter%, % Value.Default
+        }
+
+        if (Control="Edit") {
+        ; V.String:=tmp
+        }
+        }
+        */
+        GuiControl Move, vTab3, % "h" maxTabHeight
+        ;guicontrol hide,vTab3
+        ttip(maxTabHeight)
+        maxTabHeight+=25
+        gui show,
+        GuiControl Choose, vTab3, 1
+        gui Tab
+        gui add, button,y%maxTabHeight% xp hwndSubmitButton,&Submit
         onSubmit:=ObjBindMethod(this, "SubmitDynamicArguments")
         GuiControl ParamsGUI:+g,%SubmitButton%, % onSubmit
         gui add, button, yp xp+60 hwndEditConfig, Edit Configuration
@@ -320,7 +460,8 @@ Class ot {
         onEscape:=ObjBindMethod(this,"otGUI_Escape2")
         Hotkey IfWinActive, % "ahk_id " otGUI_
         Hotkey Escape,% onEscape
-        guiWidth:=404
+        guiWidth:=418
+        guiHeight:=maxTabHeight+40
         ;if (!x || (x="")) {
         currentMonitor:=MWAGetMonitor()+0
         SysGet MonCount, MonitorCount
@@ -347,9 +488,9 @@ Class ot {
         }
         ;  }
         if (x!="") && (y!="") {
-            gui ParamsGUI:Show,x%x% y%y% w%guiWidth%,% GUIName:=this.GUITitle this.type
+            gui ParamsGUI:Show,x%x% y%y% w%guiWidth% h%guiHeight%,% GUIName:=this.GUITitle this.type
         } else {
-            gui ParamsGUI:Show,w%guiWidth%,% GUIName:=this.GUITitle this.type
+            gui ParamsGUI:Show,w%guiWidth% h%guiHeight%,% GUIName:=this.GUITitle this.type
         }
         WinWait % GUIName
         if this.SkipGUI {
