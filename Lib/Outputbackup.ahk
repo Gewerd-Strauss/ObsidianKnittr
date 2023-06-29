@@ -12,7 +12,12 @@ backupOutput(Path, manuscriptName, out) {
                 FileSuffix:=strsplit(FileSuffix,"::").2
             }
         }
-        Output_File:=OutputRoot "\" Name "." FileSuffix
+        package:=out.Outputformats[output_type].package
+        if (package!="") {
+            Output_File:=OutputRoot "\" Name " (" package ")." FileSuffix
+        } else {
+            Output_File:=OutputRoot "\" Name "." FileSuffix
+        }
         BackupDirectory:=OutputRoot "\Old_Versions"
 
         if !InStr(FileExist(BackupDirectory),"D") {
@@ -34,7 +39,11 @@ backupOutput(Path, manuscriptName, out) {
                     FileCreateDir % BackupDirectory "\" MT
                 }
             }
-            FileCopy % Output_File, % BackupDirectory "\" MT "\" Name "." FileSuffix
+            if (package!="") {
+                FileCopy % Output_File, % BackupDirectory "\" MT "\" Name " (" package ")." FileSuffix
+            } else {
+                FileCopy % Output_File, % BackupDirectory "\" MT "\" Name "." FileSuffix
+            }
             Copied++
         } else {
 
