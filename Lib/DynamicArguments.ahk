@@ -385,7 +385,7 @@ Class ot {
                         gui ParamsGUI:add,text, w0 h0 yp+20 xp-77
                         ControlHeight+=20
                         GuiControl Move, vTab3, % "h" TabHeight + ControlHeight
-                    } else if (Value.Control="DDL") {
+                    } else if (Value.Control="DDL") || (Value.Control="ComboBox") {
                         gui ParamsGUI:Add, Text,h20, % Value.String
                         if Instr(Value.ctrlOptions,",") && !Instr(Value.ctrlOptions,"|") {
                             Value.ctrlOptions:=strreplace(Value.ctrlOptions,",","|")
