@@ -441,7 +441,7 @@ Class ot {
                 continue
             }
             if (Tab.Height>maxTabHeight) {
-                maxTabHeight:=Tab.Height + 16
+                maxTabHeight:=Tab.Height + 80
             }
         }
         /*
