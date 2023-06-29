@@ -113,6 +113,9 @@ Class ot {
         }
         this._Adjust()
         for Parameter, Value in this.Arguments {
+            if Value.Control="meta" {
+                continue
+            }
             if InStr(Parameter,"___") {
                 Parameter:="'" StrReplace(Parameter,"___", "-") "'"
             } else if InStr(Parameter,"-") {
@@ -157,6 +160,12 @@ Class ot {
 
             }
             Str.= Parameter " = " Value.Value ",`n"
+        }
+        for Parameter, Value in this.Arguments {
+            if Value.Control="meta" {
+                this.Arguments.Remove(Parameter)
+                continue
+            }
         }
         Str:=SubStr(Str,1,StrLen(Str)-2)
         Str.=(Instr(Str,"`n")?"`n)":"")
@@ -280,20 +289,44 @@ Class ot {
         }
         Tab3String:=""
         ind:=0
+        HiddenHeaders:={}
         for Header,_  in TabHeaders {
-            Tab3String.=Header
-            ind++
-            if (ind<TabHeaders.Count()) || (ind=1) {
-                Tab3String.="|"
+            HeaderFound:=false
+            for Parameter, Value in this.Arguments {
+                if (Value.Tab3Parent=Header) {
+                    if Value.Control!="meta" {
+
+                        HeaderFound:=true
+                        HiddenHeaders[Header]:=false
+                        break
+                    } else {
+                        HiddenHeaders[Header]:=true
+                    }
+                }
+            }
+            if (HeaderFound) {
+
+                Tab3String.=Header
+                ind++
+                if (ind<TabHeaders.Count()) || (ind=1) {
+                    Tab3String.="|"
+                }
             }
         }
         gui add, Tab3, vvTab3 h900 w400, % Tab3String
         ;gui show, % "y0 x" A_ScreenWidth-500
         for Tab, Object in TabHeaders {
+            if HiddenHeaders[Tab] {
+                continue
+            }
             TabHeight:=0
             gui Tab, % Tab,, Exact
             GuiControl Choose, vTab3, % Tab
             for Parameter, Value in this.Arguments {
+                if Value.Control="meta" {
+                    this[Parameter]:=Value.Value
+                    continue
+                }
                 if InStr(Parameter,"-") {
                     Parameter:=strreplace(Parameter,"-","___") ;; fix "toc-depth"-like formatted parameters for quarto syntax when displaying. Three underscores are used to differentiate it from valid syntax for other packages.
                 }
@@ -402,6 +435,9 @@ Class ot {
         }
         maxTabHeight:=0
         for _, Tab in TabHeaders {
+            if HiddenHeaders[Tab] {
+                continue
+            }
             if (Tab.Height>maxTabHeight) {
                 maxTabHeight:=Tab.Height + 16
             }
