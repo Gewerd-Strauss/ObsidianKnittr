@@ -403,8 +403,10 @@ Class ot {
                             Value.ctrlOptions:=strreplace(Value.ctrlOptions,Value.ctrlOptions "|")
                         }
                         Threshold:=5
-                        Count:=st_count(Value.ctrlOptions,"|")-1
-                        shown_rows:=(Count>Threshold)?Threshold:st_count(Value.ctrlOptions,"|")-1
+                        tmpctrlOptions:=LTrim(RTrim(strreplace(Value.ctrlOptions,"||","|"),"|"),"|")
+                        tmpctrlOptions_arr:=strsplit(tmpctrlOptions,"|")
+                        Count:=tmpctrlOptions_arr.Count()
+                        shown_rows:=(Count<=1?1:(Count>Threshold?Threshold:Count))
                         gui ParamsGUI:add, % Value.Control, % "  vv" Parameter " r" shown_rows , % Value.ctrlOptions
                         ControlHeight+=75
                     } else {
