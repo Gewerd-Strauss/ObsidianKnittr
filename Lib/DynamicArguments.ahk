@@ -127,7 +127,7 @@ Class ot {
             if (Value.Type="String") && (Value.Value!="") && (Value.Default!="NULL") {
                 Value.Value:=DA_Quote(Value.Value)
             }
-            if (Parameter="reference_docx") {
+            if (InStr(Parameter,"reference_docx") || InStr(Parameter,"reference-doc"))  {
                 ParamBackup:=Value.Value
                 if Instr(Value.Value,this.DDL_ParamDelimiter) {
                     ParamString:=strsplit(Value.Value,this.DDL_ParamDelimiter).2
