@@ -42,6 +42,9 @@ buildRScriptContent(Path,output_filename="",out="") {
     }
     Name:=(output_filename!=""?output_filename:"index")
         , FormatOptions:=""
+    for _, Class in out.Outputformats { 
+        Class.FilenameMod:=" (" Class.package ")"
+    }
     for _,Class in out.Outputformats {
         format:=Class.AssembledFormatString
         if Instr(format,"pdf_document") {
@@ -53,7 +56,7 @@ buildRScriptContent(Path,output_filename="",out="") {
         } else {
             Str3:=Strreplace(Str3,"%format%",format)
         }
-        Str3:=Strreplace(Str3,"%Name%",Name)
+        Str3:=Strreplace(Str3,"%Name%",Name Class.FilenameMod)
         Str.="`n`n" Str3
         FormatOptions.= A_Tab strreplace(format,"`n",A_Tab "`n") "`n`n"
     }
