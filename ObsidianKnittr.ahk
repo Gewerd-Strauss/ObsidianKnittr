@@ -262,7 +262,6 @@ main() {
     NewContents:=processTags(NewContents,bRemoveHashTagFromTags)
     ttip("Processing Abstract",5)
     NewContents:=processAbstract(NewContents)
-    NewContents:=cleanLatexEnvironmentsforRMarkdown(NewContents)
     for _, format in out.Outputformats {                        ;; rmd → qmd conversion
         if (format.package="quarto") {
             qmdContents:=convertToQMD(NewContents)
@@ -271,6 +270,7 @@ main() {
             break                                               ;; if a format is of quarto, run the quarto-conversion once, then continue on.
         }
     }
+    NewContents:=cleanLatexEnvironmentsforRMarkdown(NewContents)
     EL.Intermediary_Duration:=Codetimer_Log()
     EL.Intermediary_End:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
 
