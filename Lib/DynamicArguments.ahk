@@ -170,7 +170,10 @@ Class ot {
         Str:=SubStr(Str,1,StrLen(Str)-2)
         Str.=(Instr(Str,"`n")?"`n)":"")
         if InStr(Str,this.renderingpackage_start) {
-            Str:=strreplace(Str,"`n)",this.renderingpackage_end)
+            if this.HasKey("renderingpackage_end") {
+
+                Str:=strreplace(Str,"`n)",this.renderingpackage_end)
+            }
         }
         this.AssembledFormatString:=Str
         return
