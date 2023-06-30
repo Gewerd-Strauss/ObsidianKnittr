@@ -51,10 +51,14 @@ buildRScriptContent(Path,output_filename="",out="") {
             continue
         }
         Str3:=LTrim(Class.renderingpackage)
-        if (format="") {
-            Str3:=Strreplace(Str3,"%format%","NULL")
+        if (Str3!="") {
+            if (format="") {
+                Str3:=Strreplace(Str3,"%format%","NULL")
+            } else {
+                Str3:=Strreplace(Str3,"%format%",format)
+            }
         } else {
-            Str3:=Strreplace(Str3,"%format%",format)
+            Str3:=format
         }
         Str3:=Strreplace(Str3,"%Name%",Name Class.FilenameMod)
         Str.="`n`n" Str3
