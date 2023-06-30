@@ -301,7 +301,7 @@ main() {
             ttip("Executing R-BuildScript",5)
         }
         if bBackupOutput {
-            BackupDirectory:=backupOutput(rmd_Path,manuscriptName,out)
+            BackupDirectory:=backupOutput(rmd_Path,out)
         }
         if script.config.config.backupCount {
             limitBackups(BackupDirectory,script.config.config.backupCount)
@@ -555,7 +555,9 @@ processTags(Contents,bRemoveHashTagFromTags) {
 guiCreate() {
     global
     gui destroy
-    PotentialOutputs:=getDefinedOutputFormats(A_ScriptDir "\INI-Files\DynamicArguments.ini")
+    ret:=getDefinedOutputFormats(A_ScriptDir "\INI-Files\DynamicArguments.ini")
+    PotentialOutputs:=ret[1]
+    filesuffixes:=ret[2]
     Gui Margin, 16, 16
     Gui +AlwaysOnTop -SysMenu -ToolWindow -caption +Border +LabelGC +hwndOKGui
     Gui Color, 1d1f21, 373b41,
@@ -633,11 +635,12 @@ guiCreate() {
         guicontrol,, bStripLocalMarkdownLinks, % (script.config.LastRun.bStripLocalMarkdownLinks)
         guicontrol,, bUseOwnOHTMLFork, % (script.config.LastRun.UseOwnOHTMLFork)
     }
-    return
+    return filesuffixes
 }
 getDefinedOutputFormats(Path) {
     PotentialOutputs:=["bookdown::word_document2", "html_document", "bookdown::html_document2", "word_document", "pdf_document", "bookdown::pdf_document2", "First in YAML", "odt_document", "rtf_document", "md_document", "powerpoint_presentation", "ioslides_presentation", "tufte::tufte_html", "github_document", "All"]
     Arr:=[]
+    filesuffixes:=[]
     if !FileExist(Path) {
         Gui +OwnDialogs
         MsgBox 0x40010, % script.name " - File not found",% "A required file containing the GUI definitions for the output formats does not exist under `n`n'" Path "`n`nThis script will only use the default options for any format not found in this file"
@@ -645,6 +648,7 @@ getDefinedOutputFormats(Path) {
     } else {
         FileRead FileString, % Path
         Lines:=strsplit(FileString,"`r`n")
+        bFindSuffix:=false
         for _, Line in Lines {
             if SubStr(LTrim(Line),1,1)=";" {
                 continue
@@ -656,6 +660,12 @@ getDefinedOutputFormats(Path) {
                     Pos:=HasVal(PotentialOutputs,Line)
                     PotentialOutputs.RemoveAt(Pos,1)
                     Arr.push(Line)
+                    bFindSuffix:=true
+                }
+            }
+            if (bFindSuffix) {
+                if InStr(Line, "filesuffix:Meta") {
+                    filesuffixes[Arr[Arr.MaxIndex()]]:=strsplit(Line,"Value:").2
                 }
             }
         }
@@ -663,7 +673,7 @@ getDefinedOutputFormats(Path) {
             Arr.push(output_type)
         }
     }
-    return Arr
+    return [Arr,filesuffixes]
 }
 GCAutoSubmit() {
     global bAutoSubmitOTGUI:=True
@@ -672,7 +682,7 @@ GCAutoSubmit() {
 
 guiShow() {
     global
-    guiCreate()
+    filesuffixes:=guiCreate()
     x:=(script.config.GuiPositioning.X!=""?script.config.GuiPositioning.X:200)
     y:=(script.config.GuiPositioning.Y!=""?script.config.GuiPositioning.Y:200)
     bAutoSubmitOTGUI:=false
@@ -745,7 +755,8 @@ guiShow() {
                     ,"bRestrictOHTMLScope":bRestrictOHTMLScope + 0
                     ,"bStripLocalMarkdownLinks":bStripLocalMarkdownLinks + 0
                     ,"bUseOwnOHTMLFork":bUseOwnOHTMLFork + 0}
-                ,"Outputformats":Outputformats}
+                ,"Outputformats":Outputformats
+                ,"filesuffixes":filesuffixes}
     } Else {
         ExitApp
     }
