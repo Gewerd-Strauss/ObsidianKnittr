@@ -263,6 +263,14 @@ main() {
     ttip("Processing Abstract",5)
     NewContents:=processAbstract(NewContents)
     NewContents:=cleanLatexEnvironmentsforRMarkdown(NewContents)
+    for _, format in out.Outputformats {                        ;; rmd → qmd conversion
+        if (format.package="quarto") {
+            qmdContents:=convertToQMD(NewContents)
+            qmd_Path:=strreplace(rmd_Path,".rmd",".qmd")
+            Clipboard:=qmdContents
+            break                                               ;; if a format is of quarto, run the quarto-conversion once, then continue on.
+        }
+    }
     EL.Intermediary_Duration:=Codetimer_Log()
     EL.Intermediary_End:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
 
@@ -270,6 +278,9 @@ main() {
     EL.RScriptExecution_Start:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
     Codetimer_Log()
     writeFile(rmd_Path,NewContents,"UTF-8",,true)
+    if (qmd_Path!="") {
+        writeFile(qmd_Path,qmdContents,"UTF-8",,true)
+    }
     ttip("Creating R-BuildScript",5)
     sleep 200
     if bKeepFilename {
@@ -921,3 +932,4 @@ fTraySetup() {
 #Include <Log>
 #Include <Outputbackup>
 #Include <TemporaryObsidianVaultRoot>
+#Include <Quarto>
