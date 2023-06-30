@@ -44,6 +44,7 @@ buildRScriptContent(Path,output_filename="",out="") {
         , FormatOptions:=""
     for _, Class in out.Outputformats { 
         Class.FilenameMod:=" (" Class.package ")"
+        Class.Filename:=Name
     }
     for _,Class in out.Outputformats {
         format:=Class.AssembledFormatString
@@ -64,7 +65,8 @@ buildRScriptContent(Path,output_filename="",out="") {
         Str.="`n`n" Str3
         FormatOptions.= A_Tab strreplace(format,"`n",A_Tab "`n") "`n`n"
     }
-    for _, Class in out.Outputformats {
+    ;; pdf handling
+    for _, Class in out.Outputformats { 
         format:=Class.AssembledFormatString
         if !Instr(format,"pdf_document") {
 
@@ -108,7 +110,7 @@ buildRScriptContent(Path,output_filename="",out="") {
             print(all_times)
         )
     Str.=Str2
-    return [Str,FormatOptions]
+    return [Str,FormatOptions,RScriptFolder]
 
 }
 
