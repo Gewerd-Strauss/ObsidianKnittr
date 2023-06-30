@@ -288,6 +288,9 @@ main() {
     } else {
         tmp:=buildRScriptContent(rmd_Path,,out)
     }
+    if (qmd_Path!="") {
+        tmp.1:=modifyQuartobuildscript(tmp.1,tmp.3,out)
+    }
     script_contents:=tmp.1
     format:=tmp.2
     if bRenderRMD {
