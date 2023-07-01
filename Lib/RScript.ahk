@@ -17,7 +17,7 @@ buildRScriptContent(Path,output_filename="",out="") {
             getwd()
             sprintf('Chosen Output formats:')
             %OutputType_Print%
-
+            version
         )
     if out.settings.bForceFixPNGFiles {
         Str2=
