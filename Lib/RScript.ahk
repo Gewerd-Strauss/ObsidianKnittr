@@ -72,7 +72,7 @@ buildRScriptContent(Path,output_filename="",out="") {
 
             continue
         }
-        Str3:="`n" LTrim(Class.renderingpackage)
+        Str3:="`n`n`n`n" LTrim(Class.renderingpackage)
         if (format="") {
             Str3:=Strreplace(Str3,"%format%","NULL")
         } else {
@@ -92,6 +92,10 @@ buildRScriptContent(Path,output_filename="",out="") {
                 magick::image_write(png_image,Path)
                 sprintf( "Fixed Path '`%s'", Path)
                 })
+
+
+
+
                 rmarkdown::render(`"index.rmd`",%format%,`"%Name%"`)`n
             )
         if bFixPNGs {
