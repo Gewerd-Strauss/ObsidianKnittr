@@ -5,6 +5,7 @@ return
 
 convertToQMD(String) {
     String:=convertBookdownToQuartoReferencing(String)
+    String:=convertMermaidCodeblocks(String)
     String:=modifyEquationReferences(String)
     return String
 }
@@ -17,7 +18,6 @@ modifyEquationReferences(String) {
         Trimmed:=Trim(Line)
         if InStr(Trimmed,"$$") && !inEquation { 
             inEquation:=true
-            Rebuild.=Line "`n"
         } else if !InStr(Trimmed,"$$") && !inEquation {
             inEquation:=false
             Label:=""
@@ -35,10 +35,11 @@ modifyEquationReferences(String) {
         {
             inEquation:=true
             Line:=strreplace(Line,vFullString)
-            Rebuild.=Line "`n"
             Label:=vEQLabel
         }
         if (inEquation) {
+            Rebuild.=Line "`n"
+
         } else {
 
         }
@@ -75,6 +76,12 @@ convertBookdownToQuartoReferencing(String) {
 
     return String
 }
+convertMermaidCodeblocks(String) {
+    String:=strreplace(String,"```mermaid","```{mermaid}")
+    return String
+}
+
+
 modifyQuartobuildscript(script_contents,RScriptFolder,out) {
     Matches:=RegexMatchAll(script_contents,"iUm)(?<fullchunk>execute_params = (?<yamlpart>(.|\s)+)output_format)") ;; WORKING
     while IsObject(Matches:=RegexMatchAll(Clipboard:=script_contents,"iUm)(execute_params = ((.|\s)+),output_format = ""(.+?)"",""(.+?)""\))")) ;; can't add this here: ,output_format(.+",")))
