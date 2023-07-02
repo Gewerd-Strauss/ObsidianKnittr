@@ -137,7 +137,7 @@ main() {
     bFullLogCheckbox:=out.Settings.bFullLogCheckbox
     Outputformats:=out.Outputformats
     bKeepFilename:=out.Settings.bKeepFilename
-    bRenderRMD:=out.Settings.bRenderRMD
+    bExecuteRScript:=out.Settings.bExecuteRScript
     bBackupOutput:=out.Settings.bBackupOutput
     bRemoveHashTagFromTags:=out.Settings.bRemoveHashTagFromTags
     ;bUseCustomTOC:=out.3.7
@@ -155,7 +155,7 @@ main() {
     EL.bFullLogCheckbox:=out.Settings.bFullLogCheckbox
     EL.bSRCConverterVersion:=out.Settings.bSRCConverterVersion
     EL.bKeepFilename:=out.Settings.bKeepFilename
-    EL.bRenderRMD:=out.Settings.bRenderRMD
+    EL.bExecuteRScript:=out.Settings.bExecuteRScript
     EL.bRemoveHashTagFromTags:=out.Settings.bRemoveHashTagFromTags
     EL.bForceFixPNGFiles:=out.Settings.bForceFixPNGFiles
     EL.bInsertSetupChunk:=out.Settings.bInsertSetupChunk
@@ -293,9 +293,9 @@ main() {
     }
     script_contents:=tmp.1
     format:=tmp.2
-    if bRenderRMD {
+    if bExecuteRScript {
         ;ttip(" ",5,,,,,,,16)
-        if bRenderRMD {
+        if bExecuteRScript {
 
             ttip(-1)
             ttip("Executing R-BuildScript",5)
@@ -562,9 +562,14 @@ guiCreate() {
     Gui +AlwaysOnTop -SysMenu -ToolWindow -caption +Border +LabelGC +hwndOKGui
     Gui Color, 1d1f21, 373b41,
     Gui Font, s11 cWhite, Segoe UI
-    gui add, text,xm ym, Choose output type:
+    gui add, text,xm ym, ObsidianKnittr - automate Obsidian.md conversion
     WideControlWidth:=330
-    gui add, listview, vvLV1 cWhite LV0x8 w%WideControlWidth% r6 checked, % "Type"
+    LVRows:=(ret[1].Count()>35
+        ? 3
+        : ret[1].Count())
+
+    gui add, listview,% "vvLV1 LV0x8 w" WideControlWidth " h418 checked NoSortHdr " , % "Chooses an output Type"
+    gui add, text, % "ym xm" + WideControlWidth + 5,% " via RMarkdown and Quarto"
     last_output:=script.config.LastRun.last_output_type
     for _,output_type in PotentialOutputs { ; TODO: rework this to differentiate "word_document" from "bookdown::word_document2" -> maybe check for next char? If comma or end of string, this would be a base rmd format, if a "2" it would be bookdown
         Cond:=Instr(last_output,output_type)
@@ -574,7 +579,14 @@ guiCreate() {
         } else {
             Options:="-Check"
         }
+        if (filesuffixes.HasKey(output_type)) {
+            Options.=" cGreen"
+        } else {
+
+            Options.=" cRed"
+        }
         LV_Add(Options,output_type)
+        gui Show
     }
     HistoryString:=""
     for each, File in script.config.DDLHistory {
@@ -592,29 +604,37 @@ guiCreate() {
     }
     Gui add, button, gChooseFile, &Choose Manuscript
     DDLRows:=(script.config.Config.HistoryLimit>25?25:script.config.Config.HistoryLimit)
-    gui add, DDL, w%WideControlWidth% vChosenFile hwndChsnFile r%DDLRows%, % HistoryString
-    gui add, checkbox, vbConvertInsteadofRun, % "!!Use verb 'Convert' for OHTML-call?"
-    gui add, checkbox, vbUseOwnOHTMLFork, % "!!!Use the personal fork? *CAUTION*"
-    gui add, checkbox, vbRemoveObsidianHTMLErrors, % "!Purge OHTML-Error-strings?"
-    gui add, checkbox, vbFullLogCheckbox, % "Full Log on successful execution?"
-    gui add, checkbox, vbVerboseCheckbox, % "Set OHTML's Verbose-Flag?"
-    gui add, checkbox, vbRestrictOHTMLScope, % "Limit scope of OHTML?"
-    Gui Add, Text, w%WideControlWidth% h1 0x7 ;Horizontal Line > Black
-    gui add, checkbox, vbRemoveHashTagFromTags, % "Remove '#' from tags?"
-    gui add, checkbox, vbStripLocalMarkdownLinks, % "Strip local markdown links?"
-    gui add, checkbox, vbInsertSetupChunk, % "!Insert Setup-Chunk?"
-    gui add, checkbox, vbForceFixPNGFiles, % "Double-convert png-files pre-conversion?"
-    gui add, checkbox, vbKeepFilename, % "Keep Filename?"
-    gui add, checkbox, vbRenderRMD, % "Render RMD to chosen outputs?"
-    gui add, checkbox, vbBackupOutput, % "Backup Output files before knitting?"
+    gui add, DDL,% "w" WideControlWidth " vChosenFile hwndChsnFile r" DDLRows, % HistoryString
+    gui add, Groupbox, % "w" WideControlWidth " h150", Obsidian HTML
+    ;; OHTML
+    gui add, checkbox,% "xp+10 yp+20" " vbConvertInsteadofRun", % "!!Use verb 'Convert' for OHTML-call?"
+    gui add, checkbox,% "xp yp+20" " vbUseOwnOHTMLFork", % "!!!Use the personal fork? *CAUTION*"
+    gui add, checkbox,% "xp yp+20" " vbRemoveObsidianHTMLErrors", % "!Purge OHTML-Error-strings?"
+    gui add, checkbox,% "xp yp+20" " vbFullLogCheckbox", % "Full Log on successful execution?"
+    gui add, checkbox,% "xp yp+20" " vbVerboseCheckbox", % "Set OHTML's Verbose-Flag?"
+    gui add, checkbox,% "xp yp+20" " vbRestrictOHTMLScope", % "Limit scope of OHTML?"
+
+    ;; post-processing
+    gui add, Groupbox, % "xm" +WideControlWidth + 5 " yp" + 35 " w" WideControlWidth " h170", General configuration
+    gui add, checkbox, % "xp+10 yp+20" " vbRemoveHashTagFromTags", % "Remove '#' from tags?"
+    gui add, checkbox, % "xp yp+20" " vbStripLocalMarkdownLinks", % "Strip local markdown links?"
+    gui add, checkbox, % "xp yp+20" " vbInsertSetupChunk", % "!Insert Setup-Chunk?"
+    gui add, checkbox, % "xp yp+20" " vbForceFixPNGFiles", % "Double-convert png-files pre-conversion?"
+    gui add, checkbox, % "xp yp+20" " vbKeepFilename", % "Keep Filename?"
+    gui add, checkbox, % "xp yp+20" " vbExecuteRScript", % "Render manuscripts to chosen outputs?"
+    gui add, checkbox, % "xp yp+20" " vbBackupOutput", % "Backup Output files before knitting?"
+
+    gui add, Groupbox, % "xm" +WideControlWidth + 5 " yp" + 35 " w" WideControlWidth " h70", Engine-Specific Stuff
+    gui add, checkbox, % "xp+10 yp+20" " vbRemoveQuartoReferenceTypesFromCrossrefs", % "Remove ""figure""/""Table""/""Equation"" from`ninline references in quarto-documents?"
+    gui add, text,xp yp+20 w0
     Gui Font, s7 cWhite, Verdana
-    gui add, button, gGCSubmit, &Submit
+    gui add, button, gGCSubmit yp+38 xp-10, &Submit
     gui add, button, gGCAutoSubmit yp xp+60, &Full Submit
     onOpenConfig:=Func("EditMainConfig").Bind(script.configfile)
     gui add, button, hwndOpenConfig yp xp+81, Edit General Config
     gui add, button, gGCAbout hwndAbout yp xp+122, &About
     GuiControl +g,%OpenConfig%, % onOpenConfig
-    Gui Add, Text,x15,% script.name " v." regexreplace(script.config.version.ObsidianKnittr_Version,"\s*","") " | Obsidian-HTML v." strreplace(script.config.version.ObsidianHTML_Version,"commit:")
+    Gui Add, Text,x15 yp,% script.name " v." regexreplace(script.config.version.ObsidianKnittr_Version,"\s*","") " | Obsidian-HTML v." strreplace(script.config.version.ObsidianHTML_Version,"commit:")
     script.version:=script.config.version.ObsidianKnittr_Version
 
     if (script.config.LastRun.manuscriptpath!="") && (script.config.LastRun.last_output_type!="") {
@@ -625,7 +645,7 @@ guiCreate() {
         guicontrol,, bFullLogCheckbox, % (script.config.LastRun.FullLog)
         guicontrol,, bSRCConverterVersion, % (script.config.LastRun.Conversion)
         guicontrol,, bKeepFilename, % (script.config.LastRun.KeepFileName)
-        guicontrol,, bRenderRMD, % (script.config.LastRun.RenderRMD)
+        guicontrol,, bExecuteRScript, % (script.config.LastRun.RenderRMD)
         guicontrol,, bBackupOutput, % (script.config.LastRun.BackupOutput)
         guicontrol,, bRemoveHashTagFromTags, % (script.config.LastRun.RemoveHashTagFromTags)
         guicontrol,, bForceFixPNGFiles, % (script.config.LastRun.ForceFixPNGFiles)
@@ -634,6 +654,7 @@ guiCreate() {
         guicontrol,, bRemoveObsidianHTMLErrors, % (script.config.LastRun.RemoveObsidianHTMLErrors)
         guicontrol,, bStripLocalMarkdownLinks, % (script.config.LastRun.bStripLocalMarkdownLinks)
         guicontrol,, bUseOwnOHTMLFork, % (script.config.LastRun.UseOwnOHTMLFork)
+        guicontrol,, bRemoveQuartoReferenceTypesFromCrossrefs, % (script.config.LastRun.RemoveQuartoReferenceTypesFromCrossrefs)
     }
     return filesuffixes
 }
@@ -686,8 +707,8 @@ guiShow() {
     x:=(script.config.GuiPositioning.X!=""?script.config.GuiPositioning.X:200)
     y:=(script.config.GuiPositioning.Y!=""?script.config.GuiPositioning.Y:200)
     bAutoSubmitOTGUI:=false
-    guiWidth:=WideControlWidth + 32
-    guiHeight:=879
+    guiWidth:=2*WideControlWidth + 32
+    guiHeight:=595
     currentMonitor:=MWAGetMonitor()+0
     SysGet MonCount, MonitorCount
     if (MonCount>1) {
@@ -745,7 +766,7 @@ guiShow() {
                     ,"bSRCConverterVersion":bSRCConverterVersion + 0
                     ,"bKeepFilename":bKeepFilename + 0
                     ,"bBackupOutput":bBackupOutput + 0
-                    ,"bRenderRMD":bRenderRMD + 0
+                    ,"bExecuteRScript":bExecuteRScript + 0
                     ,"bRemoveHashTagFromTags":bRemoveHashTagFromTags + 0
                     ,"bUseCustomTOC":bUseCustomTOC + 0
                     ,"bForceFixPNGFiles":bForceFixPNGFiles + 0
@@ -813,7 +834,7 @@ guiSubmit() {
     script.config.LastRun.FullLog:=bFullLogCheckbox+0
     script.config.LastRun.Conversion:=bSRCConverterVersion+0
     script.config.LastRun.KeepFileName:=bKeepFilename+0
-    script.config.LastRun.RenderRMD:=bRenderRMD+0
+    script.config.LastRun.RenderRMD:=bExecuteRScript+0
     script.config.LastRun.BackupOutput:=bBackupOutput+0
     script.config.LastRun.RemoveHashTagFromTags:=bRemoveHashTagFromTags+0
     script.config.LastRun.ForceFixPNGFiles:=bForceFixPNGFiles+0
@@ -822,6 +843,7 @@ guiSubmit() {
     script.config.LastRun.RemoveObsidianHTMLErrors:=bRemoveObsidianHTMLErrors+0
     script.config.LastRun.bStripLocalMarkdownLinks:=bStripLocalMarkdownLinks+0
     script.config.LastRun.UseOwnOHTMLFork:=bUseOwnOHTMLFork+0
+    script.config.LastRun.RemoveQuartoReferenceTypesFromCrossrefs:=bRemoveQuartoReferenceTypesFromCrossrefs+0
     script.config.DDLHistory:=buildHistory(script.config.DDLHistory,script.config.Config.HistoryLimit,script.config.LastRun.manuscriptpath)
 
     for each,output_type in sel {
