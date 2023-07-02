@@ -5,7 +5,7 @@ return
 
 convertToQMD(String) {
     String:=convertBookdownToQuartoReferencing(String)
-    String:=convertMermaidCodeblocks(String)
+    String:=convertDiagrams(String)
     String:=modifyEquationReferences(String)
     return String
 }
@@ -76,8 +76,9 @@ convertBookdownToQuartoReferencing(String) {
 
     return String
 }
-convertMermaidCodeblocks(String) {
+convertDiagrams(String) {
     String:=strreplace(String,"```mermaid","```{mermaid}")
+    String:=strreplace(String,"```dot","```{dot}")
     return String
 }
 
