@@ -54,6 +54,9 @@ Execute R-Script          : `%bExecuteRScript`%
 Fixed PNG Files           : `%bForceFixPNGFiles`%
 Inserted Setup Chunk      : `%bInsertSetupChunk`%
 
+QMD: 
+Strip Type from Crossrefs : `%bRemoveQuartoReferenceTypesFromCrossrefs`%
+
 ___________________________________________________
 Fed OHTML - Config:
 
