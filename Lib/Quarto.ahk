@@ -1,10 +1,10 @@
 FileRead String, % "TESTFILEPATH"
-String2:=convertToQMD(String)
+String2:=convertToQMD(String,1)
 ;Validate(String,String2)
 return
 
-convertToQMD(String) {
-    String:=convertBookdownToQuartoReferencing(String)
+convertToQMD(String,bRemoveQuartoReferenceTypesFromCrossrefs) {
+    String:=convertBookdownToQuartoReferencing(String,bRemoveQuartoReferenceTypesFromCrossrefs)
     String:=convertDiagrams(String)
     String:=modifyEquationReferences(String)
     return String
@@ -47,7 +47,7 @@ modifyEquationReferences(String) {
 
     return Rebuild
 }
-convertBookdownToQuartoReferencing(String) {
+convertBookdownToQuartoReferencing(String,bRemoveQuartoReferenceTypesFromCrossrefs) {
 
     ;; 1. `\@ref(type:label)` → `@type-label`  → regexmatchall?
     needle:="\\@ref\((?<Type>\w*)\:(?<Label>[^)]*)\)"
@@ -68,7 +68,11 @@ convertBookdownToQuartoReferencing(String) {
 
             }
         }
-        String := strreplace(String, needle, "@"  Label)
+        if bRemoveQuartoReferenceTypesFromCrossrefs {
+            String := strreplace(String, needle, "[-@"  Label "]")
+        } else {
+            String := strreplace(String, needle, "@"  Label)
+        }
 
         ;; 2. tbl-WateringMethodTables →
         String:= strreplace(String,"r " lbl, "r " Label)

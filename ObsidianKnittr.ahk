@@ -148,6 +148,7 @@ main() {
     bStripLocalMarkdownLinks:=out.Settings.bStripLocalMarkdownLinks
     bUseOwnOHTMLFork:=out.Settings.bUseOwnOHTMLFork
     bRestrictOHTMLScope:=out.Settings.bRestrictOHTMLScope
+    bRemoveQuartoReferenceTypesFromCrossrefs:=out.Settings.bRemoveQuartoReferenceTypesFromCrossrefs
     EL.formats:=formats
     EL.manuscriptname:=out.manuscriptname
     EL.manuscriptpath:=out.manuscriptpath
@@ -164,7 +165,7 @@ main() {
     EL.bStripLocalMarkdownLinks:=out.Settings.bStripLocalMarkdownLinks
     EL.bUseOwnOHTMLFork:=out.Settings.bUseOwnOHTMLFork
     EL.bRestrictOHTMLScope:=out.Settings.bRestrictOHTMLScope
-
+    EL.bRemoveQuartoReferenceTypesFromCrossrefs:=out.Settings.bRemoveQuartoReferenceTypesFromCrossrefs
     if (output_type="") && (bVerboseCheckbox="") {
         reload
     }
@@ -264,7 +265,7 @@ main() {
     NewContents:=processAbstract(NewContents)
     for _, format in out.Outputformats {                        ;; rmd → qmd conversion
         if (format.package="quarto") {
-            qmdContents:=convertToQMD(NewContents)
+            qmdContents:=convertToQMD(NewContents,bRemoveQuartoReferenceTypesFromCrossrefs)
             qmd_Path:=strreplace(rmd_Path,".rmd",".qmd")
             Clipboard:=qmdContents
             break                                               ;; if a format is of quarto, run the quarto-conversion once, then continue on.
@@ -768,6 +769,7 @@ guiShow() {
                     ,"bBackupOutput":bBackupOutput + 0
                     ,"bExecuteRScript":bExecuteRScript + 0
                     ,"bRemoveHashTagFromTags":bRemoveHashTagFromTags + 0
+                    ,"bRemoveQuartoReferenceTypesFromCrossrefs":bRemoveQuartoReferenceTypesFromCrossrefs + 0
                     ,"bUseCustomTOC":bUseCustomTOC + 0
                     ,"bForceFixPNGFiles":bForceFixPNGFiles + 0
                     ,"bInsertSetupChunk":bInsertSetupChunk + 0
