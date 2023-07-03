@@ -4,12 +4,12 @@ String2:=convertToQMD(String,1)
 return
 
 convertToQMD(String,bRemoveQuartoReferenceTypesFromCrossrefs) {
-    String:=convertBookdownToQuartoReferencing(String,bRemoveQuartoReferenceTypesFromCrossrefs)
-    String:=convertDiagrams(String)
-    String:=modifyEquationReferences(String)
+    String:=convertBookdownToQuartoReferencing(String,bRemoveQuartoReferenceTypesFromCrossrefs)         ;; modify chunk labels in chunks and references to contain their ref type.
+    String:=convertDiagrams(String)                                                                     ;; convert graphviz and mermaid codechunk syntax
+    String:=moveEquationreferencesToEndofBlock(String)                                                  ;; latex equation reference keys
     return String
 }
-modifyEquationReferences(String) {
+moveEquationreferencesToEndofBlock(String) {
     ;; fix equation reference keys
     Lines:=strsplit(String,"`n")
     inEquation:=false
