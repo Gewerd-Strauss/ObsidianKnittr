@@ -147,6 +147,12 @@ modifyQuartobuildscript(script_contents,RScriptFolder,out) {
                 yaml_content <- stringr::str_replace(yaml_content,": no\"",": FALSE\"")
                 yaml_content <- stringr::str_replace(yaml_content,": yes\"",": TRUE\"")
                 yaml_content <- stringr::str_replace(yaml_content,": yes",": TRUE")
+                yaml_content <- stringr::str_replace(yaml_content,": 'true'",": TRUE")
+                yaml_content <- stringr::str_replace(yaml_content,": 'false'",": FALSE")
+                yaml_content <- stringr::str_replace(yaml_content,": 'FALSEne'",": FALSE")
+                yaml_content <- stringr::str_replace(yaml_content,": no",": FALSE")
+                yaml_content <- stringr::str_replace(yaml_content,": FALSEne",": none")
+                yaml_content <- stringr::str_replace(yaml_content,"date: FALSEw","date: now")
                 writeLines(yaml_content,"`%YAMLPATH`%")
             )
         yamlcode.="`n" yamlcode2
