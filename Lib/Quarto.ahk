@@ -7,6 +7,7 @@ convertToQMD(String,bRemoveQuartoReferenceTypesFromCrossrefs) {
     String:=convertBookdownToQuartoReferencing(String,bRemoveQuartoReferenceTypesFromCrossrefs)         ;; modify chunk labels in chunks and references to contain their ref type.
     String:=convertDiagrams(String)                                                                     ;; convert graphviz and mermaid codechunk syntax
     String:=moveEquationreferencesToEndofBlock(String)                                                  ;; latex equation reference keys
+    String:=fixCitationpathing(String)                                                                  ;; "csl" and "bibliography" frontmatter keys
     return String
 }
 moveEquationreferencesToEndofBlock(String) {
@@ -86,7 +87,21 @@ convertDiagrams(String) {
     return String
 }
 
-
+fixCitationpathing(String) {
+    needle1:="mi)(bibliography:(?<match>\N+))"
+    needle2:="mi)(csl:(?<match>\N+))"
+    if RegexMatch(String,needle1,v) {
+        vmatch:=strsplit(vmatch,"`n").1
+        ;String:=strreplace(String,vmatch,A_Space """" Trim(vmatch) """")
+        String:=strreplace(String,vmatch,A_Space "'" Trim(vmatch) "'")
+    }
+    if RegexMatch(String,needle2,v) {
+        vmatch:=strsplit(vmatch,"`n").1
+        ;String:=strreplace(String,vmatch,A_Space """" Trim(vmatch) """")
+        String:=strreplace(String,vmatch,A_Space "'" Trim(vmatch) "'")
+    }
+    return String
+}
 modifyQuartobuildscript(script_contents,RScriptFolder,out) {
     Matches:=RegexMatchAll(script_contents,"iUm)(?<fullchunk>execute_params = (?<yamlpart>(.|\s)+)output_format)") ;; WORKING
     while IsObject(Matches:=RegexMatchAll(Clipboard:=script_contents,"iUm)(execute_params = ((.|\s)+),output_format = ""(.+?)"",""(.+?)""\))")) ;; can't add this here: ,output_format(.+",")))
