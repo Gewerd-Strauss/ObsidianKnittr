@@ -280,7 +280,7 @@ main() {
     Codetimer_Log()
     writeFile(rmd_Path,NewContents,"UTF-8",,true)
     if (qmd_Path!="") {
-        writeFile(qmd_Path,qmdContents,"UTF-8",,true)
+        writeFile(qmd_Path,qmdContents,"UTF-8-RAW",,true)
     }
     ttip("Creating R-BuildScript",5)
     sleep 200
