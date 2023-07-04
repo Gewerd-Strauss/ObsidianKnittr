@@ -267,7 +267,6 @@ main() {
         if (format.package="quarto") {
             qmdContents:=convertToQMD(NewContents,bRemoveQuartoReferenceTypesFromCrossrefs)
             qmd_Path:=strreplace(rmd_Path,".rmd",".qmd")
-            Clipboard:=qmdContents
             break                                               ;; if a format is of quarto, run the quarto-conversion once, then continue on.
         }
     }

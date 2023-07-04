@@ -8,6 +8,8 @@ buildRScriptContent(Path,output_filename="",out="") {
     }
     Str=
         (LTRIM
+            cat("\014") ## clear console
+            remove (list=ls()) ## clear environment variables
             getwd()
             if (getwd() != "%RScriptFolder%")
             {
