@@ -89,17 +89,17 @@ convertDiagrams(String) {
 
 fixCitationpathing(String) {
     needle1:="mi)(bibliography:(?<match>\N+))"
-    needle2:="mi)(csl:(?<match>\N+))"
     if RegexMatch(String,needle1,v) {
         vmatch:=strsplit(vmatch,"`n").1
-        String:=strreplace(String,vmatch,A_Space """" Trim(vmatch) """")
+        String:=strreplace(String,vmatch,A_Space  Trim(vmatch) )
+        ;String:=strreplace(String,vmatch,A_Space """" Trim(vmatch) """")
         ;String:=strreplace(String,vmatch,A_Space "'" Trim(vmatch) "'")
-        ;String:=strreplace(String,vmatch,A_Space  Trim(vmatch) )
     }
+    needle2:="mi)(csl:(?<match>\N+))"
     if RegexMatch(String,needle2,v) {
         vmatch:=strsplit(vmatch,"`n").1
-        ;String:=strreplace(String,vmatch,A_Space """" Trim(vmatch) """")
         String:=strreplace(String,vmatch,A_Space "'" Trim(vmatch) "'")
+        ;String:=strreplace(String,vmatch,A_Space """" Trim(vmatch) """")
         ;String:=strreplace(String,vmatch,A_Space  Trim(vmatch) )
     }
     return String
