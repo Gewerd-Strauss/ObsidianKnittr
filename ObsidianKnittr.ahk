@@ -307,8 +307,10 @@ main() {
         if script.config.config.backupCount {
             limitBackups(BackupDirectory,script.config.config.backupCount)
         }
-        Rdata_out:=runRScript(rmd_Path,script_contents,Outputformats,script.config.config.RScriptPath)
-        EL.Rdata_out:=Rdata_out
+        ret:=runRScript(rmd_Path,script_contents,Outputformats,script.config.config.RScriptPath)
+        EL.Rdata_out:=ret[1]
+        EL.RCMD:=ret[2]
+        EL.RWD:=ret[3]
     } Else {
         ttip("Opening RMD-File",5)
         SplitPath % rmd_Path,, OutDir

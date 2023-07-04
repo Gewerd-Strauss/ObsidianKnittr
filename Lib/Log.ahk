@@ -85,7 +85,8 @@ Issued Command            : `%CMD`%
 stdOut                    : `%data_out`%
 ___________________________________________________
 R - StdStreams:
-
+Issued Command            : `%RCMD`%
+Working Directory         : `%RWD`%
 stdOut                    : `%Rdata_out`%
 
 )
