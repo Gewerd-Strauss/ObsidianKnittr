@@ -40,7 +40,6 @@ moveEquationreferencesToEndofBlock(String) {
         }
         if (inEquation) {
             Rebuild.=Line "`n"
-
         } else {
 
         }
@@ -106,7 +105,7 @@ fixCitationpathing(String) {
 }
 modifyQuartobuildscript(script_contents,RScriptFolder,out) {
     Matches:=RegexMatchAll(script_contents,"iUm)(?<fullchunk>execute_params = (?<yamlpart>(.|\s)+)output_format)") ;; WORKING
-    while IsObject(Matches:=RegexMatchAll(Clipboard:=script_contents,"iUm)(execute_params = ((.|\s)+),output_format = ""(.+?)"",""(.+?)""\))")) ;; can't add this here: ,output_format(.+",")))
+    while IsObject(Matches:=RegexMatchAll(script_contents,"iUm)(execute_params = ((.|\s)+),output_format = ""(.+?)"",""(.+?)""\))")) ;; can't add this here: ,output_format(.+",")))
     {
         if !Matches.Count() { ;; needle no longer work
             break
