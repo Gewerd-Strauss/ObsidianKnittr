@@ -133,7 +133,7 @@ runRScript(Path,script_contents,Outputformats,RScript_Path:="") {
     if !validateRExecution(InOut,Outputformats) {
         MsgBox 0x10,% script.name " - " A_ThisFunc "()", % "Error encountered`; the 'build.R'-script did not run to succession.`n`nFor more information, see the generated 'Executionlog.txt'-file, and execute the 'build.R'-script via console or RStudio.`n`nThe script will continue to cleanup its working directories now.",4
     }
-    return InOut
+    return [InOut,CMD,OutDir]
 }
 
 validateRExecution(String,Formats) {
