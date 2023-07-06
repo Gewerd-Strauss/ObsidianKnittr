@@ -1,33 +1,22 @@
-backupOutput(Path, manuscriptName, out) {
+backupOutput(Path, out) {
     SplitPath % Path, ,OutputRoot
-    Name:=(manuscriptName!=""?manuscriptName:"index")
+    BackupDirectory:=OutputRoot "\Old_Versions"
     Copied:=0
-    for _, output_type in out.sel {
-        if InStr(output_type,"word_document") {
-            FileSuffix:="docx"
-        } else {
-            FileSuffix:=strsplit(output_type,"_").1
-            if InStr(FileSuffix,"::") {
-
-                FileSuffix:=strsplit(FileSuffix,"::").2
-            }
-        }
-        package:=out.Outputformats[output_type].package
-        if (package!="") {
-            Output_File:=OutputRoot "\" Name " (" package ")." FileSuffix
-        } else {
-            Output_File:=OutputRoot "\" Name "." FileSuffix
-        }
-        BackupDirectory:=OutputRoot "\Old_Versions"
-
-        if !InStr(FileExist(BackupDirectory),"D") {
-            FileCreateDir % BackupDirectory
-        }
-        bOutputExists:=FileExist(Output_File)
-        if (bOutputExists!="") {
+    ;Lastoutputs:=strsplit(script.config.LastRun.last_output_type,",")
+    ;for ind, format in Lastoutputs {
+    ;    Lastoutputs[ind]:=Trim(format) ;; remove leftover spaces
+    ;}
+    MT:=""
+    for format, Filesuffix in out.filesuffixes {
+        ;if !(out.Outputformats.HasKey(format)) {
+        ;    continue
+        ;}
+        package:=strsplit(format,"::").1
+        Loop, Files, % OutputRoot "\*" FileSuffix 
+        {
             if (MT="") {
-                FileGetTime MT,% Output_File,M
-                FileGetTime CT,% Output_File,C
+                FileGetTime MT,% A_LoopFileFullPath,M
+                FileGetTime CT,% A_LoopFileFullPath,C
                 FormatTime CT,%CT%,yyyy-MM-dd HHmmss
                 FormatTime MT,%MT%,yyyy-MM-dd HHmmss
             }
@@ -39,14 +28,23 @@ backupOutput(Path, manuscriptName, out) {
                     FileCreateDir % BackupDirectory "\" MT
                 }
             }
+            FileMove % A_LoopFileFullPath, % A_LoopFileFullPath
+            SplitPath % A_LoopFileFullPath, OutFileName, OutDir, OutExtension, OutNameNoExt, OutDrive
+            fileisAccessible:=!ErrorLevel
             if (package!="") {
-                FileCopy % Output_File, % BackupDirectory "\" MT "\" Name " (" package ")." FileSuffix
+                if fileisAccessible {
+                    FileMove % A_LoopFileFullPath, % BackupDirectory "\" MT "\" OutFileName
+                } else {
+                    FileCopy % A_LoopFileFullPath, % BackupDirectory "\" MT "\" OutFileName
+                }
             } else {
-                FileCopy % Output_File, % BackupDirectory "\" MT "\" Name "." FileSuffix
+                if fileisAccessible {
+                    FileMove % A_LoopFileFullPath, % BackupDirectory "\" MT "\" Name "." FileSuffix
+                } else {
+                    FileCopy % A_LoopFileFullPath, % BackupDirectory "\" MT "\" Name "." FileSuffix
+                }
             }
             Copied++
-        } else {
-
         }
     }
     if (Copied) {

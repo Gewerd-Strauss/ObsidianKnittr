@@ -1,14 +1,16 @@
 FileRead String, % "TESTFILEPATH"
-String2:=convertToQMD(String)
+String2:=convertToQMD(String,1)
 ;Validate(String,String2)
 return
 
-convertToQMD(String) {
-    String:=convertBookdownToQuartoReferencing(String)
-    String:=modifyEquationReferences(String)
+convertToQMD(String,bRemoveQuartoReferenceTypesFromCrossrefs) {
+    String:=convertBookdownToQuartoReferencing(String,bRemoveQuartoReferenceTypesFromCrossrefs)         ;; modify chunk labels in chunks and references to contain their ref type.
+    String:=convertDiagrams(String)                                                                     ;; convert graphviz and mermaid codechunk syntax
+    String:=moveEquationreferencesToEndofBlock(String)                                                  ;; latex equation reference keys
+    String:=fixCitationpathing(String)                                                                  ;; "csl" and "bibliography" frontmatter keys
     return String
 }
-modifyEquationReferences(String) {
+moveEquationreferencesToEndofBlock(String) {
     ;; fix equation reference keys
     Lines:=strsplit(String,"`n")
     inEquation:=false
@@ -17,7 +19,6 @@ modifyEquationReferences(String) {
         Trimmed:=Trim(Line)
         if InStr(Trimmed,"$$") && !inEquation { 
             inEquation:=true
-            Rebuild.=Line "`n"
         } else if !InStr(Trimmed,"$$") && !inEquation {
             inEquation:=false
             Label:=""
@@ -35,10 +36,10 @@ modifyEquationReferences(String) {
         {
             inEquation:=true
             Line:=strreplace(Line,vFullString)
-            Rebuild.=Line "`n"
             Label:=vEQLabel
         }
         if (inEquation) {
+            Rebuild.=Line "`n"
         } else {
 
         }
@@ -46,7 +47,7 @@ modifyEquationReferences(String) {
 
     return Rebuild
 }
-convertBookdownToQuartoReferencing(String) {
+convertBookdownToQuartoReferencing(String,bRemoveQuartoReferenceTypesFromCrossrefs) {
 
     ;; 1. `\@ref(type:label)` → `@type-label`  → regexmatchall?
     needle:="\\@ref\((?<Type>\w*)\:(?<Label>[^)]*)\)"
@@ -67,7 +68,11 @@ convertBookdownToQuartoReferencing(String) {
 
             }
         }
-        String := strreplace(String, needle, "@"  Label)
+        if bRemoveQuartoReferenceTypesFromCrossrefs {
+            String := strreplace(String, needle, "[-@"  Label "]")
+        } else {
+            String := strreplace(String, needle, "@"  Label)
+        }
 
         ;; 2. tbl-WateringMethodTables →
         String:= strreplace(String,"r " lbl, "r " Label)
@@ -75,9 +80,32 @@ convertBookdownToQuartoReferencing(String) {
 
     return String
 }
+convertDiagrams(String) {
+    String:=strreplace(String,"```mermaid","```{mermaid}")
+    String:=strreplace(String,"```dot","```{dot}")
+    return String
+}
+
+fixCitationpathing(String) {
+    needle1:="mi)(bibliography:(?<match>\N+))"
+    if RegexMatch(String,needle1,v) {
+        vmatch:=strsplit(vmatch,"`n").1
+        String:=strreplace(String,vmatch,A_Space  Trim(vmatch) )
+        ;String:=strreplace(String,vmatch,A_Space """" Trim(vmatch) """")
+        ;String:=strreplace(String,vmatch,A_Space "'" Trim(vmatch) "'")
+    }
+    needle2:="mi)(csl:(?<match>\N+))"
+    if RegexMatch(String,needle2,v) {
+        vmatch:=strsplit(vmatch,"`n").1
+        String:=strreplace(String,vmatch,A_Space "'" Trim(vmatch) "'")
+        ;String:=strreplace(String,vmatch,A_Space """" Trim(vmatch) """")
+        ;String:=strreplace(String,vmatch,A_Space  Trim(vmatch) )
+    }
+    return String
+}
 modifyQuartobuildscript(script_contents,RScriptFolder,out) {
     Matches:=RegexMatchAll(script_contents,"iUm)(?<fullchunk>execute_params = (?<yamlpart>(.|\s)+)output_format)") ;; WORKING
-    while IsObject(Matches:=RegexMatchAll(Clipboard:=script_contents,"iUm)(execute_params = ((.|\s)+),output_format = ""(.+?)"",""(.+?)""\))")) ;; can't add this here: ,output_format(.+",")))
+    while IsObject(Matches:=RegexMatchAll(script_contents,"iUm)(execute_params = ((.|\s)+),output_format = ""(.+?)"",""(.+?)""\))")) ;; can't add this here: ,output_format(.+",")))
     {
         if !Matches.Count() { ;; needle no longer work
             break
@@ -120,6 +148,12 @@ modifyQuartobuildscript(script_contents,RScriptFolder,out) {
                 yaml_content <- stringr::str_replace(yaml_content,": no\"",": FALSE\"")
                 yaml_content <- stringr::str_replace(yaml_content,": yes\"",": TRUE\"")
                 yaml_content <- stringr::str_replace(yaml_content,": yes",": TRUE")
+                yaml_content <- stringr::str_replace(yaml_content,": 'true'",": TRUE")
+                yaml_content <- stringr::str_replace(yaml_content,": 'false'",": FALSE")
+                yaml_content <- stringr::str_replace(yaml_content,": 'FALSEne'",": FALSE")
+                yaml_content <- stringr::str_replace(yaml_content,": no",": FALSE")
+                yaml_content <- stringr::str_replace(yaml_content,": FALSEne",": none")
+                yaml_content <- stringr::str_replace(yaml_content,"date: FALSEw","date: now")
                 writeLines(yaml_content,"`%YAMLPATH`%")
             )
         yamlcode.="`n" yamlcode2

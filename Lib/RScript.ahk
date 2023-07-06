@@ -8,6 +8,8 @@ buildRScriptContent(Path,output_filename="",out="") {
     }
     Str=
         (LTRIM
+            cat("\014") ## clear console
+            remove (list=ls()) ## clear environment variables
             getwd()
             if (getwd() != "%RScriptFolder%")
             {
@@ -17,7 +19,7 @@ buildRScriptContent(Path,output_filename="",out="") {
             getwd()
             sprintf('Chosen Output formats:')
             %OutputType_Print%
-
+            version
         )
     if out.settings.bForceFixPNGFiles {
         Str2=
@@ -72,7 +74,7 @@ buildRScriptContent(Path,output_filename="",out="") {
 
             continue
         }
-        Str3:="`n" LTrim(Class.renderingpackage)
+        Str3:="`n`n`n`n" LTrim(Class.renderingpackage)
         if (format="") {
             Str3:=Strreplace(Str3,"%format%","NULL")
         } else {
@@ -92,6 +94,10 @@ buildRScriptContent(Path,output_filename="",out="") {
                 magick::image_write(png_image,Path)
                 sprintf( "Fixed Path '`%s'", Path)
                 })
+
+
+
+
                 rmarkdown::render(`"index.rmd`",%format%,`"%Name%"`)`n
             )
         if bFixPNGs {
@@ -129,7 +135,7 @@ runRScript(Path,script_contents,Outputformats,RScript_Path:="") {
     if !validateRExecution(InOut,Outputformats) {
         MsgBox 0x10,% script.name " - " A_ThisFunc "()", % "Error encountered`; the 'build.R'-script did not run to succession.`n`nFor more information, see the generated 'Executionlog.txt'-file, and execute the 'build.R'-script via console or RStudio.`n`nThe script will continue to cleanup its working directories now.",4
     }
-    return InOut
+    return [InOut,CMD,OutDir]
 }
 
 validateRExecution(String,Formats) {

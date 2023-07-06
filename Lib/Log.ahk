@@ -50,9 +50,12 @@ Stripped Local MD-Links   : `%bStripLocalMarkdownLinks`%
 Vault Limited             : `%bRestrictOHTMLScope`%
 
 RMD:
-Render to Outputs         : `%bRenderRMD`%
+Execute R-Script          : `%bExecuteRScript`%
 Fixed PNG Files           : `%bForceFixPNGFiles`%
 Inserted Setup Chunk      : `%bInsertSetupChunk`%
+
+QMD: 
+Strip Type from Crossrefs : `%bRemoveQuartoReferenceTypesFromCrossrefs`%
 
 ___________________________________________________
 Fed OHTML - Config:
@@ -82,7 +85,8 @@ Issued Command            : `%CMD`%
 stdOut                    : `%data_out`%
 ___________________________________________________
 R - StdStreams:
-
+Issued Command            : `%RCMD`%
+Working Directory         : `%RWD`%
 stdOut                    : `%Rdata_out`%
 
 )
