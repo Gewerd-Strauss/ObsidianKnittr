@@ -137,7 +137,7 @@ main() {
     bFullLogCheckbox:=out.Settings.bFullLogCheckbox
     Outputformats:=out.Outputformats
     bKeepFilename:=out.Settings.bKeepFilename
-    bRenderRMD:=out.Settings.bRenderRMD
+    bExecuteRScript:=out.Settings.bExecuteRScript
     bBackupOutput:=out.Settings.bBackupOutput
     bRemoveHashTagFromTags:=out.Settings.bRemoveHashTagFromTags
     ;bUseCustomTOC:=out.3.7
@@ -148,6 +148,7 @@ main() {
     bStripLocalMarkdownLinks:=out.Settings.bStripLocalMarkdownLinks
     bUseOwnOHTMLFork:=out.Settings.bUseOwnOHTMLFork
     bRestrictOHTMLScope:=out.Settings.bRestrictOHTMLScope
+    bRemoveQuartoReferenceTypesFromCrossrefs:=out.Settings.bRemoveQuartoReferenceTypesFromCrossrefs
     EL.formats:=formats
     EL.manuscriptname:=out.manuscriptname
     EL.manuscriptpath:=out.manuscriptpath
@@ -155,7 +156,7 @@ main() {
     EL.bFullLogCheckbox:=out.Settings.bFullLogCheckbox
     EL.bSRCConverterVersion:=out.Settings.bSRCConverterVersion
     EL.bKeepFilename:=out.Settings.bKeepFilename
-    EL.bRenderRMD:=out.Settings.bRenderRMD
+    EL.bExecuteRScript:=out.Settings.bExecuteRScript
     EL.bRemoveHashTagFromTags:=out.Settings.bRemoveHashTagFromTags
     EL.bForceFixPNGFiles:=out.Settings.bForceFixPNGFiles
     EL.bInsertSetupChunk:=out.Settings.bInsertSetupChunk
@@ -164,7 +165,7 @@ main() {
     EL.bStripLocalMarkdownLinks:=out.Settings.bStripLocalMarkdownLinks
     EL.bUseOwnOHTMLFork:=out.Settings.bUseOwnOHTMLFork
     EL.bRestrictOHTMLScope:=out.Settings.bRestrictOHTMLScope
-
+    EL.bRemoveQuartoReferenceTypesFromCrossrefs:=out.Settings.bRemoveQuartoReferenceTypesFromCrossrefs
     if (output_type="") && (bVerboseCheckbox="") {
         reload
     }
@@ -264,9 +265,8 @@ main() {
     NewContents:=processAbstract(NewContents)
     for _, format in out.Outputformats {                        ;; rmd → qmd conversion
         if (format.package="quarto") {
-            qmdContents:=convertToQMD(NewContents)
+            qmdContents:=convertToQMD(NewContents,bRemoveQuartoReferenceTypesFromCrossrefs)
             qmd_Path:=strreplace(rmd_Path,".rmd",".qmd")
-            Clipboard:=qmdContents
             break                                               ;; if a format is of quarto, run the quarto-conversion once, then continue on.
         }
     }
@@ -279,7 +279,7 @@ main() {
     Codetimer_Log()
     writeFile(rmd_Path,NewContents,"UTF-8",,true)
     if (qmd_Path!="") {
-        writeFile(qmd_Path,qmdContents,"UTF-8",,true)
+        writeFile(qmd_Path,qmdContents,"UTF-8-RAW",,true)
     }
     ttip("Creating R-BuildScript",5)
     sleep 200
@@ -293,21 +293,23 @@ main() {
     }
     script_contents:=tmp.1
     format:=tmp.2
-    if bRenderRMD {
+    if bExecuteRScript {
         ;ttip(" ",5,,,,,,,16)
-        if bRenderRMD {
+        if bExecuteRScript {
 
             ttip(-1)
             ttip("Executing R-BuildScript",5)
         }
         if bBackupOutput {
-            BackupDirectory:=backupOutput(rmd_Path,manuscriptName,out)
+            BackupDirectory:=backupOutput(rmd_Path,out)
         }
         if script.config.config.backupCount {
             limitBackups(BackupDirectory,script.config.config.backupCount)
         }
-        Rdata_out:=runRScript(rmd_Path,script_contents,Outputformats,script.config.config.RScriptPath)
-        EL.Rdata_out:=Rdata_out
+        ret:=runRScript(rmd_Path,script_contents,Outputformats,script.config.config.RScriptPath)
+        EL.Rdata_out:=ret[1]
+        EL.RCMD:=ret[2]
+        EL.RWD:=ret[3]
     } Else {
         ttip("Opening RMD-File",5)
         SplitPath % rmd_Path,, OutDir
@@ -555,14 +557,21 @@ processTags(Contents,bRemoveHashTagFromTags) {
 guiCreate() {
     global
     gui destroy
-    PotentialOutputs:=getDefinedOutputFormats(A_ScriptDir "\INI-Files\DynamicArguments.ini")
+    ret:=getDefinedOutputFormats(A_ScriptDir "\INI-Files\DynamicArguments.ini")
+    PotentialOutputs:=ret[1]
+    filesuffixes:=ret[2]
     Gui Margin, 16, 16
     Gui +AlwaysOnTop -SysMenu -ToolWindow -caption +Border +LabelGC +hwndOKGui
     Gui Color, 1d1f21, 373b41,
     Gui Font, s11 cWhite, Segoe UI
-    gui add, text,xm ym, Choose output type:
+    gui add, text,xm ym, ObsidianKnittr - automate Obsidian.md conversion
     WideControlWidth:=330
-    gui add, listview, vvLV1 cWhite LV0x8 w%WideControlWidth% r6 checked, % "Type"
+    LVRows:=(ret[1].Count()>35
+        ? 3
+        : ret[1].Count())
+
+    gui add, listview,% "vvLV1 LV0x8 w" WideControlWidth " h418 checked NoSortHdr " , % "Chooses an output Type"
+    gui add, text, % "ym xm" + WideControlWidth + 5,% " via RMarkdown and Quarto"
     last_output:=script.config.LastRun.last_output_type
     for _,output_type in PotentialOutputs { ; TODO: rework this to differentiate "word_document" from "bookdown::word_document2" -> maybe check for next char? If comma or end of string, this would be a base rmd format, if a "2" it would be bookdown
         Cond:=Instr(last_output,output_type)
@@ -572,7 +581,14 @@ guiCreate() {
         } else {
             Options:="-Check"
         }
+        if (filesuffixes.HasKey(output_type)) {
+            Options.=" cGreen"
+        } else {
+
+            Options.=" cRed"
+        }
         LV_Add(Options,output_type)
+        gui Show
     }
     HistoryString:=""
     for each, File in script.config.DDLHistory {
@@ -590,29 +606,37 @@ guiCreate() {
     }
     Gui add, button, gChooseFile, &Choose Manuscript
     DDLRows:=(script.config.Config.HistoryLimit>25?25:script.config.Config.HistoryLimit)
-    gui add, DDL, w%WideControlWidth% vChosenFile hwndChsnFile r%DDLRows%, % HistoryString
-    gui add, checkbox, vbConvertInsteadofRun, % "!!Use verb 'Convert' for OHTML-call?"
-    gui add, checkbox, vbUseOwnOHTMLFork, % "!!!Use the personal fork? *CAUTION*"
-    gui add, checkbox, vbRemoveObsidianHTMLErrors, % "!Purge OHTML-Error-strings?"
-    gui add, checkbox, vbFullLogCheckbox, % "Full Log on successful execution?"
-    gui add, checkbox, vbVerboseCheckbox, % "Set OHTML's Verbose-Flag?"
-    gui add, checkbox, vbRestrictOHTMLScope, % "Limit scope of OHTML?"
-    Gui Add, Text, w%WideControlWidth% h1 0x7 ;Horizontal Line > Black
-    gui add, checkbox, vbRemoveHashTagFromTags, % "Remove '#' from tags?"
-    gui add, checkbox, vbStripLocalMarkdownLinks, % "Strip local markdown links?"
-    gui add, checkbox, vbInsertSetupChunk, % "!Insert Setup-Chunk?"
-    gui add, checkbox, vbForceFixPNGFiles, % "Double-convert png-files pre-conversion?"
-    gui add, checkbox, vbKeepFilename, % "Keep Filename?"
-    gui add, checkbox, vbRenderRMD, % "Render RMD to chosen outputs?"
-    gui add, checkbox, vbBackupOutput, % "Backup Output files before knitting?"
+    gui add, DDL,% "w" WideControlWidth " vChosenFile hwndChsnFile r" DDLRows, % HistoryString
+    gui add, Groupbox, % "w" WideControlWidth " h150", Obsidian HTML
+    ;; OHTML
+    gui add, checkbox,% "xp+10 yp+20" " vbConvertInsteadofRun", % "!!Use verb 'Convert' for OHTML-call?"
+    gui add, checkbox,% "xp yp+20" " vbUseOwnOHTMLFork", % "!!!Use the personal fork? *CAUTION*"
+    gui add, checkbox,% "xp yp+20" " vbRemoveObsidianHTMLErrors", % "!Purge OHTML-Error-strings?"
+    gui add, checkbox,% "xp yp+20" " vbFullLogCheckbox", % "Full Log on successful execution?"
+    gui add, checkbox,% "xp yp+20" " vbVerboseCheckbox", % "Set OHTML's Verbose-Flag?"
+    gui add, checkbox,% "xp yp+20" " vbRestrictOHTMLScope", % "Limit scope of OHTML?"
+
+    ;; post-processing
+    gui add, Groupbox, % "xm" +WideControlWidth + 5 " yp" + 35 " w" WideControlWidth " h170", General configuration
+    gui add, checkbox, % "xp+10 yp+20" " vbRemoveHashTagFromTags", % "Remove '#' from tags?"
+    gui add, checkbox, % "xp yp+20" " vbStripLocalMarkdownLinks", % "Strip local markdown links?"
+    gui add, checkbox, % "xp yp+20" " vbInsertSetupChunk", % "!Insert Setup-Chunk?"
+    gui add, checkbox, % "xp yp+20" " vbForceFixPNGFiles", % "Double-convert png-files pre-conversion?"
+    gui add, checkbox, % "xp yp+20" " vbKeepFilename", % "Keep Filename?"
+    gui add, checkbox, % "xp yp+20" " vbExecuteRScript", % "Render manuscripts to chosen outputs?"
+    gui add, checkbox, % "xp yp+20" " vbBackupOutput", % "Backup Output files before knitting?"
+
+    gui add, Groupbox, % "xm" +WideControlWidth + 5 " yp" + 35 " w" WideControlWidth " h70", Engine-Specific Stuff
+    gui add, checkbox, % "xp+10 yp+20" " vbRemoveQuartoReferenceTypesFromCrossrefs", % "Remove ""figure""/""Table""/""Equation"" from`ninline references in quarto-documents?"
+    gui add, text,xp yp+20 w0
     Gui Font, s7 cWhite, Verdana
-    gui add, button, gGCSubmit, &Submit
+    gui add, button, gGCSubmit yp+38 xp-10, &Submit
     gui add, button, gGCAutoSubmit yp xp+60, &Full Submit
     onOpenConfig:=Func("EditMainConfig").Bind(script.configfile)
     gui add, button, hwndOpenConfig yp xp+81, Edit General Config
     gui add, button, gGCAbout hwndAbout yp xp+122, &About
     GuiControl +g,%OpenConfig%, % onOpenConfig
-    Gui Add, Text,x15,% script.name " v." regexreplace(script.config.version.ObsidianKnittr_Version,"\s*","") " | Obsidian-HTML v." strreplace(script.config.version.ObsidianHTML_Version,"commit:")
+    Gui Add, Text,x15 yp,% script.name " v." regexreplace(script.config.version.ObsidianKnittr_Version,"\s*","") " | Obsidian-HTML v." strreplace(script.config.version.ObsidianHTML_Version,"commit:")
     script.version:=script.config.version.ObsidianKnittr_Version
 
     if (script.config.LastRun.manuscriptpath!="") && (script.config.LastRun.last_output_type!="") {
@@ -623,7 +647,7 @@ guiCreate() {
         guicontrol,, bFullLogCheckbox, % (script.config.LastRun.FullLog)
         guicontrol,, bSRCConverterVersion, % (script.config.LastRun.Conversion)
         guicontrol,, bKeepFilename, % (script.config.LastRun.KeepFileName)
-        guicontrol,, bRenderRMD, % (script.config.LastRun.RenderRMD)
+        guicontrol,, bExecuteRScript, % (script.config.LastRun.RenderRMD)
         guicontrol,, bBackupOutput, % (script.config.LastRun.BackupOutput)
         guicontrol,, bRemoveHashTagFromTags, % (script.config.LastRun.RemoveHashTagFromTags)
         guicontrol,, bForceFixPNGFiles, % (script.config.LastRun.ForceFixPNGFiles)
@@ -632,12 +656,14 @@ guiCreate() {
         guicontrol,, bRemoveObsidianHTMLErrors, % (script.config.LastRun.RemoveObsidianHTMLErrors)
         guicontrol,, bStripLocalMarkdownLinks, % (script.config.LastRun.bStripLocalMarkdownLinks)
         guicontrol,, bUseOwnOHTMLFork, % (script.config.LastRun.UseOwnOHTMLFork)
+        guicontrol,, bRemoveQuartoReferenceTypesFromCrossrefs, % (script.config.LastRun.RemoveQuartoReferenceTypesFromCrossrefs)
     }
-    return
+    return filesuffixes
 }
 getDefinedOutputFormats(Path) {
     PotentialOutputs:=["bookdown::word_document2", "html_document", "bookdown::html_document2", "word_document", "pdf_document", "bookdown::pdf_document2", "First in YAML", "odt_document", "rtf_document", "md_document", "powerpoint_presentation", "ioslides_presentation", "tufte::tufte_html", "github_document", "All"]
     Arr:=[]
+    filesuffixes:=[]
     if !FileExist(Path) {
         Gui +OwnDialogs
         MsgBox 0x40010, % script.name " - File not found",% "A required file containing the GUI definitions for the output formats does not exist under `n`n'" Path "`n`nThis script will only use the default options for any format not found in this file"
@@ -645,6 +671,7 @@ getDefinedOutputFormats(Path) {
     } else {
         FileRead FileString, % Path
         Lines:=strsplit(FileString,"`r`n")
+        bFindSuffix:=false
         for _, Line in Lines {
             if SubStr(LTrim(Line),1,1)=";" {
                 continue
@@ -656,6 +683,12 @@ getDefinedOutputFormats(Path) {
                     Pos:=HasVal(PotentialOutputs,Line)
                     PotentialOutputs.RemoveAt(Pos,1)
                     Arr.push(Line)
+                    bFindSuffix:=true
+                }
+            }
+            if (bFindSuffix) {
+                if InStr(Line, "filesuffix:Meta") {
+                    filesuffixes[Arr[Arr.MaxIndex()]]:=strsplit(Line,"Value:").2
                 }
             }
         }
@@ -663,7 +696,7 @@ getDefinedOutputFormats(Path) {
             Arr.push(output_type)
         }
     }
-    return Arr
+    return [Arr,filesuffixes]
 }
 GCAutoSubmit() {
     global bAutoSubmitOTGUI:=True
@@ -672,12 +705,12 @@ GCAutoSubmit() {
 
 guiShow() {
     global
-    guiCreate()
+    filesuffixes:=guiCreate()
     x:=(script.config.GuiPositioning.X!=""?script.config.GuiPositioning.X:200)
     y:=(script.config.GuiPositioning.Y!=""?script.config.GuiPositioning.Y:200)
     bAutoSubmitOTGUI:=false
-    guiWidth:=WideControlWidth + 32
-    guiHeight:=879
+    guiWidth:=2*WideControlWidth + 32
+    guiHeight:=595
     currentMonitor:=MWAGetMonitor()+0
     SysGet MonCount, MonitorCount
     if (MonCount>1) {
@@ -735,8 +768,9 @@ guiShow() {
                     ,"bSRCConverterVersion":bSRCConverterVersion + 0
                     ,"bKeepFilename":bKeepFilename + 0
                     ,"bBackupOutput":bBackupOutput + 0
-                    ,"bRenderRMD":bRenderRMD + 0
+                    ,"bExecuteRScript":bExecuteRScript + 0
                     ,"bRemoveHashTagFromTags":bRemoveHashTagFromTags + 0
+                    ,"bRemoveQuartoReferenceTypesFromCrossrefs":bRemoveQuartoReferenceTypesFromCrossrefs + 0
                     ,"bUseCustomTOC":bUseCustomTOC + 0
                     ,"bForceFixPNGFiles":bForceFixPNGFiles + 0
                     ,"bInsertSetupChunk":bInsertSetupChunk + 0
@@ -745,7 +779,8 @@ guiShow() {
                     ,"bRestrictOHTMLScope":bRestrictOHTMLScope + 0
                     ,"bStripLocalMarkdownLinks":bStripLocalMarkdownLinks + 0
                     ,"bUseOwnOHTMLFork":bUseOwnOHTMLFork + 0}
-                ,"Outputformats":Outputformats}
+                ,"Outputformats":Outputformats
+                ,"filesuffixes":filesuffixes}
     } Else {
         ExitApp
     }
@@ -802,7 +837,7 @@ guiSubmit() {
     script.config.LastRun.FullLog:=bFullLogCheckbox+0
     script.config.LastRun.Conversion:=bSRCConverterVersion+0
     script.config.LastRun.KeepFileName:=bKeepFilename+0
-    script.config.LastRun.RenderRMD:=bRenderRMD+0
+    script.config.LastRun.RenderRMD:=bExecuteRScript+0
     script.config.LastRun.BackupOutput:=bBackupOutput+0
     script.config.LastRun.RemoveHashTagFromTags:=bRemoveHashTagFromTags+0
     script.config.LastRun.ForceFixPNGFiles:=bForceFixPNGFiles+0
@@ -811,6 +846,7 @@ guiSubmit() {
     script.config.LastRun.RemoveObsidianHTMLErrors:=bRemoveObsidianHTMLErrors+0
     script.config.LastRun.bStripLocalMarkdownLinks:=bStripLocalMarkdownLinks+0
     script.config.LastRun.UseOwnOHTMLFork:=bUseOwnOHTMLFork+0
+    script.config.LastRun.RemoveQuartoReferenceTypesFromCrossrefs:=bRemoveQuartoReferenceTypesFromCrossrefs+0
     script.config.DDLHistory:=buildHistory(script.config.DDLHistory,script.config.Config.HistoryLimit,script.config.LastRun.manuscriptpath)
 
     for each,output_type in sel {
