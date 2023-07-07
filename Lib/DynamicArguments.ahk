@@ -344,7 +344,11 @@ Class ot {
                         Options:=""
                     }
                     if (Value.Control="Edit") {
-                        gui ParamsGUI: add, text,h20, % Value.String
+                        if Value.HasKey("Link") {
+                            gui ParamsGUI: add, Link,h20, % "<a href=" Value.Link ">?</a>" A_Space Value.String
+                        } else {
+                            gui ParamsGUI: add, text,h20, % Value.String
+                        }
                         ControlHeight+=20
                         if (Value.ctrlOptions="Number") {
                             if (Value.Max!="") && (Value.Min!="") {
@@ -371,7 +375,11 @@ Class ot {
                         gui ParamsGUI: add, % Value.Control, % Value.ctrlOptions " vv" Parameter, % (Value.Value="NULL"?:Value.Value)
                         ;GuiControl Move, vTab3, % "h" TabHeight
                     } else if (Value.Control="File") {
-                        gui ParamsGUI:Add, Text,TabHeight+20, % Value.String
+                        if Value.HasKey("Link") {
+                            gui ParamsGUI: add, Link,h20, % "<a href=" Value.Link ">?</a>" A_Space Value.String
+                        } else {
+                            gui ParamsGUI: add, text,TabHeight+20, % Value.String
+                        }
                         ControlHeight+=20
                         ;GuiControl Move, vTab3, % "h" TabHeight + ControlHeight
                         gui ParamsGUI:Add, edit, % Value.ctrlOptions " vv" Parameter " disabled w200 yp+30 h60", % Value.Value
@@ -389,7 +397,11 @@ Class ot {
                         ControlHeight+=20
                         GuiControl Move, vTab3, % "h" TabHeight + ControlHeight
                     } else if (Value.Control="DDL") || (Value.Control="ComboBox") {
-                        gui ParamsGUI:Add, Text,h20, % Value.String
+                        if Value.HasKey("Link") {
+                            gui ParamsGUI: add, Link,h20, % "<a href=" Value.Link ">?</a>" A_Space Value.String
+                        } else {
+                            gui ParamsGUI: add, text,h20, % Value.String
+                        }
                         if Instr(Value.ctrlOptions,",") && !Instr(Value.ctrlOptions,"|") {
                             Value.ctrlOptions:=strreplace(Value.ctrlOptions,",","|")
                         }
@@ -413,7 +425,15 @@ Class ot {
                         gui ParamsGUI:add, % Value.Control, % "  vv" Parameter " r" shown_rows , % Value.ctrlOptions
                         ControlHeight+=75
                     } else {
-                        gui ParamsGUI:add, % Value.Control, % Value.ctrlOptions " h30 vv" Parameter, % Value.String
+                        if Value.HasKey("Link") {
+                            if (Value.Control="Checkbox") { 
+                                gui ParamsGUI: add, Link,h20, % "<a href=" Value.Link ">?</a>" A_Space
+                                gui ParamsGUI: add, % Value.Control, % Value.ctrlOptions "yp-8 xp+8 h30 vv" Parameter, % Value.String
+                                gui ParamsGUI: add, text, h0 w0 xp-8 yp+20
+                            }
+                        } else {
+                            gui ParamsGUI:add, % Value.Control, % Value.ctrlOptions " h30 vv" Parameter, % Value.String
+                        }
                         ControlHeight+=30
                     }
                     if (Value.Control="Checkbox") {
