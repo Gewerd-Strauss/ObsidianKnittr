@@ -143,6 +143,9 @@ chooseTV_Element(TV_String,Graph,Level,bAutoSubmitOTGUI) {
         }
         Hotkey IfWinActive
     }
+    Hotkey !a, % objTOVRHK_Handler
+    Hotkey !f, % objTOVRHK_Handler
+    Hotkey IfWinActive
     if (Level) && (bAutoSubmitOTGUI) {
         submitConfigFolder()
     } else if (Level=1) && (TVIDs.Count() = 1) {
@@ -186,17 +189,21 @@ TOVRHK_Handler(TVIDs:="") {
         loop, % vCount {
             Key:="Level" A_Index
         }
-        for each, ID in TVIDs {
-            if (each=Key) {
-                r:=TV_Modify(ID,"Check") ;; check selected
-            } else {
-                r2:=TV_Modify(ID,"-Check") ;; uncheck the rest just in case
-            }
-        }
         ;ID:=TVIDs[Key]
         ;TV_Modify(ID,"Check") ;; recheck the intended oned
     } else {
-
+        if (A_ThisHotkey="!a") {
+            Key:="Level1"
+        } else if (A_ThisHotkey="!f") {
+            Key:="Level" TVIDs.Count()
+        }
+    }
+    for each, ID in TVIDs {
+        if (each=Key) {
+            r:=TV_Modify(ID,"Check") ;; check selected
+        } else {
+            r2:=TV_Modify(ID,"-Check") ;; uncheck the rest just in case
+        }
     }
     ;gui % dfg ":" default
     return
