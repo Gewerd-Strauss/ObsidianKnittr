@@ -265,6 +265,7 @@ main() {
     NewContents:=processAbstract(NewContents)
     for _, format in out.Outputformats {                        ;; rmd → qmd conversion
         if (format.package="quarto") {
+            ttip("Convert to QMD",5)
             qmdContents:=convertToQMD(NewContents,bRemoveQuartoReferenceTypesFromCrossrefs)
             qmd_Path:=strreplace(rmd_Path,".rmd",".qmd")
             break                                               ;; if a format is of quarto, run the quarto-conversion once, then continue on.
