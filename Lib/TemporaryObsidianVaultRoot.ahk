@@ -133,15 +133,19 @@ chooseTV_Element(TV_String,Graph,Level,bAutoSubmitOTGUI) {
             }
         }
     }
-    gui show, w600 Autosize, % script.name  " - Set limiting '.obsidian'-folder"
-    objTOVRHK_Handler:=Func("TOVRHK_Handler").Bind(TVIDs)
-    Hotkey ifWinActive, % "ahk_id " TOVRGUI
-    loop, 9 {
-        Key:="^" A_Index-1
-        Hotkey % Key, % objTOVRHK_Handler
+    if !(TVIDs.Count() = 1) {
+        gui show, w600 Autosize, % script.name  " - Set limiting '.obsidian'-folder"
+        objTOVRHK_Handler:=Func("TOVRHK_Handler").Bind(TVIDs)
+        Hotkey ifWinActive, % "ahk_id " TOVRGUI
+        loop, 9 {
+            Key:="^" A_Index-1
+            Hotkey % Key, % objTOVRHK_Handler
+        }
+        Hotkey IfWinActive
     }
-    Hotkey IfWinActive
     if (Level) && (bAutoSubmitOTGUI) {
+        submitConfigFolder()
+    } else if (Level=1) && (TVIDs.Count() = 1) {
         submitConfigFolder()
     } else {
         WinWaitClose % script.name  " - Set limiting '.obsidian'-folder"
