@@ -319,7 +319,8 @@ Class ot {
                 }
             }
         }
-        gui add, Tab3, vvTab3 h900 w400, % Tab3String
+        WideControlWidth:=330
+        gui add, Tab3, vvTab3 h900 w674, % Tab3String
         ;gui show, % "y0 x" A_ScreenWidth-500
         for Tab, Object in TabHeaders {
             if HiddenHeaders[Tab] {
@@ -552,7 +553,7 @@ Class ot {
         onEscape:=ObjBindMethod(this,"otGUI_Escape2")
         Hotkey IfWinActive, % "ahk_id " otGUI_
         Hotkey Escape,% onEscape
-        guiWidth:=418
+        guiWidth:=692
         guiHeight:=maxTabHeight+40
         ;if (!x || (x="")) {
         currentMonitor:=MWAGetMonitor()+0
