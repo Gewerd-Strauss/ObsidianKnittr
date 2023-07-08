@@ -116,6 +116,9 @@ Class ot {
             if Value.Control="meta" {
                 continue
             }
+            if Value.Value="" && Value.Default="" {
+                continue
+            }
             if InStr(Parameter,"___") {
                 Parameter:="'" StrReplace(Parameter,"___", "-") "'"
             } else if InStr(Parameter,"-") {
@@ -336,6 +339,11 @@ Class ot {
                 if InStr(Parameter,"pandoc") {
 
 
+                }
+                if (True) {
+                    if !InStr(Value.String,strreplace(Parameter,"___","-")) {
+                        Value.String:= "" strreplace(Parameter,"___","-") "" ":" A_Space Value.String
+                    }
                 }
                 ControlHeight:=0
                 if (Tab=Value.Tab3Parent) {
