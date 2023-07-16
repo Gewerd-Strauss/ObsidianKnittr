@@ -166,3 +166,9 @@ modifyQuartobuildscript(script_contents,RScriptFolder,out) {
     }
     return script_contents
 }
+
+
+quartogetVersion() {
+    GetStdStreams_WithInput("quarto -V",,out)
+    return Out
+}
