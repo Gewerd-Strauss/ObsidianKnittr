@@ -84,7 +84,7 @@ buildRScriptContent(Path,output_filename="",out="") {
         } else {
             Str3:=format
         }
-        Str3:=Strreplace(Str3,"%Name%",Name)
+        Str3:=Strreplace(Str3,"%Name%",Name Class.FilenameMod)
         Str2=
             (LTrim
                 files <- list.files(pattern="*.PNG",recursive = TRUE)
