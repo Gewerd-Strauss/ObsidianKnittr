@@ -291,6 +291,7 @@ main() {
     }
     if (qmd_Path!="") {
         tmp.1:=modifyQuartobuildscript(tmp.1,tmp.3,out)
+        EL.Quarto_Version:=quartogetVersion()
     }
     script_contents:=tmp.1
     format:=tmp.2
