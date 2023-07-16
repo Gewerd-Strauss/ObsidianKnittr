@@ -120,7 +120,7 @@ buildRScriptContent(Path,output_filename="",out="") {
             print(all_times)
         )
     Str.=Str2
-    OD(,Str,FormatOptions)
+    ;OD(,Str,FormatOptions)
     return [Str,FormatOptions,RScriptFolder]
 
 }
