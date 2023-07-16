@@ -50,11 +50,11 @@ buildRScriptContent(Path,output_filename="",out="") {
     }
     for _,Class in out.Outputformats {
         format:=Class.AssembledFormatString
-        if Instr(format,"pdf_document") {
+        if Instr(format,"pdf") {
             continue
         }
         Str3:=LTrim(Class.renderingpackage)
-        if (Str3!="") {
+        if (Trim(Str3)!="") {
             if (format="") {
                 Str3:=Strreplace(Str3,"%format%","NULL")
             } else {
@@ -70,15 +70,19 @@ buildRScriptContent(Path,output_filename="",out="") {
     ;; pdf handling
     for _, Class in out.Outputformats { 
         format:=Class.AssembledFormatString
-        if !Instr(format,"pdf_document") {
+        if !Instr(format,"pdf") {
 
             continue
         }
         Str3:="`n`n`n`n" LTrim(Class.renderingpackage)
-        if (format="") {
-            Str3:=Strreplace(Str3,"%format%","NULL")
+        if (RegexMatch(Str3,"\S+")) {
+            if (format="") {
+                Str3:=Strreplace(Str3,"%format%","NULL")
+            } else {
+                Str3:=Strreplace(Str3,"%format%",format)
+            }
         } else {
-            Str3:=Strreplace(Str3,"%format%",format)
+            Str3:=format
         }
         Str3:=Strreplace(Str3,"%Name%",Name)
         Str2=
@@ -103,7 +107,7 @@ buildRScriptContent(Path,output_filename="",out="") {
         if bFixPNGs {
             ;Str2:="`n" Str3 "`n"
         }
-        Str.=Str3
+        Str.="`n`n" Str3
         FormatOptions.= A_Tab strreplace(format,"`n",A_Tab "`n") "`n`n"
     }
     Str2=
@@ -116,6 +120,7 @@ buildRScriptContent(Path,output_filename="",out="") {
             print(all_times)
         )
     Str.=Str2
+    ;OD(,Str,FormatOptions)
     return [Str,FormatOptions,RScriptFolder]
 
 }
