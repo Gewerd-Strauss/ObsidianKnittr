@@ -12,6 +12,7 @@ Used Verb                 : `%UsedVerb`%
 OHTML - Version           : `%obsidianhtml_version`%
 Used Personal Fork        : `%bUseOwnOHTMLFork`%
 ObsidianKnittr - Version  : `%ObsidianKnittr_Version`%
+Quarto - Version          : `%Quarto_Version`%
 
 ___________________________________________________
 Timings:
@@ -55,6 +56,7 @@ Fixed PNG Files           : `%bForceFixPNGFiles`%
 Inserted Setup Chunk      : `%bInsertSetupChunk`%
 
 QMD: 
+Quarto - Version          : `%Quarto_Version`%
 Strip Type from Crossrefs : `%bRemoveQuartoReferenceTypesFromCrossrefs`%
 
 ___________________________________________________
