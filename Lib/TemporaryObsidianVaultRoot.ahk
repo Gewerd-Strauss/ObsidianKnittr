@@ -141,11 +141,11 @@ chooseTV_Element(TV_String,Graph,Level,bAutoSubmitOTGUI) {
             Key:="^" A_Index-1
             Hotkey % Key, % objTOVRHK_Handler
         }
-        Hotkey IfWinActive
-    }
-    Hotkey !a, % objTOVRHK_Handler
-    Hotkey !f, % objTOVRHK_Handler
-    Hotkey IfWinActive
+        Hotkey IfWinActive	
+    	Hotkey !a, % objTOVRHK_Handler
+    	Hotkey !f, % objTOVRHK_Handler
+    	Hotkey IfWinActive
+	}
     if (Level) && (bAutoSubmitOTGUI) {
         submitConfigFolder()
     } else if (Level=1) && (TVIDs.Count() = 1) {
