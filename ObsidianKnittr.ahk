@@ -921,3 +921,4 @@ fTraySetup() {
 #Include <Log>
 #Include <Outputbackup>
 #Include <TemporaryObsidianVaultRoot>
+#Include <script>
