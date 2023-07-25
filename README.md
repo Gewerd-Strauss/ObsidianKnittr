@@ -34,5 +34,4 @@ ObsidianKnitter requires the installation of
 
 - ObsidianHTML
 - R (tested on 4.2.2, other versions might break)
-
-
+- [this](https://gist.github.com/Gewerd-Strauss/8ee61682aef45c0d124b19afaeedc2fe) gist for the script.ahk include for commits older than 25.07.2023 22:10.
