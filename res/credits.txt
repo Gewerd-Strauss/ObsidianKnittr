@@ -11,7 +11,7 @@ anonymous1184   -      Quote                                                    
 anonymous1184   -      RegexMatchAll/RegexMatchLines                                        - https://www.reddit.com/r/AutoHotkey/comments/12l4gr8/comment/jg6ngt7/?utm_source=reddit&utm_medium=web2x&context=3
 tidbit et al    -      st_count										                        - https://www.autohotkey.com/boards/viewtopic.php?t=53
 Gewerd Strauss  -      ttip                                                                 - https://gist.github.com/Gewerd-Strauss/fad218c28b8120ab1a3cadea1a8dea9b
-Gewerd Strauss  -      partial, self-written subset of ScriptObj                            - https://github.com/Gewerd-Strauss/ScriptObj/blob/master/ScriptObj.ahk
+Gewerd Strauss  -      partial, self-written subset of ScriptObj                            - https://gist.github.com/Gewerd-Strauss/8ee61682aef45c0d124b19afaeedc2fe
 Gewerd Strauss  -      main script, 
 
 
