@@ -73,6 +73,7 @@ main() {
                 RScriptPath=%given_rscriptpath%
                 searchroot=%given_searchroot%
                 SetSearchRootToLastRunManuscriptFolder=1
+                confirmOHTMLCustomBuild=1
                 [Version]
                 ObsidianHTML_Version=3.4.1
                 ObsidianKnittr_Version=3.1.3
@@ -975,4 +976,3 @@ fTraySetup() {
 #Include <TemporaryObsidianVaultRoot>
 #Include <Quarto>
 #Include <script>
-
