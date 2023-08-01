@@ -9,6 +9,7 @@ hi5             -      TF.ahk, license                                          
 AHK-RARE (?)    -      PrettyTickCount                                                      - https://github.com/Ixiko/AHK-Rare
 anonymous1184   -      Quote                                                                - https://www.reddit.com/r/AutoHotkey/comments/p2z9co/comment/h8oq1av/?utm_source=share&utm_medium=web2x&context=3
 anonymous1184   -      RegexMatchAll/RegexMatchLines                                        - https://www.reddit.com/r/AutoHotkey/comments/12l4gr8/comment/jg6ngt7/?utm_source=reddit&utm_medium=web2x&context=3
+polythene       -      DateParse                                                            - https://www.autohotkey.com/board/topic/18760-date-parser-convert-any-date-format-to-yyyymmddhh24miss/?p=124324, https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
 tidbit et al    -      st_count										                        - https://www.autohotkey.com/boards/viewtopic.php?t=53
 Gewerd Strauss  -      ttip                                                                 - https://gist.github.com/Gewerd-Strauss/fad218c28b8120ab1a3cadea1a8dea9b
 Gewerd Strauss  -      partial, self-written subset of ScriptObj                            - https://gist.github.com/Gewerd-Strauss/8ee61682aef45c0d124b19afaeedc2fe
