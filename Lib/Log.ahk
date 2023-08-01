@@ -12,6 +12,7 @@ Used Verb                 : `%UsedVerb`%
 OHTML - Version           : `%obsidianhtml_version`%
 Used Personal Fork        : `%bUseOwnOHTMLFork`%
 ObsidianKnittr - Version  : `%ObsidianKnittr_Version`%
+Quarto - Version          : `%Quarto_Version`%
 
 ___________________________________________________
 Timings:
@@ -50,9 +51,13 @@ Stripped Local MD-Links   : `%bStripLocalMarkdownLinks`%
 Vault Limited             : `%bRestrictOHTMLScope`%
 
 RMD:
-Render to Outputs         : `%bRenderRMD`%
+Execute R-Script          : `%bExecuteRScript`%
 Fixed PNG Files           : `%bForceFixPNGFiles`%
 Inserted Setup Chunk      : `%bInsertSetupChunk`%
+
+QMD: 
+Quarto - Version          : `%Quarto_Version`%
+Strip Type from Crossrefs : `%bRemoveQuartoReferenceTypesFromCrossrefs`%
 
 ___________________________________________________
 Fed OHTML - Config:
@@ -82,7 +87,8 @@ Issued Command            : `%CMD`%
 stdOut                    : `%data_out`%
 ___________________________________________________
 R - StdStreams:
-
+Issued Command            : `%RCMD`%
+Working Directory         : `%RWD`%
 stdOut                    : `%Rdata_out`%
 
 )
