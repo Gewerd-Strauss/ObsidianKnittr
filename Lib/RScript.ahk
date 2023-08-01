@@ -8,6 +8,8 @@ buildRScriptContent(Path,output_filename="",out="") {
     }
     Str=
         (LTRIM
+            cat("\014") ## clear console
+            remove (list=ls()) ## clear environment variables
             getwd()
             if (getwd() != "%RScriptFolder%")
             {
@@ -17,7 +19,7 @@ buildRScriptContent(Path,output_filename="",out="") {
             getwd()
             sprintf('Chosen Output formats:')
             %OutputType_Print%
-
+            version
         )
     if out.settings.bForceFixPNGFiles {
         Str2=
@@ -42,33 +44,47 @@ buildRScriptContent(Path,output_filename="",out="") {
     }
     Name:=(output_filename!=""?output_filename:"index")
         , FormatOptions:=""
+    for _, Class in out.Outputformats { 
+        Class.FilenameMod:=" (" Class.package ")"
+        Class.Filename:=Name
+    }
     for _,Class in out.Outputformats {
         format:=Class.AssembledFormatString
-        if Instr(format,"pdf_document") {
+        if Instr(format,"pdf") {
             continue
         }
-        if (format="") {
-            Str2=
-                (LTRIM
-
-                    rmarkdown::render(`"index.rmd`",NULL,`"%Name%"`)`n
-                )
+        Str3:=LTrim(Class.renderingpackage)
+        if (Trim(Str3)!="") {
+            if (format="") {
+                Str3:=Strreplace(Str3,"%format%","NULL")
+            } else {
+                Str3:=Strreplace(Str3,"%format%",format)
+            }
         } else {
-            Str2=
-                (LTRIM
-
-                    rmarkdown::render(`"index.rmd`",%format%,`"%Name%"`)`n
-                )
+            Str3:=format
         }
-        Str.=Str2
+        Str3:=Strreplace(Str3,"%Name%",Name Class.FilenameMod)
+        Str.="`n`n" Str3
         FormatOptions.= A_Tab strreplace(format,"`n",A_Tab "`n") "`n`n"
     }
-    for _, Class in out.Outputformats {
+    ;; pdf handling
+    for _, Class in out.Outputformats { 
         format:=Class.AssembledFormatString
-        if !Instr(format,"pdf_document") {
+        if !Instr(format,"pdf") {
 
             continue
         }
+        Str3:="`n`n`n`n" LTrim(Class.renderingpackage)
+        if (RegexMatch(Str3,"\S+")) {
+            if (format="") {
+                Str3:=Strreplace(Str3,"%format%","NULL")
+            } else {
+                Str3:=Strreplace(Str3,"%format%",format)
+            }
+        } else {
+            Str3:=format
+        }
+        Str3:=Strreplace(Str3,"%Name%",Name Class.FilenameMod)
         Str2=
             (LTrim
                 files <- list.files(pattern="*.PNG",recursive = TRUE)
@@ -82,16 +98,16 @@ buildRScriptContent(Path,output_filename="",out="") {
                 magick::image_write(png_image,Path)
                 sprintf( "Fixed Path '`%s'", Path)
                 })
+
+
+
+
                 rmarkdown::render(`"index.rmd`",%format%,`"%Name%"`)`n
             )
         if bFixPNGs {
-            Str2=
-                (LTrim
-
-                    rmarkdown::render(`"index.rmd`",%format%,`"%Name%"`)`n
-                )
+            ;Str2:="`n" Str3 "`n"
         }
-        Str.=Str2
+        Str.="`n`n" Str3
         FormatOptions.= A_Tab strreplace(format,"`n",A_Tab "`n") "`n`n"
     }
     Str2=
@@ -104,7 +120,8 @@ buildRScriptContent(Path,output_filename="",out="") {
             print(all_times)
         )
     Str.=Str2
-    return [Str,FormatOptions]
+    ;OD(,Str,FormatOptions)
+    return [Str,FormatOptions,RScriptFolder]
 
 }
 
@@ -123,7 +140,7 @@ runRScript(Path,script_contents,Outputformats,RScript_Path:="") {
     if !validateRExecution(InOut,Outputformats) {
         MsgBox 0x10,% script.name " - " A_ThisFunc "()", % "Error encountered`; the 'build.R'-script did not run to succession.`n`nFor more information, see the generated 'Executionlog.txt'-file, and execute the 'build.R'-script via console or RStudio.`n`nThe script will continue to cleanup its working directories now.",4
     }
-    return InOut
+    return [InOut,CMD,OutDir]
 }
 
 validateRExecution(String,Formats) {
