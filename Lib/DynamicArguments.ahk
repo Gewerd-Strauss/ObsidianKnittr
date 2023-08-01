@@ -28,7 +28,8 @@ Class ot {
         for _, Line in Lines {
             Count:=1
             p := 1
-            regex:="(?<Key>\w+\:)(?<Val>[^|]+)"
+            regex:="(?<Key>\w+\:)(?<Val>[^|]+)" ;; does not support keys a la 'toc-depth' (as required by quarto)
+            regex:="(?<Key>(\-|\w)+\:)(?<Val>[^|]+)"
             if (SubStr(Trim(Line),1,1)=";") {
                 continue
             }
@@ -40,11 +41,20 @@ Class ot {
                     } else {
                         matchKey:=SubStr(matchKey,1,StrLen(matchKey)-1) ;; remove the doublepoint.
                         if (Count<2) { ;; initiate Parameter-Object
-                            CurrentParam:=matchKey
-                            ObjRawSet(This.Arguments,matchKey,{})
-                            ObjRawSet(This.Arguments[CurrentParam],"Control",matchVal)
+                            if (InStr(Line,"renderingpackage")) {
+                                This[matchKey]:=StrSplit(Line,"Value:").2
+                                p+=StrLen(Match)
+                                Count++
+                                continue
+                            } else {
+                                CurrentParam:=matchKey
+                                ObjRawSet(This.Arguments,matchKey,{})
+                                ObjRawSet(This.Arguments[CurrentParam],"Control",matchVal)
+                            }
                         }
-                        ObjRawSet(This.Arguments[CurrentParam],matchKey,matchVal) ;; there ought to be a simpler method than ObjRawSet that I am utterly missing, or tested with bad data and assumed faulty...
+                        if !(InStr(Line,"renderingpackage")) {
+                            ObjRawSet(This.Arguments[CurrentParam],matchKey,matchVal) ;; there ought to be a simpler method than ObjRawSet that I am utterly missing, or tested with bad data and assumed faulty...
+                        }
                         p+=StrLen(Match)
                         Count++
                     }
@@ -88,20 +98,39 @@ Class ot {
         return This
     }
     AssembleFormatString() {
-        if InStr(this.type,"::") { ;; start string
-            Str:=this.type "(`n" ;; check if format is from a specific package or not
+        if this.HasKey("renderingpackage_start") {
+            if !this.HasKey("renderingpackage_end") {
+                MsgBox 0x40031, % "output_type: " this.type " - faulty meta parameter", % "The meta parameter`n'renderingpackage_end'`ndoes not exist. Exiting. Please refer to documentation and fix the file 'DynamicArguments.ini'."
+            }
+            Str:=this.renderingpackage_start
         } else {
-            Str:="rmarkdown::" this.type "(`n"  ;; assume rmarkdown-package if not the case
+
+            if InStr(this.type,"::") { ;; start string
+                Str:=this.type "(`n" ;; check if format is from a specific package or not
+            } else {
+                Str:="rmarkdown::" this.type "(`n"  ;; assume rmarkdown-package if not the case
+            }
         }
         this._Adjust()
         for Parameter, Value in this.Arguments {
+            if Value.Control="meta" {
+                continue
+            }
+            if Value.Value="" && Value.Default="" {
+                continue
+            }
+            if InStr(Parameter,"___") {
+                Parameter:="'" StrReplace(Parameter,"___", "-") "'"
+            } else if InStr(Parameter,"-") {
+                Parameter:="'" Parameter "'"
+            }
             if (Parameter="toc_depth" && !this.Arguments["toc"].Value) {
                 continue
             }
             if (Value.Type="String") && (Value.Value!="") && (Value.Default!="NULL") {
                 Value.Value:=DA_Quote(Value.Value)
             }
-            if (Parameter="reference_docx") {
+            if (InStr(Parameter,"reference_docx") || InStr(Parameter,"reference-doc"))  {
                 ParamBackup:=Value.Value
                 if Instr(Value.Value,this.DDL_ParamDelimiter) {
                     ParamString:=strsplit(Value.Value,this.DDL_ParamDelimiter).2
@@ -135,10 +164,22 @@ Class ot {
             }
             Str.= Parameter " = " Value.Value ",`n"
         }
+        for Parameter, Value in this.Arguments {
+            if Value.Control="meta" {
+                this.Arguments.Remove(Parameter)
+                continue
+            }
+        }
         Str:=SubStr(Str,1,StrLen(Str)-2)
         Str.=(Instr(Str,"`n")?"`n)":"")
+        if InStr(Str,this.renderingpackage_start) {
+            if this.HasKey("renderingpackage_end") {
+
+                Str:=strreplace(Str,"`n)",this.renderingpackage_end)
+            }
+        }
         this.AssembledFormatString:=Str
-        return Str
+        return
     }
 
     AdjustDDLs() {
@@ -176,7 +217,8 @@ Class ot {
             if Value.HasKey("Max") {
                 Value.Value:=Value.Max+0
             }
-            if Value.HasKey(Min) && Value.Min>Value.Value {
+            if Value.HasKey("Min") && Value.Min>Value.Value 
+            {
                 Value.Value:=Value.Min+0
             }
         }
@@ -241,67 +283,268 @@ Class ot {
 
         gui ParamsGUI: new, +AlwaysOnTop -SysMenu -ToolWindow +caption +Border +LabelotGUI_ +hwndotGUI_
         gui font, s8
+        TabHeaders:={}
+        for Parameter, Value in this.Arguments {
+            if Value.HasKey("Tab3Parent") {
 
-        for Parameter,Value in this.Arguments {
-            Control:=Value.Control
-            if (Options="") {
-                Options:=""
-            }
-            if (Value.Control="Edit") {
-                gui ParamsGUI: add, text,, % Value.String
-                if (Value.ctrlOptions="Number") {
-                    if (Value.Max!="") && (Value.Min!="") {
-                        Value.ctrlOptions.= A_Space
-                        Gui ParamsGUI:Add, Edit
-                        gui ParamsGUI:add, UpDown, % "h25 w80 Range" Value.Min "-" Value.Max " vv" Parameter, % Value.Default + 0
-                        continue
-                    }
-                }
-                if !RegexMatch(Value.ctrlOptions,"w\d*") {
-                    Value.ctrlOptions.= " w120"
-                }
-                gui ParamsGUI: add, % Value.Control, % Value.ctrlOptions " vv" Parameter, % (Value.Value="NULL"?:Value.Value)
-            } else if (Value.Control="File") {
-                gui ParamsGUI:Add, Text,, % Value.String
-                gui ParamsGUI:Add, edit, % Value.ctrlOptions " vv" Parameter " disabled w200", % Value.Value
-                Gui ParamsGUI:Add, button, hwndSelectFile, % "Select &File"
-                gui ParamsGUI:add, button, yp xp+77 hwndOpenFileSelectionFolder, % "Open File Selection Folder"
-                onOpenFileSelectionFolder:=ObjBindMethod(this, "OpenFileSelectionFolder", Value.SearchPath)
-                onSelectFile := ObjBindMethod(this, "ChooseFile",Parameter)
-                GuiControl ParamsGUI:+g, %SelectFile%, % onSelectFile
-                GuiControl ParamsGUI:+g, %OpenFileSelectionFolder%, % onOpenFileSelectionFolder
-                gui ParamsGUI:add,text, w0 h0 yp+20 xp-77
-            } else if (Value.Control="DDL") {
-                gui ParamsGUI:Add, Text,, % Value.String
-                if Instr(Value.ctrlOptions,",") && !Instr(Value.ctrlOptions,"|") {
-                    Value.ctrlOptions:=strreplace(Value.ctrlOptions,",","|")
-                }
-                if !Instr(Value.ctrlOptions,Value.Default) {
-                    Value.ctrlOptions.=((SubStr(Value.ctrlOptions,-1)="|")?"":"|") Value.Default
-                }
-                if !Instr(Value.ctrlOptions,Value.Default "|") {
-                    Value.ctrlOptions:=strreplace(Value.ctrlOptions,Value.Default,Value.Default "|")
-                }
-                if !Instr(Value.ctrlOptions,Value.Default "||") {
-                    Value.ctrlOptions:=strreplace(Value.ctrlOptions,Value.Default,Value.Default "|")
-                }
-                if !Instr(Value.ctrlOptions,Value.Default "||") {
-                    Value.ctrlOptions:=strreplace(Value.ctrlOptions,Value.ctrlOptions "|")
-                }
-                gui ParamsGUI:add, % Value.Control, % " vv" Parameter, % Value.ctrlOptions
+                TabHeaders[Value.Tab3Parent]:={Height:0}
             } else {
-                gui ParamsGUI:add, % Value.Control, % Value.ctrlOptions " vv" Parameter, % Value.String
-            }
-            if (Value.Control="Checkbox") {
-                ;@ahk-neko-ignore-fn 1 line; at 4/28/2023, 9:49:09 AM ; case sensitivity
-                guicontrol % "ParamsGUI:",v%Parameter%, % Value.Default
-            }
-
-            if (Control="Edit") {
-                ; V.String:=tmp
+                this.Arguments[Parameter,"Tab3Parent"]:="Other"
+                TabHeaders[Value.Tab3Parent]:={Height:0}
             }
         }
-        gui add, button,hwndSubmitButton,&Submit
+        Tab3String:=""
+        ind:=0
+        HiddenHeaders:={}
+        for Header,_  in TabHeaders {
+            HeaderFound:=false
+            for Parameter, Value in this.Arguments {
+                if (Value.Tab3Parent=Header) {
+                    if Value.Control!="meta" {
+
+                        HeaderFound:=true
+                        HiddenHeaders[Header]:=false
+                        break
+                    } else {
+                        HiddenHeaders[Header]:=true
+                    }
+                }
+            }
+            if (HeaderFound) {
+
+                Tab3String.=Header
+                ind++
+                if (ind<TabHeaders.Count()) || (ind=1) {
+                    Tab3String.="|"
+                }
+            }
+        }
+        WideControlWidth:=330
+        gui add, Tab3, vvTab3 h900 w674, % Tab3String
+        ;gui show, % "y0 x" A_ScreenWidth-500
+        for Tab, Object in TabHeaders {
+            if HiddenHeaders[Tab] {
+                continue
+            }
+            TabHeight:=0
+            gui Tab, % Tab,, Exact
+            GuiControl Choose, vTab3, % Tab
+            for Parameter, Value in this.Arguments {
+                if Value.Control="meta" {
+                    this[Parameter]:=Value.Value
+                    continue
+                }
+                if InStr(Parameter,"-") {
+                    Parameter:=strreplace(Parameter,"-","___") ;; fix "toc-depth"-like formatted parameters for quarto syntax when displaying. Three underscores are used to differentiate it from valid syntax for other packages.
+                }
+                if InStr(Parameter,"pandoc") {
+
+
+                }
+                if (True) {
+                    if !InStr(Value.String,strreplace(Parameter,"___","-")) {
+                        Value.String:= "" strreplace(Parameter,"___","-") "" ":" A_Space Value.String
+                    }
+                }
+                ControlHeight:=0
+                if (Tab=Value.Tab3Parent) {
+                    Control:=Value.Control
+                    if (Options="") {
+                        Options:=""
+                    }
+                    if (Value.Control="Edit") {
+                        if Value.HasKey("Link") {
+                            gui ParamsGUI: add, Link,h20, % "<a href=" Value.Link ">?</a>" A_Space Value.String
+                        } else {
+                            gui ParamsGUI: add, text,h20, % Value.String
+                        }
+                        ControlHeight+=20
+                        if (Value.ctrlOptions="Number") {
+                            if (Value.Max!="") && (Value.Min!="") {
+                                Value.ctrlOptions.= A_Space
+                                Gui ParamsGUI:Add, Edit,
+                                gui ParamsGUI:add, UpDown, % "h20 w80 Range" Value.Min "-" Value.Max " vv" Parameter, % Value.Default + 0
+                                ControlHeight+=20
+                                GuiControl Move, vTab3, % "h" TabHeight + ControlHeight + 16
+                                TabHeight+=ControlHeight
+                                GuiControl Move, vTab3, % "h" TabHeight + 16
+                                ;gui show
+                                continue
+                            }
+                        }
+                        if !RegexMatch(Value.ctrlOptions,"w\d*") {
+                            Value.ctrlOptions.= " w120"
+                        }
+                        if RegexMatch(Value.ctrlOptions,"h(?<vH>\d*)",v) {
+                            ControlHeight+=vvH + 15
+                        } else if !RegexMatch(Value.ctrlOptions,"h(?<vH>\d*)",v) {
+                            Value.ctrlOptions.= " h35"
+                            ControlHeight+=35
+                        }
+                        gui ParamsGUI: add, % Value.Control, % Value.ctrlOptions " vv" Parameter, % (Value.Value="NULL"?:Value.Value)
+                        ;GuiControl Move, vTab3, % "h" TabHeight
+                    } else if (Value.Control="File") {
+                        if Value.HasKey("Link") {
+                            gui ParamsGUI: add, Link,h20, % "<a href=" Value.Link ">?</a>" A_Space Value.String
+                        } else {
+                            gui ParamsGUI: add, text,TabHeight+20, % Value.String
+                        }
+                        ControlHeight+=20
+                        ;GuiControl Move, vTab3, % "h" TabHeight + ControlHeight
+                        gui ParamsGUI:Add, edit, % Value.ctrlOptions " vv" Parameter " disabled w200 yp+30 h60", % Value.Value
+                        ControlHeight+=90
+                        ;GuiControl Move, vTab3, % "h" TabHeight + ControlHeight
+                        Gui ParamsGUI:Add, button, yp+70 hwndSelectFile, % "Select &File"
+                        ControlHeight+=30
+                        ;GuiControl Move, vTab3, % "h" TabHeight + ControlHeight
+                        gui ParamsGUI:add, button, yp xp+77 hwndOpenFileSelectionFolder, % "Open File Selection Folder"
+                        onOpenFileSelectionFolder:=ObjBindMethod(this, "OpenFileSelectionFolder", Value.SearchPath)
+                        onSelectFile := ObjBindMethod(this, "ChooseFile",Parameter)
+                        GuiControl ParamsGUI:+g, %SelectFile%, % onSelectFile
+                        GuiControl ParamsGUI:+g, %OpenFileSelectionFolder%, % onOpenFileSelectionFolder
+                        gui ParamsGUI:add,text, w0 h0 yp+20 xp-77
+                        ControlHeight+=20
+                        GuiControl Move, vTab3, % "h" TabHeight + ControlHeight
+                    } else if (Value.Control="DDL") || (Value.Control="ComboBox") {
+                        if Value.HasKey("Link") {
+                            gui ParamsGUI: add, Link,h20, % "<a href=" Value.Link ">?</a>" A_Space Value.String
+                        } else {
+                            gui ParamsGUI: add, text,h20, % Value.String
+                        }
+                        if Instr(Value.ctrlOptions,",") && !Instr(Value.ctrlOptions,"|") {
+                            Value.ctrlOptions:=strreplace(Value.ctrlOptions,",","|")
+                        }
+                        if !Instr(Value.ctrlOptions,Value.Default) {
+                            Value.ctrlOptions.=((SubStr(Value.ctrlOptions,-1)="|")?"":"|") Value.Default
+                        }
+                        if !Instr(Value.ctrlOptions,Value.Default "|") {
+                            Value.ctrlOptions:=strreplace(Value.ctrlOptions,Value.Default,Value.Default "|")
+                        }
+                        if !Instr(Value.ctrlOptions,Value.Default "||") {
+                            Value.ctrlOptions:=strreplace(Value.ctrlOptions,Value.Default,Value.Default "|")
+                        }
+                        if !Instr(Value.ctrlOptions,Value.Default "||") {
+                            Value.ctrlOptions:=strreplace(Value.ctrlOptions,Value.ctrlOptions "|")
+                        }
+                        Threshold:=5
+                        tmpctrlOptions:=LTrim(RTrim(strreplace(Value.ctrlOptions,"||","|"),"|"),"|")
+                        tmpctrlOptions_arr:=strsplit(tmpctrlOptions,"|")
+                        Count:=tmpctrlOptions_arr.Count()
+                        shown_rows:=(Count<=1?1:(Count>Threshold?Threshold:Count))
+                        gui ParamsGUI:add, % Value.Control, % "  vv" Parameter " r" shown_rows , % Value.ctrlOptions
+                        ControlHeight+=75
+                    } else {
+                        if Value.HasKey("Link") {
+                            if (Value.Control="Checkbox") { 
+                                gui ParamsGUI: add, Link,h20, % "<a href=" Value.Link ">?</a>" A_Space
+                                gui ParamsGUI: add, % Value.Control, % Value.ctrlOptions "yp-8 xp+8 h30 vv" Parameter, % Value.String
+                                gui ParamsGUI: add, text, h0 w0 xp-8 yp+20
+                            }
+                        } else {
+                            gui ParamsGUI:add, % Value.Control, % Value.ctrlOptions " h30 vv" Parameter, % Value.String
+                        }
+                        ControlHeight+=30
+                    }
+                    if (Value.Control="Checkbox") {
+                        ;@ahk-neko-ignore-fn 1 line; at 4/28/2023, 9:49:09 AM ; case sensitivity
+                        guicontrol % "ParamsGUI:",v%Parameter%, % Value.Default
+                    }
+
+                    if (Control="Edit") {
+                        ; V.String:=tmp
+                    }
+                    if InStr(Parameter,"pandoc") {
+                        GuiControl Move, vTab3, % "h" TabHeight + ControlHeight
+
+                    } else {
+
+                        GuiControl Move, vTab3, % "h" TabHeight + ControlHeight + 16
+                    }
+                    TabHeight+=ControlHeight + 3
+                }
+                GuiControl Move, vTab3, % "h" TabHeight + 32
+                ;gui show
+            }
+            TabHeaders[Tab].Height+=TabHeight+=32
+        }
+        maxTabHeight:=0
+        for _, Tab in TabHeaders {
+            if HiddenHeaders[Tab] {
+                continue
+            }
+            if (Tab.Height>maxTabHeight) {
+                maxTabHeight:=Tab.Height + 80
+            }
+        }
+        /*
+        for Parameter,Value in this.Arguments {
+        Control:=Value.Control
+        if (Options="") {
+        Options:=""
+        }
+        if (Value.Control="Edit") {
+        gui ParamsGUI: add, text,, % Value.String
+        if (Value.ctrlOptions="Number") {
+        if (Value.Max!="") && (Value.Min!="") {
+        Value.ctrlOptions.= A_Space
+        Gui ParamsGUI:Add, Edit
+        gui ParamsGUI:add, UpDown, % "h25 w80 Range" Value.Min "-" Value.Max " vv" Parameter, % Value.Default + 0
+        continue
+        }
+        }
+        if !RegexMatch(Value.ctrlOptions,"w\d*") {
+        Value.ctrlOptions.= " w120"
+        }
+        gui ParamsGUI: add, % Value.Control, % Value.ctrlOptions " vv" Parameter, % (Value.Value="NULL"?:Value.Value)
+        } else if (Value.Control="File") {
+        gui ParamsGUI:Add, Text,, % Value.String
+        gui ParamsGUI:Add, edit, % Value.ctrlOptions " vv" Parameter " disabled w200", % Value.Value
+        Gui ParamsGUI:Add, button, hwndSelectFile, % "Select &File"
+        gui ParamsGUI:add, button, yp xp+77 hwndOpenFileSelectionFolder, % "Open File Selection Folder"
+        onOpenFileSelectionFolder:=ObjBindMethod(this, "OpenFileSelectionFolder", Value.SearchPath)
+        onSelectFile := ObjBindMethod(this, "ChooseFile",Parameter)
+        GuiControl ParamsGUI:+g, %SelectFile%, % onSelectFile
+        GuiControl ParamsGUI:+g, %OpenFileSelectionFolder%, % onOpenFileSelectionFolder
+        gui ParamsGUI:add,text, w0 h0 yp+20 xp-77
+        } else if (Value.Control="DDL") {
+        gui ParamsGUI:Add, Text,, % Value.String
+        if Instr(Value.ctrlOptions,",") && !Instr(Value.ctrlOptions,"|") {
+        Value.ctrlOptions:=strreplace(Value.ctrlOptions,",","|")
+        }
+        if !Instr(Value.ctrlOptions,Value.Default) {
+        Value.ctrlOptions.=((SubStr(Value.ctrlOptions,-1)="|")?"":"|") Value.Default
+        }
+        if !Instr(Value.ctrlOptions,Value.Default "|") {
+        Value.ctrlOptions:=strreplace(Value.ctrlOptions,Value.Default,Value.Default "|")
+        }
+        if !Instr(Value.ctrlOptions,Value.Default "||") {
+        Value.ctrlOptions:=strreplace(Value.ctrlOptions,Value.Default,Value.Default "|")
+        }
+        if !Instr(Value.ctrlOptions,Value.Default "||") {
+        Value.ctrlOptions:=strreplace(Value.ctrlOptions,Value.ctrlOptions "|")
+        }
+        gui ParamsGUI:add, % Value.Control, % " vv" Parameter, % Value.ctrlOptions
+        } else {
+        gui ParamsGUI:add, % Value.Control, % Value.ctrlOptions " vv" Parameter, % Value.String
+        }
+        if (Value.Control="Checkbox") {
+        ;@ahk-neko-ignore-fn 1 line; at 4/28/2023, 9:49:09 AM ; case sensitivity
+        guicontrol % "ParamsGUI:",v%Parameter%, % Value.Default
+        }
+
+        if (Control="Edit") {
+        ; V.String:=tmp
+        }
+        }
+        */
+        GuiControl Move, vTab3, % "h" maxTabHeight
+        ;guicontrol hide,vTab3
+        ttip(maxTabHeight)
+        maxTabHeight+=25
+        ;gui show,
+        GuiControl Choose, vTab3, 1
+        gui Tab
+        gui add, button,y%maxTabHeight% xp hwndSubmitButton,&Submit
         onSubmit:=ObjBindMethod(this, "SubmitDynamicArguments")
         GuiControl ParamsGUI:+g,%SubmitButton%, % onSubmit
         gui add, button, yp xp+60 hwndEditConfig, Edit Configuration
@@ -310,7 +553,8 @@ Class ot {
         onEscape:=ObjBindMethod(this,"otGUI_Escape2")
         Hotkey IfWinActive, % "ahk_id " otGUI_
         Hotkey Escape,% onEscape
-        guiWidth:=404
+        guiWidth:=692
+        guiHeight:=maxTabHeight+40
         ;if (!x || (x="")) {
         currentMonitor:=MWAGetMonitor()+0
         SysGet MonCount, MonitorCount
@@ -337,9 +581,9 @@ Class ot {
         }
         ;  }
         if (x!="") && (y!="") {
-            gui ParamsGUI:Show,x%x% y%y% w%guiWidth%,% GUIName:=this.GUITitle this.type
+            gui ParamsGUI:Show,x%x% y%y% w%guiWidth% h%guiHeight%,% GUIName:=this.GUITitle this.type
         } else {
-            gui ParamsGUI:Show,w%guiWidth%,% GUIName:=this.GUITitle this.type
+            gui ParamsGUI:Show,w%guiWidth% h%guiHeight%,% GUIName:=this.GUITitle this.type
         }
         WinWait % GUIName
         if this.SkipGUI {
@@ -372,7 +616,9 @@ Class ot {
         gui ParamsGui: destroy
         for Parameter,_ in this.Arguments {
             ;@ahk-neko-ignore 1 line; at 4/28/2023, 9:49:42 AM ; https://github.com/CoffeeChaton/vscode-autohotkey-NekoHelp/blob/main/note/code107.md
+            parameter:=strreplace(parameter,"-","___")
             k=v%Parameter% ;; i know this is jank, but I can't seem to fix it. just don't touch for now?
+            parameter:=strreplace(parameter,"___","-")
             a:=%k%
             this["Arguments",Parameter].Value:=a
         }
