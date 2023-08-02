@@ -757,7 +757,7 @@ guiShow() {
         if bAutoSubmitOTGUI {
             ot.SkipGUI:=bAutoSubmitOTGUI
         }
-        ot.GenerateGUI(x,y)
+        ot.GenerateGUI(x,y,TRUE,"ParamsGUI:",1,1,674,1)
         ot.AssembleFormatString()
         Outputformats[format]:=ot
     }
