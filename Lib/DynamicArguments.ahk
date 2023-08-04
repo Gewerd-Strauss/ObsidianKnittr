@@ -209,18 +209,23 @@ Class ot {
     }
     AdjustMinMax() {
         for Parameter, Value in this.Arguments {
+            oldVal:=Value.Value
             if RegexMatch(Value.Other,"Max\:(?<Max>\d*)",v_) {
                 Value.Max:=v_Max+0
             }
             if RegexMatch(Value.Other,"Min\:(?<Min>\d*)",v_) {
                 Value.Min:=v_Min+0
             }
-            if Value.HasKey("Max") {
+            if Value.HasKey("Max") && Value.Value>Value.Max {
                 Value.Value:=Value.Max+0
             }
-            if Value.HasKey("Min") && Value.Min>Value.Value 
-            {
+            if Value.HasKey("Min") && Value.Min>Value.Value {
                 Value.Value:=Value.Min+0
+            }
+            if (Value.HasKey("Max") && Value.HasKey("Max")) {
+                if !((Value.Value<=Value.Max) && (Value.Min<=Value.Value)) {
+                    Value.Value:=Value.Default
+                }
             }
         }
     }
@@ -600,18 +605,20 @@ Class ot {
 
     }
     SubmitDynamicArguments() {
-        static ; global
+        static
         GUI_ID:=this.GUI_ID
+        gui %GUI_ID% Default
         gui %GUI_ID% Submit
-        gui %GUI_ID% destroy
         for Parameter,_ in this.Arguments {
             ;@ahk-neko-ignore 1 line; at 4/28/2023, 9:49:42 AM ; https://github.com/CoffeeChaton/vscode-autohotkey-NekoHelp/blob/main/note/code107.md
             parameter:=strreplace(parameter,"-","___")
-            k=v%Parameter% ;; i know this is jank, but I can't seem to fix it. just don't touch for now?
+            ;k=v%Parameter% ;; i know this is jank, but I can't seem to fix it. just don't touch for now?
+            ;a:=%k%
+            GuiControlGet val,, v%Parameter%
             parameter:=strreplace(parameter,"___","-")
-            a:=%k%
-            this["Arguments",Parameter].Value:=a
+            this["Arguments",Parameter].Value:=val
         }
+        gui %GUI_ID% destroy
         return this
     }
     otGUI_Escape2() {
