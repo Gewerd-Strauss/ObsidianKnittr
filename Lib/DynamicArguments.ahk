@@ -209,7 +209,6 @@ Class ot {
     }
     AdjustMinMax() {
         for Parameter, Value in this.Arguments {
-            oldVal:=Value.Value
             if RegexMatch(Value.Other,"Max\:(?<Max>\d*)",v_) {
                 Value.Max:=v_Max+0
             }
