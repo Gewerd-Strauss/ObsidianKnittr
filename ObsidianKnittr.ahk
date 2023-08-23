@@ -69,6 +69,8 @@ main() {
                 obsidianhtml_configfile=
                 obsidianTagEndChars=():'
                 OHTML_OutputDir=%A_Desktop%\TempTemporal\
+                OHTML_WorkDir=%A_Desktop%\TempTemporal
+                OHTML_WorkDir_OwnFork=D:\Dokumente neu\Repositories\obsidian-html
                 OpenParentfolderInstead=1
                 RScriptPath=%given_rscriptpath%
                 searchroot=%given_searchroot%
@@ -110,8 +112,7 @@ main() {
 
     ; 2.2
     out:=guiShow()
-    WorkDir := "C:\Users\Claudius Main\Desktop\TempTemporal"
-    WorkDir_OwnFork := "D:\Dokumente neu\ObsidianPluginDev\obsidian-html"
+
     formats:=""
     bAutoSubmitOTGUI:=false
     for _,format in out.Outputformats {
@@ -184,15 +185,17 @@ main() {
     ATC1:=A_TickCount
     Codetimer_Log()
     OHTML_OutputDir:=Deref(script.config.config.OHTML_OutputDir)
+    OHTML_WorkDir:=Deref(script.config.config.OHTML_WorkDir)
+    OHTML_WorkDir_OwnFork := script.config.Config.OHTML_WorkDir_OwnFork ; "D:\Dokumente neu\ObsidianPluginDev\obsidian-html"
     if (bRestrictOHTMLScope) {
 
         OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(manuscriptpath,bAutoSubmitOTGUI)
     }
 
     if (tmpconfig[1] && bConvertInsteadofRun) {
-        ret:=ObsidianHtml(,tmpconfig[1],,bUseOwnOHTMLFork,bVerboseCheckbox,OHTML_OutputDir,WorkDir,WorkDir_OwnFork,OHTMLScopeRestrictor_Object)
+        ret:=ObsidianHtml(,tmpconfig[1],,bUseOwnOHTMLFork,bVerboseCheckbox,OHTML_OutputDir,OHTML_WorkDir,OHTML_WorkDir_OwnFork,OHTMLScopeRestrictor_Object)
     } else {
-        ret:=ObsidianHtml(manuscriptpath,tmpconfig[1],,bUseOwnOHTMLFork,bVerboseCheckbox,OHTML_OutputDir,WorkDir,WorkDir_OwnFork,OHTMLScopeRestrictor_Object)
+        ret:=ObsidianHtml(manuscriptpath,tmpconfig[1],,bUseOwnOHTMLFork,bVerboseCheckbox,OHTML_OutputDir,OHTML_WorkDir,OHTML_WorkDir_OwnFork,OHTMLScopeRestrictor_Object)
     }
     if (bRestrictOHTMLScope) {
         tempOVaultRoot:=removeTemporaryObsidianVaultRoot(OHTMLScopeRestrictor_Object.Path,OHTMLScopeRestrictor_Object.Graph)
