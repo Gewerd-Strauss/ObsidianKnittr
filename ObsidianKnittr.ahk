@@ -104,7 +104,7 @@ main() {
                 Y=
                 [DDLHistory]
             )
-        writeFile(script.configfile,InitialSettings)
+        writeFile(script.configfile,InitialSettings,"UTF-16")
         script.load()
     }
     FileRead ObsidianKnittr_Version, % A_ScriptDir "\INI-Files\ObsidianKnittr_Version.ini"
