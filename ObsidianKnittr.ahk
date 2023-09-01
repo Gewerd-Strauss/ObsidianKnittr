@@ -598,6 +598,11 @@ guiCreate() {
     }
     HistoryString:=""
     for each, File in script.config.DDLHistory {
+        if (!FileExist(File)) {
+            script.config.DDLHistory.RemoveAt(each,1)
+        }
+    }
+    for each, File in script.config.DDLHistory {
         if (FileExist(File)) {
 
             SplitPath % File, , OutDir, , FileName
@@ -606,10 +611,9 @@ guiCreate() {
             if (each=1) {
                 HistoryString.="|"
             }
-        } else {
-            script.config.DDLHistory.RemoveAt(each,1)
         }
     }
+    script.save()
     Gui add, button, gChooseFile, &Choose Manuscript
     DDLRows:=(script.config.Config.HistoryLimit>25?25:script.config.Config.HistoryLimit)
     gui add, DDL,% "w" WideControlWidth " vChosenFile hwndChsnFile r" DDLRows, % HistoryString
