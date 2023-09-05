@@ -9,6 +9,7 @@ hi5             -      TF.ahk, license                                          
 AHK-RARE (?)    -      PrettyTickCount                                                      - https://github.com/Ixiko/AHK-Rare
 anonymous1184   -      Quote                                                                - https://www.reddit.com/r/AutoHotkey/comments/p2z9co/comment/h8oq1av/?utm_source=share&utm_medium=web2x&context=3
 anonymous1184   -      RegexMatchAll/RegexMatchLines                                        - https://www.reddit.com/r/AutoHotkey/comments/12l4gr8/comment/jg6ngt7/?utm_source=reddit&utm_medium=web2x&context=3
+anonymous1184   -      WinHttpRequest & large parts of SRC_ImageConverter                   - https://gist.github.com/anonymous1184/33b2511412158f286d8a719da4f38790
 polythene       -      DateParse                                                            - https://www.autohotkey.com/board/topic/18760-date-parser-convert-any-date-format-to-yyyymmddhh24miss/?p=124324, https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
 anonymous1184   -      Format_EX
 tidbit et al    -      st_count										                        - https://www.autohotkey.com/boards/viewtopic.php?t=53
