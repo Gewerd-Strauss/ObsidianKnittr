@@ -8,6 +8,7 @@ convertToQMD(String,bRemoveQuartoReferenceTypesFromCrossrefs) {
     String:=convertDiagrams(String)                                                                     ;; convert graphviz and mermaid codechunk syntax
     String:=moveEquationreferencesToEndofBlock(String)                                                  ;; latex equation reference keys
     String:=fixCitationpathing(String)                                                                  ;; "csl" and "bibliography" frontmatter keys
+    String:=fixNullFields(String)                                                                       ;; fix null-valued yaml fields
     return String
 }
 moveEquationreferencesToEndofBlock(String) {
