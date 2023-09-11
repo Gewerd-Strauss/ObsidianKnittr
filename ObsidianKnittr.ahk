@@ -188,7 +188,6 @@ main() {
     OHTML_WorkDir:=Deref(script.config.config.OHTML_WorkDir)
     OHTML_WorkDir_OwnFork := script.config.Config.OHTML_WorkDir_OwnFork ; "D:\Dokumente neu\ObsidianPluginDev\obsidian-html"
     if (bRestrictOHTMLScope) {
-
         OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(manuscriptpath,bAutoSubmitOTGUI)
     }
 
@@ -276,6 +275,7 @@ main() {
         }
     }
     NewContents:=cleanLatexEnvironmentsforRMarkdown(NewContents)
+    NewContents:=fixNullFields(NewContents)
     EL.Intermediary_Duration:=Codetimer_Log()
     EL.Intermediary_End:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
 
