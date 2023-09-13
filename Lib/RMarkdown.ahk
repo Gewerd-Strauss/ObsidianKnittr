@@ -72,7 +72,9 @@ fixNullFields(String) {
             }
             if RegexMatch(Line,".+\:$") {
                 if InStr(Line, "tags") {
-                    Rebuild:=Strreplace(Rebuild,"tags:","tags: []",,1)
+                    if !InStr(Lines[_+1],"- ") {    ;; make sure that an empty array is only added when no tags are added yet
+                        Rebuild:=Strreplace(Rebuild,"tags:","tags: []",,1)
+                    }
                 }
             }
         } else if InStr(Trimmed,"---") && inFrontMatter  && (_>1) {     ;; encountered the second code-fence of the yaml front matter
