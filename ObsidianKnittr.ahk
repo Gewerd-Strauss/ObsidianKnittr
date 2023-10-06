@@ -69,13 +69,16 @@ main() {
                 obsidianhtml_configfile=
                 obsidianTagEndChars=():'
                 OHTML_OutputDir=%A_Desktop%\TempTemporal\
+                OHTML_WorkDir=%A_Desktop%\TempTemporal
+                OHTML_WorkDir_OwnFork=D:\Dokumente neu\Repositories\obsidian-html
                 OpenParentfolderInstead=1
                 RScriptPath=%given_rscriptpath%
                 searchroot=%given_searchroot%
                 SetSearchRootToLastRunManuscriptFolder=1
+                confirmOHTMLCustomBuild=1
                 [Version]
                 ObsidianHTML_Version=3.4.1
-                ObsidianKnittr_Version=3.1.3
+                ObsidianKnittr_Version=3.1.4
                 [LastRun]
                 BackupOutput=1
                 bStripLocalMarkdownLinks=0
@@ -101,7 +104,7 @@ main() {
                 Y=
                 [DDLHistory]
             )
-        writeFile(script.configfile,InitialSettings)
+        writeFile(script.configfile,InitialSettings,"UTF-16")
         script.load()
     }
     FileRead ObsidianKnittr_Version, % A_ScriptDir "\INI-Files\ObsidianKnittr_Version.ini"
@@ -109,8 +112,7 @@ main() {
 
     ; 2.2
     out:=guiShow()
-    WorkDir := "C:\Users\Claudius Main\Desktop\TempTemporal"
-    WorkDir_OwnFork := "D:\Dokumente neu\ObsidianPluginDev\obsidian-html"
+
     formats:=""
     bAutoSubmitOTGUI:=false
     for _,format in out.Outputformats {
@@ -183,15 +185,16 @@ main() {
     ATC1:=A_TickCount
     Codetimer_Log()
     OHTML_OutputDir:=Deref(script.config.config.OHTML_OutputDir)
+    OHTML_WorkDir:=Deref(script.config.config.OHTML_WorkDir)
+    OHTML_WorkDir_OwnFork := script.config.Config.OHTML_WorkDir_OwnFork ; "D:\Dokumente neu\ObsidianPluginDev\obsidian-html"
     if (bRestrictOHTMLScope) {
-
         OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(manuscriptpath,bAutoSubmitOTGUI)
     }
 
     if (tmpconfig[1] && bConvertInsteadofRun) {
-        ret:=ObsidianHtml(,tmpconfig[1],,bUseOwnOHTMLFork,bVerboseCheckbox,OHTML_OutputDir,WorkDir,WorkDir_OwnFork,OHTMLScopeRestrictor_Object)
+        ret:=ObsidianHtml(,tmpconfig[1],,bUseOwnOHTMLFork,bVerboseCheckbox,OHTML_OutputDir,OHTML_WorkDir,OHTML_WorkDir_OwnFork,OHTMLScopeRestrictor_Object)
     } else {
-        ret:=ObsidianHtml(manuscriptpath,tmpconfig[1],,bUseOwnOHTMLFork,bVerboseCheckbox,OHTML_OutputDir,WorkDir,WorkDir_OwnFork,OHTMLScopeRestrictor_Object)
+        ret:=ObsidianHtml(manuscriptpath,tmpconfig[1],,bUseOwnOHTMLFork,bVerboseCheckbox,OHTML_OutputDir,OHTML_WorkDir,OHTML_WorkDir_OwnFork,OHTMLScopeRestrictor_Object)
     }
     if (bRestrictOHTMLScope) {
         tempOVaultRoot:=removeTemporaryObsidianVaultRoot(OHTMLScopeRestrictor_Object.Path,OHTMLScopeRestrictor_Object.Graph)
@@ -272,6 +275,7 @@ main() {
         }
     }
     NewContents:=cleanLatexEnvironmentsforRMarkdown(NewContents)
+    NewContents:=fixNullFields(NewContents)
     EL.Intermediary_Duration:=Codetimer_Log()
     EL.Intermediary_End:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
 
@@ -594,6 +598,11 @@ guiCreate() {
     }
     HistoryString:=""
     for each, File in script.config.DDLHistory {
+        if (!FileExist(File)) {
+            script.config.DDLHistory.RemoveAt(each,1)
+        }
+    }
+    for each, File in script.config.DDLHistory {
         if (FileExist(File)) {
 
             SplitPath % File, , OutDir, , FileName
@@ -602,10 +611,9 @@ guiCreate() {
             if (each=1) {
                 HistoryString.="|"
             }
-        } else {
-            script.config.DDLHistory.RemoveAt(each,1)
         }
     }
+    script.save()
     Gui add, button, gChooseFile, &Choose Manuscript
     DDLRows:=(script.config.Config.HistoryLimit>25?25:script.config.Config.HistoryLimit)
     gui add, DDL,% "w" WideControlWidth " vChosenFile hwndChsnFile r" DDLRows, % HistoryString
@@ -756,7 +764,7 @@ guiShow() {
         if bAutoSubmitOTGUI {
             ot.SkipGUI:=bAutoSubmitOTGUI
         }
-        ot.GenerateGUI(x,y)
+        ot.GenerateGUI(x,y,TRUE,"ParamsGUI:",1,1,674,1)
         ot.AssembleFormatString()
         Outputformats[format]:=ot
     }
@@ -975,4 +983,3 @@ fTraySetup() {
 #Include <TemporaryObsidianVaultRoot>
 #Include <Quarto>
 #Include <script>
-

@@ -53,3 +53,33 @@ cleanLatexEnvironmentsforRMarkdown(String) {
     OutputDebug % String
     return String
 }
+fixNullFields(String) {
+    Lines:=strsplit(String,"`n")
+    inFrontMatter:=false
+    Rebuild:=""
+    Rebuild:=String
+    for _, Line in Lines {
+        Trimmed:=Trim(Line)
+        if InStr(Trimmed,"---") && !inFrontMatter && (_=1) {            ;; encountered first fence
+            inFrontMatter:=true
+        } else if !InStr(Trimmed,"---") && !inFrontMatter {             ;; not a code-fence, not in front matter -> text after frontmatter
+            inFrontMatter:=false
+            break
+        } else if !InStr(Trimmed,"---") && inFrontMatter {              ;; not a code-fence, but after first codefence -> we are in frontmatter
+            if RegExMatch(Line, ".+\:\s*(?<NULL>null)") {
+                Line2:=StrReplace(Line, "null","""null""")
+                Rebuild:=Strreplace(Rebuild,Line,Line2,,1)
+            }
+            if RegexMatch(Line,".+\:$") {
+                if InStr(Line, "tags") {
+                    if !InStr(Lines[_+1],"- ") {    ;; make sure that an empty array is only added when no tags are added yet
+                        Rebuild:=Strreplace(Rebuild,"tags:","tags: []",,1)
+                    }
+                }
+            }
+        } else if InStr(Trimmed,"---") && inFrontMatter  && (_>1) {     ;; encountered the second code-fence of the yaml front matter
+            inFrontMatter:=false
+        }
+    }
+    return Rebuild
+}

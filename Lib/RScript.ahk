@@ -114,10 +114,6 @@ buildRScriptContent(Path,output_filename="",out="") {
         (LTRIM
 
             sprintf("'build.R' successfully finished running.")
-            sprintf("Total Time for codechunks:")
-            print(sum(as.numeric(all_times)))
-            sprintf("Timings for used codechunks:")
-            print(all_times)
         )
     Str.=Str2
     ;OD(,Str,FormatOptions)
