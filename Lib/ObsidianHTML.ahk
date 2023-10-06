@@ -163,12 +163,20 @@ createTemporaryObsidianHTML_Config(manuscriptpath, obsidianhtml_configfile,Conve
                 max_note_depth: 15
                 # preserve_inline_tags: False
                 copy_vault_to_tempdir: True
+                exclude_glob:
+                %A_Space%%A_Space%- "".git""
+                %A_Space%%A_Space%- "".obsidian""
+                %A_Space%%A_Space%- "".trash""
+                %A_Space%%A_Space%- "".vscode""
+                %A_Space%%A_Space%- "".DS_Store""
+                %A_Space%%A_Space%- ""002 templates""
                 exclude_subfolders:
                 %A_Space%%A_Space%- "".git""
                 %A_Space%%A_Space%- "".obsidian""
                 %A_Space%%A_Space%- "".trash""
                 %A_Space%%A_Space%- "".vscode""
                 %A_Space%%A_Space%- "".DS_Store""
+                %A_Space%%A_Space%- ""002 templates""
 
 
 
