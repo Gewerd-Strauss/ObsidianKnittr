@@ -209,7 +209,7 @@ createTemporaryObsidianHTML_Config(manuscriptpath, obsidianhtml_configfile,Conve
                 %A_Space%%A_Space%callouts:
                 %A_Space%%A_Space%%A_Space%%A_Space%enabled: False
             )"
-        Clipboard:=template:=fixYAMLSyntax(template)
+        template:=fixYAMLSyntax(template)
         OutputDebug % template
         writeFile_ObsidianHTML(script.configfolder "\OHTMLconfig_template.yaml",template,,,true)
         obsidianhtml_configfile:=script.configfolder "\OHTMLconfig_template.yaml"
