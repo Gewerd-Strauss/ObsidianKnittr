@@ -1,4 +1,4 @@
-createTemporaryObsidianVaultRoot(manuscript_location,bAutoSubmitOTGUI) {
+createTemporaryObsidianVaultRoot(manuscript_location,bAutoSubmitOTGUI,LastRelativeLevel:=-1) {
     if (bAutoSubmitOTGUI) {
         if (script.config.Config.defaultRelativeLevel!="") && (script.config.Config.defaultRelativeLevel >0) {
             Level:=script.config.Config.defaultRelativeLevel + 0
@@ -6,6 +6,13 @@ createTemporaryObsidianVaultRoot(manuscript_location,bAutoSubmitOTGUI) {
 
     } else {
         Level:=script.config.Config.defaultRelativeLevel + 0
+    }
+    if (LastRelativeLevel!=-1) {
+        if (LastRelativeLevel=0) {
+            Level:=0
+        } else {
+            Level:=LastRelativeLevel
+        }
     }
     Graph:=findObsidianVaultRootFromNote(manuscript_location,true)
     TV_String:=AssembleTV_String(Graph[2])
@@ -103,7 +110,7 @@ chooseTV_Element(TV_String,Graph,Level,bAutoSubmitOTGUI) {
     Gui Add, Button, Default w70 gsubmitConfigFolder, &Submit Folder
     Gui +OwnDialogs
     TV_Delete()
-    if (Level) && (bAutoSubmitOTGUI) {
+    if (1) && (bAutoSubmitOTGUI) {
         occurences:=st_count(TV_String,"Icon4 expand")
         intended_level:=occurences-Level
         Lines:=strsplit(TV_String,"`n")
@@ -121,9 +128,13 @@ chooseTV_Element(TV_String,Graph,Level,bAutoSubmitOTGUI) {
         TV_String:=strreplace(TV_String,"Icon4 expand Check1","Icon 4")
     }
     TVIDs:=CreateTreeView(TV_String)
-    if (Level) && !(bAutoSubmitOTGUI) {
-        loop, % TVIDs.Count() - Level {
-            Key:="Level" A_Index
+    if (1) && !(bAutoSubmitOTGUI) {
+        if ((TVIDs.Count() - Level)>1) {    ;; make sure that a too-high 'defaultRelativeLevel' does not underflow the range of possible directories
+            loop, % TVIDs.Count() - Level {
+                Key:="Level" A_Index
+            }
+        } else {
+            Key:="Level" 1
         }
         for each, ID in TVIDs {
             if (each=Key) {
@@ -138,15 +149,15 @@ chooseTV_Element(TV_String,Graph,Level,bAutoSubmitOTGUI) {
         objTOVRHK_Handler:=Func("TOVRHK_Handler").Bind(TVIDs)
         Hotkey ifWinActive, % "ahk_id " TOVRGUI
         loop, 9 {
-            Key:="^" A_Index-1
-            Hotkey % Key, % objTOVRHK_Handler
+            HKey:="!" A_Index-1
+            Hotkey % HKey, % objTOVRHK_Handler
         }
         Hotkey IfWinActive
         Hotkey !a, % objTOVRHK_Handler
         Hotkey !f, % objTOVRHK_Handler
         Hotkey IfWinActive
     }
-    if (Level) && (bAutoSubmitOTGUI) {
+    if (1) && (bAutoSubmitOTGUI) {
         submitConfigFolder()
     } else if (Level=1) && (TVIDs.Count() = 1) {
         submitConfigFolder()
@@ -250,11 +261,9 @@ removeTemporaryObsidianVaultRoot(Path,Graph) {
     Loop, Files, % Path "\*.*", FD ;; check if temporary obsidian folder contains any files - which it shouldn't
     {
         isEmpty:=false
-
     }
     if isEmpty { ;; remove if empty
         if (Path!=Graph[1]) {
-
             FileRemoveDir % Path
         }
     } else {
@@ -300,9 +309,9 @@ submitConfigFolder() {
         gui TOVR: destroy
         return temporary_obsidianconfig_path:=-1
     }
+    script.config.LastRun.LastRelativeLevel:=reordered_arr.Count()-vCount
     temporary_obsidianconfig_path:=temporary_obsidianconfig_path "\.obsidian"
     temporary_obsidianconfig_path:=RegexReplace(temporary_obsidianconfig_path,"\\{2,}","\")
-    ;m(temporary_obsidianconfig_path)
     gui TOVR: destroy
     return temporary_obsidianconfig_path
 }
@@ -322,6 +331,6 @@ CreateTreeView(TreeViewDefinitionString) {	; by Learning one
             IDs["Level" Level] := TV_Add("(" A_Index ") " match1, IDs["Level" Level-1], match3)
     }
     return IDs
-}	; http://www.autohotkey.com/board/topic/92863-fu
+}	; https://www.autohotkey.com/board/topic/92863-function-createtreeview/
 
 
