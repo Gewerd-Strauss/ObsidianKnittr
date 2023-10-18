@@ -78,7 +78,7 @@ main() {
                 confirmOHTMLCustomBuild=1
                 [Version]
                 ObsidianHTML_Version=3.4.1
-                ObsidianKnittr_Version=3.1.4
+                ObsidianKnittr_Version=3.1.5
                 [LastRun]
                 BackupOutput=1
                 bStripLocalMarkdownLinks=0
@@ -188,7 +188,12 @@ main() {
     OHTML_WorkDir:=Deref(script.config.config.OHTML_WorkDir)
     OHTML_WorkDir_OwnFork := script.config.Config.OHTML_WorkDir_OwnFork ; "D:\Dokumente neu\ObsidianPluginDev\obsidian-html"
     if (bRestrictOHTMLScope) {
-        OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(manuscriptpath,bAutoSubmitOTGUI)
+        if (manuscriptpath==script.config.LastRun.path_lastmanuscript) {
+            OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(manuscriptpath,bAutoSubmitOTGUI,script.config.LastRun.LastRelativeLevel)
+        } else {
+            script.config.LastRun.LastRelativeLevel:=-1
+            OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(manuscriptpath,bAutoSubmitOTGUI)
+        }
     }
 
     if (tmpconfig[1] && bConvertInsteadofRun) {
@@ -840,6 +845,7 @@ guiSubmit() {
     if !FileExist(manuscriptpath) {
         manuscriptpath:=chooseFile()
     }
+    script.config.LastRun.path_lastmanuscript:=script.config.LastRun.manuscriptpath
     script.config.LastRun.manuscriptpath:=manuscriptpath
     script.config.LastRun.last_output_type:=""
     script.config.LastRun.Verbose:=bVerboseCheckbox+0
