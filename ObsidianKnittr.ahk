@@ -74,9 +74,9 @@ main() {
                 InputBox rscript_path, % script.name,% "Please give the absolute path of your installed 'Rscript.exe'-file you wish to use.`nIf you don't want to use this step, leave this empty and continue.", , , , , , , , % "C:\Program Files\R\R-MAJORVERSION.MINORVERSION.PATCH\bin\Rscript.exe"
             }
         } else {
-        if !(FileExist(rscript_path)) {
-            InputBox rscript_path, % script.name,% "Please give the absolute path of your installed 'Rscript.exe'-file you wish to use.`nIf you don't want to use this step, leave this empty and continue.", , , , , , , , % "C:\Program Files\R\R-MAJORVERSION.MINORVERSION.PATCH\bin\Rscript.exe"
-        }
+            if !(FileExist(rscript_path)) {
+                InputBox rscript_path, % script.name,% "Please give the absolute path of your installed 'Rscript.exe'-file you wish to use.`nIf you don't want to use this step, leave this empty and continue.", , , , , , , , % "C:\Program Files\R\R-MAJORVERSION.MINORVERSION.PATCH\bin\Rscript.exe"
+            }
         }
         InputBox given_searchroot, % script.name " - Initiate settings","Please give the search root folder."
         InitialSettings=
@@ -615,7 +615,12 @@ guiCreate() {
         : ret[1].Count())
 
     gui add, listview,% "vvLV1 LV0x8 w" WideControlWidth " h418 checked NoSortHdr " , % "Chooses an output Type"
-    gui add, text, % "ym xm" + WideControlWidth + 5,% " via RMarkdown and Quarto"
+    gui add, Groupbox, % "xm" " yp" + 423 " w" WideControlWidth " h70", Last execution
+    SplitPath % script.config.LastRun.manuscriptpath , , OutDir, , OutNameNoExt
+    SplitPath % OutDir, , , , OutDir,
+    gui add, text, % "yp+20 xp+5", % "LM: " OutNameNoExt " (" OutDir ")"
+    gui add, text, % "yp+20 xp", % "LL: " script.config.LastRun.LastRelativeLevel (script.config.LastRun.LastRelativeLevel=0?" (manuscript-folder)":"") " DL: " script.config.Config.defaultRelativeLevel
+    gui add, text, % "ym xm" + WideControlWidth + 5,% " via Obsidian-HTML, RMarkdown and Quarto"
     last_output:=script.config.LastRun.last_output_type
     for _,output_type in PotentialOutputs { ; TODO: rework this to differentiate "word_document" from "bookdown::word_document2" -> maybe check for next char? If comma or end of string, this would be a base rmd format, if a "2" it would be bookdown
         Cond:=Instr(last_output,output_type)
