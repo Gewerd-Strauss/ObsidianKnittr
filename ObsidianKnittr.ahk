@@ -55,8 +55,30 @@ main() {
     onExit(exh)
     if !script.load() {
         ;InputBox, given_obsidianhtml_configfile, % script.name " - Initiate settings","Please give the path of your configfile for obsidianhtml."
+        GetStdStreams_WithInput("where rscript",,rscript_path) ;; works
+        if (InStr(rscript_path,"`n")){
+            rscript_path:=StrReplace(rscript_path, "`r`n")
+            rscript_path:=StrSplit(rscript_path)
+            found:=false
+            for , path in rscript_path { ;; check if an installation of rscript is found; then check if there are multiple
+                if !InStr(path,".exe") { ;; skip wrong file formats.
+                    continue
+                }
+                if (FileExist(path)) { ;; if a qualified hit is found, reassign it to the required variable, then break out.
+                    found:=true
+                    rscript_path:=path
+                    break
+                }
+            }
+            if (!found) { ;; no 
+                InputBox rscript_path, % script.name,% "Please give the absolute path of your installed 'Rscript.exe'-file you wish to use.`nIf you don't want to use this step, leave this empty and continue.", , , , , , , , % "C:\Program Files\R\R-MAJORVERSION.MINORVERSION.PATCH\bin\Rscript.exe"
+            }
+        } else {
+        if !(FileExist(rscript_path)) {
+            InputBox rscript_path, % script.name,% "Please give the absolute path of your installed 'Rscript.exe'-file you wish to use.`nIf you don't want to use this step, leave this empty and continue.", , , , , , , , % "C:\Program Files\R\R-MAJORVERSION.MINORVERSION.PATCH\bin\Rscript.exe"
+        }
+        }
         InputBox given_searchroot, % script.name " - Initiate settings","Please give the search root folder."
-        InputBox given_rscriptpath, % script.name,% "Please give the absolute path of your installed 'Rscript.exe'-file you wish to use.`nIf you don't want to use this step, leave this empty and continue.", , , , , , , , % "C:\Program Files\R\R-MAJORVERSION.MINORVERSION.PATCH\bin\Rscript.exe"
         InitialSettings=
             (LTrim
                 [Config]
@@ -72,7 +94,7 @@ main() {
                 OHTML_WorkDir=%A_Desktop%\TempTemporal
                 OHTML_WorkDir_OwnFork=D:\Dokumente neu\Repositories\obsidian-html
                 OpenParentfolderInstead=1
-                RScriptPath=%given_rscriptpath%
+                RScriptPath=%rscript_path%
                 searchroot=%given_searchroot%
                 SetSearchRootToLastRunManuscriptFolder=1
                 confirmOHTMLCustomBuild=1
