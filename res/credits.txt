@@ -16,5 +16,6 @@ tidbit et al    -      st_count										                        - https://www.a
 Gewerd Strauss  -      ttip                                                                 - https://gist.github.com/Gewerd-Strauss/fad218c28b8120ab1a3cadea1a8dea9b
 Gewerd Strauss  -      partial, self-written subset of ScriptObj                            - https://gist.github.com/Gewerd-Strauss/8ee61682aef45c0d124b19afaeedc2fe
 Gewerd Strauss  -      main script, 
-
+obsidianhtml    -      obsidianhtml                                                         - https://www.github.com/obsidian-html/obsidian-html
+Posit PBC       -      quarto                                                               - https://www.github.com/quarto-dev/quarto-cli
 
