@@ -685,6 +685,7 @@ guiCreate() {
     gui add, button, gGCAbout hwndAbout yp xp+122, &About
     GuiControl +g,%OpenConfig%, % onOpenConfig
     Gui Add, Text,x15 yp,% script.name " v." regexreplace(script.config.version.ObsidianKnittr_Version,"\s*","") " | Obsidian-HTML v." strreplace(script.config.version.ObsidianHTML_Version,"commit:")
+    Gui Add, Text,x15 yp+15,% "Quarto-cli" " v." regexreplace(quartogetVersion(),"\s*","")
     script.version:=script.config.version.ObsidianKnittr_Version
 
     if (script.config.LastRun.manuscriptpath!="") && (script.config.LastRun.last_output_type!="") {
