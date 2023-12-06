@@ -444,17 +444,6 @@ copyBack(Source,Destination,manuscriptpath) {
     }
     return Output_Path OutFileName
 }
-getOutputPath(Destination,manuscriptpath) {
-    SplitPath % manuscriptpath,,,, manuscriptname
-    if Destination {
-        Output_Path:=Destination "\" manuscriptname "\"
-        Raw_InputFile:=Output_Path "\" manuscriptname "_vault.md"
-    } else {
-        Output_Path:= A_Desktop "\TempTemporal\" manuscriptname
-        Raw_InputFile:=Output_Path "\" manuscriptname "_vault.md "
-    }
-    return [Output_Path,Raw_InputFile]
-}
 convertMDToRMD(md_Path,notename) {
     OldName:=md_Path "\" notename ".md"
     NewName:=md_Path "\" notename ".rmd"
