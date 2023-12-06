@@ -1,5 +1,5 @@
 #NoEnv ; Recommended for performance and compatibility with future AutoHotkey releases.
-#Requires AutoHotkey v1.1.36+ ;; version at which script was written.
+#Requires AutoHotkey v1.1.35+ ;; version at which script was written.
 #SingleInstance Force
 #MaxHotkeysPerInterval 99999999
 #Warn All, Outputdebug
