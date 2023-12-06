@@ -149,14 +149,12 @@ main() {
     }
     formats:=SubStr(formats,1,StrLen(formats)-2)
     output_type:=out.sel
-    if (output_type="All") || HasVal(output_type,"All") {
-        output_type:=["html_document" , "pdf_document" , "word_document" , "odt_document" , "rtf_document" , "md_document" , "powerpoint_presentation" , "ioslides_presentation" , "tufte::tufte_html" , "github_document"] ;; todo:: add bookdown format support
-    }
     if (HasVal(output_type,"First in YAML")) {
         output_type:=""
     }
     manuscriptname:=out.manuscriptname
     manuscriptpath:=out.manuscriptpath
+    ExecutionDirectory:=out.Settings.ExecutionDirectory
     bVerboseCheckbox:=out.Settings.bVerboseCheckbox
     bFullLogCheckbox:=out.Settings.bFullLogCheckbox
     Outputformats:=out.Outputformats
@@ -284,7 +282,8 @@ main() {
     ; 5, 6
     ttip(TrayString:="Moving to output folder",5)
     Menu Tray,Tip, % TrayString
-    rmd_Path:=copyBack(rmd_Path,script.config.Destination,manuscriptpath)
+    Destination:=(InStr(Deref(ExecutionDirectory),A_Desktop)?0:ExecutionDirectory)
+    rmd_Path:=copyBack(rmd_Path,Destination,manuscriptpath)
     SplitPath % rmd_Path,, OutDir
     rawinputCopyLocation:=regexreplace(OutDir "\" manuscriptName "_vault.md ","\\{2,}","\")
     EL.output_path
@@ -429,12 +428,11 @@ copyBack(Source,Destination,manuscriptpath) {
     SplitPath % Source, OutFileName, Dir,
     SplitPath % manuscriptpath,,,,manuscriptname,
     if Destination {
-        if FileExist(Destination "\" manuscriptname "\") { ;; make sure the output is clean
-            FileRemoveDir % Destination "\" manuscriptname "\", true
-        }
         FileCopyDir % Dir, % Output_Path:=Destination "\" manuscriptname "\", true
         writeFile(Output_Path "\index.md",manuscriptcontent,,,true)
-        FileCopy % manuscriptpath, % rawinputCopyLocation, 1
+        global pd:=regexreplace(Output_Path "\" manuscriptname "_vault.md ","\\{2,}","\")
+        pd:=Trim(pd)
+        FileCopy % manuscriptpath, % pd, 1
     } Else {
         FileCopyDir % Dir, % Output_Path:= A_Desktop "\TempTemporal\" manuscriptname "\" , true
         if Errorlevel {
@@ -614,8 +612,19 @@ guiCreate() {
         ? 3
         : ret[1].Count())
 
-    gui add, listview,% "vvLV1 LV0x8 w" WideControlWidth " h418 checked NoSortHdr " , % "Chooses an output Type"
-    gui add, Groupbox, % "xm" " yp" + 423 " w" WideControlWidth " h70", Last execution
+    gui add, listview,% "vvLV1 LV0x8 w" WideControlWidth " h245 checked NoSortHdr " , % "Chooses an output Type"
+    gui add, Groupbox, % "xm" " yp" + 248 " w" WideControlWidth " h170", Execution Directories
+    ExecutionDirectories:=""
+    for each, File in script.config.DDLHistory {
+        if (!FileExist(File)) {
+            script.config.DDLHistory.RemoveAt(each,1)
+        }
+    }
+    ExecutionDirectories:=script.config.config.OHTML_OutputDir "||"
+    DDLRows:=(script.config.Config.HistoryLimit>25?25:script.config.Config.HistoryLimit)
+    gui add, text, % "yp+25 xp+10 w" WideControlWidth -  3*5, % "Choose execution directory for OHTML"
+    gui add, DDL,% "yp+20 xp w" WideControlWidth -  4*5 " vExecutionDirectory hwndExeDir r" DDLRows, % ExecutionDirectories
+    gui add, Groupbox, % "xm" " yp" + 130 " w" WideControlWidth " h70", Last execution
     SplitPath % script.config.LastRun.manuscriptpath , , OutDir, , OutNameNoExt
     SplitPath % OutDir, , , , OutDir,
     gui add, text, % "yp+20 xp+5", % "LM: " OutNameNoExt " (" OutDir ")"
@@ -659,7 +668,7 @@ guiCreate() {
     script.save()
     Gui add, button, gChooseFile, &Choose Manuscript
     DDLRows:=(script.config.Config.HistoryLimit>25?25:script.config.Config.HistoryLimit)
-    gui add, DDL,% "w" WideControlWidth " vChosenFile hwndChsnFile r" DDLRows, % HistoryString
+    gui add, DDL,% "w" WideControlWidth " vChosenFile hwndChsnFile r" DDLRows " ggetPotentialWorkDir", % HistoryString
     gui add, Groupbox, % "w" WideControlWidth " h150", Obsidian HTML
     ;; OHTML
     gui add, checkbox,% "xp+10 yp+20" " vbConvertInsteadofRun", % "!!Use verb 'Convert' for OHTML-call?"
@@ -714,8 +723,18 @@ guiCreate() {
     }
     return filesuffixes
 }
+getPotentialWorkDir() {
+    global
+    gui submit, nohide
+    SplitPath % strsplit(ChosenFile," -<>- ").2,, OutDir
+
+    ExecutionDirectories:=script.config.config.OHTML_OutputDir "||" OutDir "\ObsidianKnittr_output"
+    GuiControl,, ExecutionDirectory, |
+    guicontrol,,ExecutionDirectory,% ExecutionDirectories
+    return
+}
 getDefinedOutputFormats(Path) {
-    PotentialOutputs:=["bookdown::word_document2", "html_document", "bookdown::html_document2", "word_document", "pdf_document", "bookdown::pdf_document2", "First in YAML", "odt_document", "rtf_document", "md_document", "powerpoint_presentation", "ioslides_presentation", "tufte::tufte_html", "github_document", "All"]
+    PotentialOutputs:=["bookdown::word_document2", "html_document", "bookdown::html_document2", "bookdown::pdf_document2", "odt_document", "rtf_document", "md_document", "tufte::tufte_html", "github_document"]
     Arr:=[]
     filesuffixes:=[]
     if !FileExist(Path) {
@@ -832,6 +851,7 @@ guiShow() {
                     ,"bRemoveObsidianHTMLErrors":bRemoveObsidianHTMLErrors + 0
                     ,"bRestrictOHTMLScope":bRestrictOHTMLScope + 0
                     ,"bStripLocalMarkdownLinks":bStripLocalMarkdownLinks + 0
+                    ,"ExecutionDirectory":ExecutionDirectory
                     ,"bUseOwnOHTMLFork":bUseOwnOHTMLFork + 0}
                 ,"Outputformats":Outputformats
                 ,"filesuffixes":filesuffixes}
