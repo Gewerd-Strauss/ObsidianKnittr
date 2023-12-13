@@ -612,8 +612,10 @@ guiCreate() {
     ExecutionDirectories:=script.config.config.OHTML_OutputDir "||"
     DDLRows:=(script.config.Config.HistoryLimit>25?25:script.config.Config.HistoryLimit)
     gui add, text, % "yp+25 xp+10 w" WideControlWidth -  3*5, % "Choose execution directory for OHTML"
-    gui add, DDL,% "yp+20 xp w" WideControlWidth -  4*5 " vExecutionDirectory hwndExeDir r" DDLRows, % ExecutionDirectories
-    gui add, Groupbox, % "xm" " yp" + 130 " w" WideControlWidth " h70", Last execution
+    gui add, Radio,% "vExecutionDirectory Checked",% "&1. OHTML-Output-Dir"
+    gui add, Radio, ,% "&2. subfolder of note-location in vault"
+    ;gui add, DDL,% "yp+20 xp w" WideControlWidth -  4*5 " vExecutionDirectory hwndExeDir r" DDLRows, % ExecutionDirectories
+    gui add, Groupbox, % "xm" " yp" + 78 " w" WideControlWidth " h70", Last execution
     SplitPath % script.config.LastRun.manuscriptpath , , OutDir, , OutNameNoExt
     SplitPath % OutDir, , , , OutDir,
     gui add, text, % "yp+20 xp+5", % "LM: " OutNameNoExt " (" OutDir ")"
@@ -709,18 +711,18 @@ guiCreate() {
         guicontrol,, bStripLocalMarkdownLinks, % (script.config.LastRun.bStripLocalMarkdownLinks)
         guicontrol,, bUseOwnOHTMLFork, % (script.config.LastRun.UseOwnOHTMLFork)
         guicontrol,, bRemoveQuartoReferenceTypesFromCrossrefs, % (script.config.LastRun.RemoveQuartoReferenceTypesFromCrossrefs)
+        guicontrol,, Button2, % (script.config.LastRun.LastExecutionDirectory=1?1:0)
+        guicontrol,, Button3, % (script.config.LastRun.LastExecutionDirectory=1?0:1)
     }
     return filesuffixes
 }
-getPotentialWorkDir() {
-    global
+getPotentialWorkDir(File) {
+    global ExecutionDirectory
     gui submit, nohide
-    SplitPath % strsplit(ChosenFile," -<>- ").2,, OutDir
+    SplitPath % File,, OutDir
 
-    ExecutionDirectories:=script.config.config.OHTML_OutputDir "||" OutDir "\ObsidianKnittr_output"
-    GuiControl,, ExecutionDirectory, |
-    guicontrol,,ExecutionDirectory,% ExecutionDirectories
-    return
+    ExecutionDirectories:= OutDir "\ObsidianKnittr_output"
+    return {relativeToNote:ExecutionDirectory,ExecutionDirectories:ExecutionDirectories}
 }
 getDefinedOutputFormats(Path) {
     PotentialOutputs:=["bookdown::word_document2", "html_document", "bookdown::html_document2", "bookdown::pdf_document2", "odt_document", "rtf_document", "md_document", "tufte::tufte_html", "github_document"]
@@ -820,6 +822,10 @@ guiShow() {
         ot.AssembleFormatString()
         Outputformats[format]:=ot
     }
+    atmp:=getPotentialWorkDir(ChosenFile)
+    script.config.LastRun.LastExecutionDirectory:=atmp.relativeToNote
+    ExecutionDirectory:=(atmp.relativeToNote=1?script.config.config.OHTML_OutputDir:atmp.ExecutionDirectories)
+    ExecutionDirectory:=ExecutionDirectory . (SubStr(ExecutionDirectory,0)!="\"?"\":"")
     if (manuscriptpath!="") && !ot.bClosedNoSubmit {
         SplitPath % manuscriptpath,,,, manuscriptName
         return {"sel":sel
