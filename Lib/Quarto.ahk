@@ -7,6 +7,7 @@ convertToQMD(String,bRemoveQuartoReferenceTypesFromCrossrefs) {
     String:=convertBookdownToQuartoReferencing(String,bRemoveQuartoReferenceTypesFromCrossrefs)         ;; modify chunk labels in chunks and references to contain their ref type.
     String:=convertDiagrams(String)                                                                     ;; convert graphviz and mermaid codechunk syntax
     String:=moveEquationreferencesToEndofBlock(String)                                                  ;; latex equation reference keys
+    String:=moveEquationLabelsUpIntoLatexEquation(String)                                               ;; 
     String:=fixCitationpathing(String)                                                                  ;; "csl" and "bibliography" frontmatter keys
     String:=fixNullFields(String)                                                                       ;; fix null-valued yaml fields
     return String
@@ -47,6 +48,15 @@ moveEquationreferencesToEndofBlock(String) {
     }
 
     return Rebuild
+}
+moveEquationLabelsUpIntoLatexEquation(String) {
+    needle:="\$+\s*\{#eq"
+    Matches:=RegexMatchAll(String, "im)" needle)
+    for _, match in Matches {                                                  ;; star, top
+        needle := match[0]
+        String:=strreplace(String,needle,"$$ {#eq",,1)
+    }
+    return String
 }
 convertBookdownToQuartoReferencing(String,bRemoveQuartoReferenceTypesFromCrossrefs) {
 
