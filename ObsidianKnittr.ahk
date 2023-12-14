@@ -333,31 +333,59 @@ main() {
     }
     script_contents:=tmp.1
     format:=tmp.2
-    if bExecuteRScript {
-        ;ttip(" ",5,,,,,,,16)
-        if bExecuteRScript {
-
-            ttip(-1)
-            ttip(TrayString:="Executing R-BuildScript",5)
-            Menu Tray,Tip, % TrayString
-        }
+    if (1<2) {
         if bBackupOutput {
+            ttip(-1)
+            ttip(TrayString:="Backing up Files",5)
+            Menu Tray,Tip, % TrayString
             BackupDirectory:=backupOutput(rmd_Path,out)
         }
         if script.config.config.backupCount {
             limitBackups(BackupDirectory,script.config.config.backupCount)
         }
-        ret:=runRScript(rmd_Path,script_contents,Outputformats,script.config.config.RScriptPath)
+        ttip(-1)
+        ttip(TrayString:="Executing quarto-CLI",5)
+        Menu Tray,Tip, % TrayString
+        SplitPath % rmd_Path,, OutDir
+        ret:=["","",OutDir]
+        for _, output_type in out.sel {
+            write_quarto_yaml(out.Outputformats[output_type],OutDir,"qCLI_yaml_" out.Outputformats[output_type].filesuffix ".yaml")
+            cmd:="quarto render index.qmd --to " out.Outputformats[output_type].filesuffix 
+            cmd.=" --metadata-file=""qCLI_yaml_" out.Outputformats[output_type].filesuffix ".yaml"""
+            cmd.=" --output """ out.Outputformats[output_type].Filename out.Outputformats[output_type].FilenameMod "."  out.Outputformats[output_type].filesuffix """"
+            GetStdStreams_WithInput(CMD, OutDir, InOut:="`n")
+                , ret[1].="`nFormat " output_type ":`n" InOut
+                , ret[2].=CMD
+                , Clipboard:=InOut
+            writeFile(OutDir "\build_" out.Outputformats[output_type].filesuffix ".cmd",CMD,,,true)
+        }
         EL.Rdata_out:=ret[1]
         EL.RCMD:=ret[2]
         EL.RWD:=ret[3]
-    } Else {
-        ttip(TrayString:="Opening RMD-File",5)
-        Menu Tray,Tip, % TrayString
-        SplitPath % rmd_Path,, OutDir
-        writeFile(OutDir "\build.R",script_contents,"UTF-8-RAW",,true)
-        if (!DEBUG) {
-            run % rmd_Path
+    } else {
+        if bExecuteRScript {
+            ;ttip(" ",5,,,,,,,16)
+            ttip(-1)
+            ttip(TrayString:="Executing R-BuildScript",5)
+            Menu Tray,Tip, % TrayString
+            if bBackupOutput {
+                BackupDirectory:=backupOutput(rmd_Path,out)
+            }
+            if script.config.config.backupCount {
+                limitBackups(BackupDirectory,script.config.config.backupCount)
+            }
+            ret:=runRScript(rmd_Path,script_contents,Outputformats,script.config.config.RScriptPath)
+            EL.Rdata_out:=ret[1]
+            EL.RCMD:=ret[2]
+            EL.RWD:=ret[3]
+        } Else {
+            ttip(TrayString:="Opening RMD-File",5)
+            Menu Tray,Tip, % TrayString
+            SplitPath % rmd_Path,, OutDir
+            writeFile(OutDir "\build.R",script_contents,"UTF-8-RAW",,true)
+            if (!DEBUG) {
+                run % rmd_Path
+            }
         }
     }
     EL.DocumentSettings:=tmp[2]
