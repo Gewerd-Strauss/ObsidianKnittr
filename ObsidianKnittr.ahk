@@ -55,35 +55,55 @@ main() {
     onExit(exh)
     if !script.load() {
         ;InputBox, given_obsidianhtml_configfile, % script.name " - Initiate settings","Please give the path of your configfile for obsidianhtml."
-        GetStdStreams_WithInput("where rscript",,rscript_path) ;; works
-        if (InStr(rscript_path,"`n")){
-            rscript_path:=StrReplace(rscript_path, "`r`n")
-            rscript_path:=StrSplit(rscript_path)
-            found:=false
-            for , path in rscript_path { ;; check if an installation of rscript is found; then check if there are multiple
-                if !InStr(path,".exe") { ;; skip wrong file formats.
-                    continue
+        RS_C:=rscript_check()
+        OHTML_C:=obsidianhtml_check()
+        QUARTO_C:=quarto_check()
+        if (!RS_C[1]) {
+            ttip("rscript not available")
+            if (InStr(rscript_path,"`n")){
+                rscript_path:=StrReplace(rscript_path, "`r`n")
+                rscript_path:=StrSplit(rscript_path)
+                found:=false
+                for , path in rscript_path { ;; check if an installation of rscript is found; then check if there are multiple
+                    if !InStr(path,".exe") { ;; skip wrong file formats.
+                        continue
+                    }
+                    if (FileExist(path)) { ;; if a qualified hit is found, reassign it to the required variable, then break out.
+                        found:=true
+                        rscript_path:=path
+                        break
+                    }
                 }
-                if (FileExist(path)) { ;; if a qualified hit is found, reassign it to the required variable, then break out.
-                    found:=true
-                    rscript_path:=path
-                    break
+                if (!found) { ;; no 
+                    InputBox rscript_path, % script.name,% "Please give the absolute path of your installed 'Rscript.exe'-file you wish to use.`nIf you don't want to use this step, leave this empty and continue.", , , , , , , , % "C:\Program Files\R\R-MAJORVERSION.MINORVERSION.PATCH\bin\Rscript.exe"
                 }
-            }
-            if (!found) { ;; no 
-                InputBox rscript_path, % script.name,% "Please give the absolute path of your installed 'Rscript.exe'-file you wish to use.`nIf you don't want to use this step, leave this empty and continue.", , , , , , , , % "C:\Program Files\R\R-MAJORVERSION.MINORVERSION.PATCH\bin\Rscript.exe"
+            } else {
+                if !(FileExist(rscript_path)) {
+                    InputBox rscript_path, % script.name,% "Please give the absolute path of your installed 'Rscript.exe'-file you wish to use.`nIf you don't want to use this step, leave this empty and continue.", , , , , , , , % "C:\Program Files\R\R-MAJORVERSION.MINORVERSION.PATCH\bin\Rscript.exe"
+                }
             }
         } else {
-            if !(FileExist(rscript_path)) {
-                InputBox rscript_path, % script.name,% "Please give the absolute path of your installed 'Rscript.exe'-file you wish to use.`nIf you don't want to use this step, leave this empty and continue.", , , , , , , , % "C:\Program Files\R\R-MAJORVERSION.MINORVERSION.PATCH\bin\Rscript.exe"
-            }
+            rscript_path:=RS_C[2]
         }
+        if (!OHTML_C[1]) {
+            ttip("ObsidianHTML not available")
+        } else {
+            ;obsidianhtml_path:=OHTML_C[2]
+        }
+
+        if (!(QUARTO_C[1])) {
+            ttip("quarto not available")
+        } else {
+
+        }
+        ;python_check()
         InputBox given_searchroot, % script.name " - Initiate settings","Please give the search root folder."
         InitialSettings=
             (LTrim
                 [Config]
                 backupCount=250
-                bundleAHKStarter=1
+                bundleStarterScript=1
+                useQuartoCLI=1
                 defaultRelativeLevel=2
                 Destination=0
                 FullLogOnSuccess=0
@@ -333,31 +353,59 @@ main() {
     }
     script_contents:=tmp.1
     format:=tmp.2
-    if bExecuteRScript {
-        ;ttip(" ",5,,,,,,,16)
-        if bExecuteRScript {
-
-            ttip(-1)
-            ttip(TrayString:="Executing R-BuildScript",5)
-            Menu Tray,Tip, % TrayString
-        }
+    if (script.config.config.useQuartoCLI) {
         if bBackupOutput {
+            ttip(-1)
+            ttip(TrayString:="Backing up Files",5)
+            Menu Tray,Tip, % TrayString
             BackupDirectory:=backupOutput(rmd_Path,out)
         }
         if script.config.config.backupCount {
             limitBackups(BackupDirectory,script.config.config.backupCount)
         }
-        ret:=runRScript(rmd_Path,script_contents,Outputformats,script.config.config.RScriptPath)
+        ttip(-1)
+        ttip(TrayString:="Executing quarto-CLI",5)
+        Menu Tray,Tip, % TrayString
+        SplitPath % rmd_Path,, OutDir
+        ret:=["","",OutDir]
+        for _, output_type in out.sel {
+            write_quarto_yaml(out.Outputformats[output_type],OutDir,"qCLI_yaml_" out.Outputformats[output_type].filesuffix ".yaml")
+            cmd:="quarto render index.qmd --to " out.Outputformats[output_type].filesuffix 
+            cmd.=" --metadata-file=""qCLI_yaml_" out.Outputformats[output_type].filesuffix ".yaml"""
+            cmd.=" --output """ out.Outputformats[output_type].Filename out.Outputformats[output_type].FilenameMod "."  out.Outputformats[output_type].filesuffix """"
+            GetStdStreams_WithInput(CMD, OutDir, InOut:="`n")
+                , ret[1].="`nFormat " output_type ":`n" InOut
+                , ret[2].=CMD
+                , Clipboard:=InOut
+            writeFile(OutDir "\build_" out.Outputformats[output_type].filesuffix ".cmd",CMD,"UTF-8-RAW",,true)
+        }
         EL.Rdata_out:=ret[1]
         EL.RCMD:=ret[2]
         EL.RWD:=ret[3]
-    } Else {
-        ttip(TrayString:="Opening RMD-File",5)
-        Menu Tray,Tip, % TrayString
-        SplitPath % rmd_Path,, OutDir
-        writeFile(OutDir "\build.R",script_contents,"UTF-8-RAW",,true)
-        if (!DEBUG) {
-            run % rmd_Path
+    } else {
+        if bExecuteRScript {
+            ;ttip(" ",5,,,,,,,16)
+            ttip(-1)
+            ttip(TrayString:="Executing R-BuildScript",5)
+            Menu Tray,Tip, % TrayString
+            if bBackupOutput {
+                BackupDirectory:=backupOutput(rmd_Path,out)
+            }
+            if script.config.config.backupCount {
+                limitBackups(BackupDirectory,script.config.config.backupCount)
+            }
+            ret:=runRScript(rmd_Path,script_contents,Outputformats,script.config.config.RScriptPath)
+            EL.Rdata_out:=ret[1]
+            EL.RCMD:=ret[2]
+            EL.RWD:=ret[3]
+        } Else {
+            ttip(TrayString:="Opening RMD-File",5)
+            Menu Tray,Tip, % TrayString
+            SplitPath % rmd_Path,, OutDir
+            writeFile(OutDir "\build.R",script_contents,"UTF-8-RAW",,true)
+            if (!DEBUG) {
+                run % rmd_Path
+            }
         }
     }
     EL.DocumentSettings:=tmp[2]
@@ -409,7 +457,7 @@ openFolder(Path) {
 
 buildAHKScriptContent(Path,RScript_Path:="") {
     SplitPath % Path,, OutDir
-    if script.config.config.bundleAHKStarter && (RScript_Path!="") {
+    if script.config.config.bundleStarterScript && (RScript_Path!="") {
         RSCRIPT_PATH:=RScript_Path
         BUILD_RPATH:=strreplace(OutDir "\build.R","\","\\")
         OUTDIR_PATH:=OutDir
@@ -674,10 +722,10 @@ guiCreate() {
     gui add, checkbox, % "xp+10 yp+20" " vbRemoveHashTagFromTags", % "Remove '#' from tags?"
     gui add, checkbox, % "xp yp+20" " vbStripLocalMarkdownLinks", % "Strip local markdown links?"
     gui add, checkbox, % "xp yp+20" " vbInsertSetupChunk", % "!Insert Setup-Chunk?"
-    gui add, checkbox, % "xp yp+20" " vbForceFixPNGFiles", % "Double-convert png-files pre-conversion?"
+    gui add, checkbox, % "xp yp+20" " vbForceFixPNGFiles", % "Double-convert png-files pre-rendering?"
     gui add, checkbox, % "xp yp+20" " vbKeepFilename", % "Keep Filename?"
     gui add, checkbox, % "xp yp+20" " vbExecuteRScript", % "Render manuscripts to chosen outputs?"
-    gui add, checkbox, % "xp yp+20" " vbBackupOutput", % "Backup Output files before knitting?"
+    gui add, checkbox, % "xp yp+20" " vbBackupOutput", % "Backup Output files before rendering?"
 
     gui add, Groupbox, % "xm" +WideControlWidth + 5 " yp" + 35 " w" WideControlWidth " h70", Engine-Specific Stuff
     gui add, checkbox, % "xp+10 yp+20" " vbRemoveQuartoReferenceTypesFromCrossrefs", % "Remove ""figure""/""Table""/""Equation"" from`ninline references in quarto-documents?"
