@@ -1,5 +1,5 @@
 #NoEnv ; Recommended for performance and compatibility with future AutoHotkey releases.
-#Requires AutoHotkey v1.1.36+ ;; version at which script was written.
+#Requires AutoHotkey v1.1.35+ ;; version at which script was written.
 #SingleInstance Force
 #MaxHotkeysPerInterval 99999999
 #Warn All, Outputdebug
@@ -55,13 +55,55 @@ main() {
     onExit(exh)
     if !script.load() {
         ;InputBox, given_obsidianhtml_configfile, % script.name " - Initiate settings","Please give the path of your configfile for obsidianhtml."
+        RS_C:=rscript_check()
+        OHTML_C:=obsidianhtml_check()
+        QUARTO_C:=quarto_check()
+        if (!RS_C[1]) {
+            ttip("rscript not available")
+            if (InStr(rscript_path,"`n")){
+                rscript_path:=StrReplace(rscript_path, "`r`n")
+                rscript_path:=StrSplit(rscript_path)
+                found:=false
+                for , path in rscript_path { ;; check if an installation of rscript is found; then check if there are multiple
+                    if !InStr(path,".exe") { ;; skip wrong file formats.
+                        continue
+                    }
+                    if (FileExist(path)) { ;; if a qualified hit is found, reassign it to the required variable, then break out.
+                        found:=true
+                        rscript_path:=path
+                        break
+                    }
+                }
+                if (!found) { ;; no 
+                    InputBox rscript_path, % script.name,% "Please give the absolute path of your installed 'Rscript.exe'-file you wish to use.`nIf you don't want to use this step, leave this empty and continue.", , , , , , , , % "C:\Program Files\R\R-MAJORVERSION.MINORVERSION.PATCH\bin\Rscript.exe"
+                }
+            } else {
+                if !(FileExist(rscript_path)) {
+                    InputBox rscript_path, % script.name,% "Please give the absolute path of your installed 'Rscript.exe'-file you wish to use.`nIf you don't want to use this step, leave this empty and continue.", , , , , , , , % "C:\Program Files\R\R-MAJORVERSION.MINORVERSION.PATCH\bin\Rscript.exe"
+                }
+            }
+        } else {
+            rscript_path:=RS_C[2]
+        }
+        if (!OHTML_C[1]) {
+            ttip("ObsidianHTML not available")
+        } else {
+            ;obsidianhtml_path:=OHTML_C[2]
+        }
+
+        if (!(QUARTO_C[1])) {
+            ttip("quarto not available")
+        } else {
+
+        }
+        ;python_check()
         InputBox given_searchroot, % script.name " - Initiate settings","Please give the search root folder."
-        InputBox given_rscriptpath, % script.name,% "Please give the absolute path of your installed 'Rscript.exe'-file you wish to use.`nIf you don't want to use this step, leave this empty and continue.", , , , , , , , % "C:\Program Files\R\R-MAJORVERSION.MINORVERSION.PATCH\bin\Rscript.exe"
         InitialSettings=
             (LTrim
                 [Config]
                 backupCount=250
-                bundleAHKStarter=1
+                bundleStarterScript=1
+                useQuartoCLI=1
                 defaultRelativeLevel=2
                 Destination=0
                 FullLogOnSuccess=0
@@ -72,13 +114,13 @@ main() {
                 OHTML_WorkDir=%A_Desktop%\TempTemporal
                 OHTML_WorkDir_OwnFork=D:\Dokumente neu\Repositories\obsidian-html
                 OpenParentfolderInstead=1
-                RScriptPath=%given_rscriptpath%
+                RScriptPath=%rscript_path%
                 searchroot=%given_searchroot%
                 SetSearchRootToLastRunManuscriptFolder=1
                 confirmOHTMLCustomBuild=1
                 [Version]
                 ObsidianHTML_Version=3.4.1
-                ObsidianKnittr_Version=3.1.4
+                ObsidianKnittr_Version=3.1.5
                 [LastRun]
                 BackupOutput=1
                 bStripLocalMarkdownLinks=0
@@ -127,14 +169,12 @@ main() {
     }
     formats:=SubStr(formats,1,StrLen(formats)-2)
     output_type:=out.sel
-    if (output_type="All") || HasVal(output_type,"All") {
-        output_type:=["html_document" , "pdf_document" , "word_document" , "odt_document" , "rtf_document" , "md_document" , "powerpoint_presentation" , "ioslides_presentation" , "tufte::tufte_html" , "github_document"] ;; todo:: add bookdown format support
-    }
     if (HasVal(output_type,"First in YAML")) {
         output_type:=""
     }
     manuscriptname:=out.manuscriptname
     manuscriptpath:=out.manuscriptpath
+    ExecutionDirectory:=out.Settings.ExecutionDirectory
     bVerboseCheckbox:=out.Settings.bVerboseCheckbox
     bFullLogCheckbox:=out.Settings.bFullLogCheckbox
     Outputformats:=out.Outputformats
@@ -177,7 +217,8 @@ main() {
     tmpconfig:=createTemporaryObsidianHTML_Config(manuscriptpath, obsidianhtml_configfile,bConvertInsteadofRun)
     EL.configtemplate_path:=obsidianhtml_configfile
     EL.configfile_contents:=tmpconfig[2]
-    ttip("Running ObsidianHTML",5)
+    ttip(TrayString:="Running ObsidianHTML",5)
+    Menu Tray,Tip, % TrayString
     if (obsidianhtml_configfile="") {
         obsidianhtml_configfile:=script.config.config.obsidianhtml_configfile
     }
@@ -188,7 +229,12 @@ main() {
     OHTML_WorkDir:=Deref(script.config.config.OHTML_WorkDir)
     OHTML_WorkDir_OwnFork := script.config.Config.OHTML_WorkDir_OwnFork ; "D:\Dokumente neu\ObsidianPluginDev\obsidian-html"
     if (bRestrictOHTMLScope) {
-        OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(manuscriptpath,bAutoSubmitOTGUI)
+        if (manuscriptpath==script.config.LastRun.path_lastmanuscript) {
+            OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(manuscriptpath,bAutoSubmitOTGUI,script.config.LastRun.LastRelativeLevel)
+        } else {
+            script.config.LastRun.LastRelativeLevel:=-1
+            OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(manuscriptpath,bAutoSubmitOTGUI)
+        }
     }
 
     if (tmpconfig[1] && bConvertInsteadofRun) {
@@ -250,25 +296,32 @@ main() {
     ;; Intermediary
     EL.Intermediary_Start:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
     Codetimer_Log()
-    ttip("Converting to .rmd-file",5)
+    ttip(TrayString:="Converting to .rmd-file",5)
+    Menu Tray,Tip, % TrayString
     rmd_Path:=convertMDToRMD(vMDPath,"index")
     ; 5, 6
-    ttip("Moving to output folder",5)
-    rmd_Path:=copyBack(rmd_Path,script.config.Destination,manuscriptpath)
+    ttip(TrayString:="Moving to output folder",5)
+    Menu Tray,Tip, % TrayString
+    Destination:=(InStr(Deref(ExecutionDirectory),A_Desktop)?0:ExecutionDirectory)
+    rmd_Path:=copyBack(rmd_Path,Destination,manuscriptpath)
     SplitPath % rmd_Path,, OutDir
     rawinputCopyLocation:=regexreplace(OutDir "\" manuscriptName "_vault.md ","\\{2,}","\")
     EL.output_path
     EL.rawInputcopyLocation:=rawinputCopyLocation
     ; 7
-    ttip("Converting Image SRC's")
+    ttip(TrayString:="Converting Image SRC's")
+    Menu Tray,Tip, % TrayString
     NewContents:=ConvertSRC_SYNTAX_V4(rmd_Path,bInsertSetupChunk,bRemoveObsidianHTMLErrors,bStripLocalMarkdownLinks)
-    ttip("Processing Tags",5)
+    ttip(TrayString:="Processing Tags",5)
+    Menu Tray,Tip, % TrayString
     NewContents:=processTags(NewContents,bRemoveHashTagFromTags)
-    ttip("Processing Abstract",5)
+    ttip(TrayString:="Processing Abstract",5)
+    Menu Tray,Tip, % TrayString
     NewContents:=processAbstract(NewContents)
     for _, format in out.Outputformats {                        ;; rmd → qmd conversion
         if (format.package="quarto") {
-            ttip("Convert to QMD",5)
+            ttip(TrayString:="Convert to QMD",5)
+            Menu Tray,Tip, % TrayString
             qmdContents:=convertToQMD(NewContents,bRemoveQuartoReferenceTypesFromCrossrefs)
             qmd_Path:=strreplace(rmd_Path,".rmd",".qmd")
             break                                               ;; if a format is of quarto, run the quarto-conversion once, then continue on.
@@ -286,7 +339,8 @@ main() {
     if (qmd_Path!="") {
         writeFile(qmd_Path,qmdContents,"UTF-8-RAW",,true)
     }
-    ttip("Creating R-BuildScript",5)
+    ttip(TrayString:="Creating R-BuildScript",5)
+    Menu Tray,Tip, % TrayString
     sleep 200
     if bKeepFilename {
         tmp:=buildRScriptContent(rmd_Path,manuscriptName,out)
@@ -299,29 +353,59 @@ main() {
     }
     script_contents:=tmp.1
     format:=tmp.2
-    if bExecuteRScript {
-        ;ttip(" ",5,,,,,,,16)
-        if bExecuteRScript {
-
-            ttip(-1)
-            ttip("Executing R-BuildScript",5)
-        }
+    if (script.config.config.useQuartoCLI) {
         if bBackupOutput {
+            ttip(-1)
+            ttip(TrayString:="Backing up Files",5)
+            Menu Tray,Tip, % TrayString
             BackupDirectory:=backupOutput(rmd_Path,out)
         }
         if script.config.config.backupCount {
             limitBackups(BackupDirectory,script.config.config.backupCount)
         }
-        ret:=runRScript(rmd_Path,script_contents,Outputformats,script.config.config.RScriptPath)
+        ttip(-1)
+        ttip(TrayString:="Executing quarto-CLI",5)
+        Menu Tray,Tip, % TrayString
+        SplitPath % rmd_Path,, OutDir
+        ret:=["","",OutDir]
+        for _, output_type in out.sel {
+            write_quarto_yaml(out.Outputformats[output_type],OutDir,"qCLI_yaml_" out.Outputformats[output_type].filesuffix ".yaml")
+            cmd:="quarto render index.qmd --to " out.Outputformats[output_type].filesuffix 
+            cmd.=" --metadata-file=""qCLI_yaml_" out.Outputformats[output_type].filesuffix ".yaml"""
+            cmd.=" --output """ out.Outputformats[output_type].Filename out.Outputformats[output_type].FilenameMod "."  out.Outputformats[output_type].filesuffix """"
+            GetStdStreams_WithInput(CMD, OutDir, InOut:="`n")
+                , ret[1].="`nFormat " output_type ":`n" InOut
+                , ret[2].=CMD
+                , Clipboard:=InOut
+            writeFile(OutDir "\build_" out.Outputformats[output_type].filesuffix ".cmd",CMD,"UTF-8-RAW",,true)
+        }
         EL.Rdata_out:=ret[1]
         EL.RCMD:=ret[2]
         EL.RWD:=ret[3]
-    } Else {
-        ttip("Opening RMD-File",5)
-        SplitPath % rmd_Path,, OutDir
-        writeFile(OutDir "\build.R",script_contents,"UTF-8-RAW",,true)
-        if (!DEBUG) {
-            run % rmd_Path
+    } else {
+        if bExecuteRScript {
+            ;ttip(" ",5,,,,,,,16)
+            ttip(-1)
+            ttip(TrayString:="Executing R-BuildScript",5)
+            Menu Tray,Tip, % TrayString
+            if bBackupOutput {
+                BackupDirectory:=backupOutput(rmd_Path,out)
+            }
+            if script.config.config.backupCount {
+                limitBackups(BackupDirectory,script.config.config.backupCount)
+            }
+            ret:=runRScript(rmd_Path,script_contents,Outputformats,script.config.config.RScriptPath)
+            EL.Rdata_out:=ret[1]
+            EL.RCMD:=ret[2]
+            EL.RWD:=ret[3]
+        } Else {
+            ttip(TrayString:="Opening RMD-File",5)
+            Menu Tray,Tip, % TrayString
+            SplitPath % rmd_Path,, OutDir
+            writeFile(OutDir "\build.R",script_contents,"UTF-8-RAW",,true)
+            if (!DEBUG) {
+                run % rmd_Path
+            }
         }
     }
     EL.DocumentSettings:=tmp[2]
@@ -334,7 +418,8 @@ main() {
         EL.RCodeChunkExecutionTime:=Round(SubStr(t2,5),3)
     }
     ;; final touches - ahk starter, moving shit to output folder
-    ttip("Building AHK-Starterscript",5)
+    ttip(TrayString:="Building AHK-Starterscript",5)
+    Menu Tray,Tip, % TrayString
     buildAHKScriptContent(rmd_Path,script.config.config.RScriptPath)
     SplitPath % Path,, OutDir
     SplitPath % OutDir,, OutDir2
@@ -372,7 +457,7 @@ openFolder(Path) {
 
 buildAHKScriptContent(Path,RScript_Path:="") {
     SplitPath % Path,, OutDir
-    if script.config.config.bundleAHKStarter && (RScript_Path!="") {
+    if script.config.config.bundleStarterScript && (RScript_Path!="") {
         RSCRIPT_PATH:=RScript_Path
         BUILD_RPATH:=strreplace(OutDir "\build.R","\","\\")
         OUTDIR_PATH:=OutDir
@@ -391,12 +476,11 @@ copyBack(Source,Destination,manuscriptpath) {
     SplitPath % Source, OutFileName, Dir,
     SplitPath % manuscriptpath,,,,manuscriptname,
     if Destination {
-        if FileExist(Destination "\" manuscriptname "\") { ;; make sure the output is clean
-            FileRemoveDir % Destination "\" manuscriptname "\", true
-        }
         FileCopyDir % Dir, % Output_Path:=Destination "\" manuscriptname "\", true
         writeFile(Output_Path "\index.md",manuscriptcontent,,,true)
-        FileCopy % manuscriptpath, % rawinputCopyLocation, 1
+        global pd:=regexreplace(Output_Path "\" manuscriptname "_vault.md ","\\{2,}","\")
+        pd:=Trim(pd)
+        FileCopy % manuscriptpath, % pd, 1
     } Else {
         FileCopyDir % Dir, % Output_Path:= A_Desktop "\TempTemporal\" manuscriptname "\" , true
         if Errorlevel {
@@ -407,17 +491,6 @@ copyBack(Source,Destination,manuscriptpath) {
         FileCopy % manuscriptpath, % pd, 1
     }
     return Output_Path OutFileName
-}
-getOutputPath(Destination,manuscriptpath) {
-    SplitPath % manuscriptpath,,,, manuscriptname
-    if Destination {
-        Output_Path:=Destination "\" manuscriptname "\"
-        Raw_InputFile:=Output_Path "\" manuscriptname "_vault.md"
-    } else {
-        Output_Path:= A_Desktop "\TempTemporal\" manuscriptname
-        Raw_InputFile:=Output_Path "\" manuscriptname "_vault.md "
-    }
-    return [Output_Path,Raw_InputFile]
 }
 convertMDToRMD(md_Path,notename) {
     OldName:=md_Path "\" notename ".md"
@@ -576,8 +649,26 @@ guiCreate() {
         ? 3
         : ret[1].Count())
 
-    gui add, listview,% "vvLV1 LV0x8 w" WideControlWidth " h418 checked NoSortHdr " , % "Chooses an output Type"
-    gui add, text, % "ym xm" + WideControlWidth + 5,% " via RMarkdown and Quarto"
+    gui add, listview,% "vvLV1 LV0x8 w" WideControlWidth " h245 checked NoSortHdr " , % "Chooses an output Type"
+    gui add, Groupbox, % "xm" " yp" + 248 " w" WideControlWidth " h170", Execution Directories
+    ExecutionDirectories:=""
+    for each, File in script.config.DDLHistory {
+        if (!FileExist(File)) {
+            script.config.DDLHistory.RemoveAt(each,1)
+        }
+    }
+    ExecutionDirectories:=script.config.config.OHTML_OutputDir "||"
+    DDLRows:=(script.config.Config.HistoryLimit>25?25:script.config.Config.HistoryLimit)
+    gui add, text, % "yp+25 xp+10 w" WideControlWidth -  3*5, % "Choose execution directory for OHTML"
+    gui add, Radio,% "vExecutionDirectory Checked",% "&1. OHTML-Output-Dir"
+    gui add, Radio, ,% "&2. subfolder of note-location in vault"
+    ;gui add, DDL,% "yp+20 xp w" WideControlWidth -  4*5 " vExecutionDirectory hwndExeDir r" DDLRows, % ExecutionDirectories
+    gui add, Groupbox, % "xm" " yp" + 78 " w" WideControlWidth " h70", Last execution
+    SplitPath % script.config.LastRun.manuscriptpath , , OutDir, , OutNameNoExt
+    SplitPath % OutDir, , , , OutDir,
+    gui add, text, % "yp+20 xp+5", % "LM: " OutNameNoExt " (" OutDir ")"
+    gui add, text, % "yp+20 xp", % "LL: " script.config.LastRun.LastRelativeLevel (script.config.LastRun.LastRelativeLevel=0?" (manuscript-folder)":"") " DL: " script.config.Config.defaultRelativeLevel
+    gui add, text, % "ym xm" + WideControlWidth + 5,% " via Obsidian-HTML, RMarkdown and Quarto"
     last_output:=script.config.LastRun.last_output_type
     for _,output_type in PotentialOutputs { ; TODO: rework this to differentiate "word_document" from "bookdown::word_document2" -> maybe check for next char? If comma or end of string, this would be a base rmd format, if a "2" it would be bookdown
         Cond:=Instr(last_output,output_type)
@@ -616,7 +707,7 @@ guiCreate() {
     script.save()
     Gui add, button, gChooseFile, &Choose Manuscript
     DDLRows:=(script.config.Config.HistoryLimit>25?25:script.config.Config.HistoryLimit)
-    gui add, DDL,% "w" WideControlWidth " vChosenFile hwndChsnFile r" DDLRows, % HistoryString
+    gui add, DDL,% "w" WideControlWidth " vChosenFile hwndChsnFile r" DDLRows " ggetPotentialWorkDir", % HistoryString
     gui add, Groupbox, % "w" WideControlWidth " h150", Obsidian HTML
     ;; OHTML
     gui add, checkbox,% "xp+10 yp+20" " vbConvertInsteadofRun", % "!!Use verb 'Convert' for OHTML-call?"
@@ -631,10 +722,10 @@ guiCreate() {
     gui add, checkbox, % "xp+10 yp+20" " vbRemoveHashTagFromTags", % "Remove '#' from tags?"
     gui add, checkbox, % "xp yp+20" " vbStripLocalMarkdownLinks", % "Strip local markdown links?"
     gui add, checkbox, % "xp yp+20" " vbInsertSetupChunk", % "!Insert Setup-Chunk?"
-    gui add, checkbox, % "xp yp+20" " vbForceFixPNGFiles", % "Double-convert png-files pre-conversion?"
+    gui add, checkbox, % "xp yp+20" " vbForceFixPNGFiles", % "Double-convert png-files pre-rendering?"
     gui add, checkbox, % "xp yp+20" " vbKeepFilename", % "Keep Filename?"
     gui add, checkbox, % "xp yp+20" " vbExecuteRScript", % "Render manuscripts to chosen outputs?"
-    gui add, checkbox, % "xp yp+20" " vbBackupOutput", % "Backup Output files before knitting?"
+    gui add, checkbox, % "xp yp+20" " vbBackupOutput", % "Backup Output files before rendering?"
 
     gui add, Groupbox, % "xm" +WideControlWidth + 5 " yp" + 35 " w" WideControlWidth " h70", Engine-Specific Stuff
     gui add, checkbox, % "xp+10 yp+20" " vbRemoveQuartoReferenceTypesFromCrossrefs", % "Remove ""figure""/""Table""/""Equation"" from`ninline references in quarto-documents?"
@@ -647,6 +738,7 @@ guiCreate() {
     gui add, button, gGCAbout hwndAbout yp xp+122, &About
     GuiControl +g,%OpenConfig%, % onOpenConfig
     Gui Add, Text,x15 yp,% script.name " v." regexreplace(script.config.version.ObsidianKnittr_Version,"\s*","") " | Obsidian-HTML v." strreplace(script.config.version.ObsidianHTML_Version,"commit:")
+    Gui Add, Text,x15 yp+15,% "Quarto-cli" " v." regexreplace(quartogetVersion(),"\s*","")
     script.version:=script.config.version.ObsidianKnittr_Version
 
     if (script.config.LastRun.manuscriptpath!="") && (script.config.LastRun.last_output_type!="") {
@@ -667,11 +759,21 @@ guiCreate() {
         guicontrol,, bStripLocalMarkdownLinks, % (script.config.LastRun.bStripLocalMarkdownLinks)
         guicontrol,, bUseOwnOHTMLFork, % (script.config.LastRun.UseOwnOHTMLFork)
         guicontrol,, bRemoveQuartoReferenceTypesFromCrossrefs, % (script.config.LastRun.RemoveQuartoReferenceTypesFromCrossrefs)
+        guicontrol,, Button2, % (script.config.LastRun.LastExecutionDirectory=1?1:0)
+        guicontrol,, Button3, % (script.config.LastRun.LastExecutionDirectory=1?0:1)
     }
     return filesuffixes
 }
+getPotentialWorkDir(File) {
+    global ExecutionDirectory
+    gui submit, nohide
+    SplitPath % File,, OutDir
+
+    ExecutionDirectories:= OutDir "\ObsidianKnittr_output"
+    return {relativeToNote:ExecutionDirectory,ExecutionDirectories:ExecutionDirectories}
+}
 getDefinedOutputFormats(Path) {
-    PotentialOutputs:=["bookdown::word_document2", "html_document", "bookdown::html_document2", "word_document", "pdf_document", "bookdown::pdf_document2", "First in YAML", "odt_document", "rtf_document", "md_document", "powerpoint_presentation", "ioslides_presentation", "tufte::tufte_html", "github_document", "All"]
+    PotentialOutputs:=["bookdown::word_document2", "html_document", "bookdown::html_document2", "bookdown::pdf_document2", "odt_document", "rtf_document", "md_document", "tufte::tufte_html", "github_document"]
     Arr:=[]
     filesuffixes:=[]
     if !FileExist(Path) {
@@ -768,6 +870,10 @@ guiShow() {
         ot.AssembleFormatString()
         Outputformats[format]:=ot
     }
+    atmp:=getPotentialWorkDir(ChosenFile)
+    script.config.LastRun.LastExecutionDirectory:=atmp.relativeToNote
+    ExecutionDirectory:=(atmp.relativeToNote=1?script.config.config.OHTML_OutputDir:atmp.ExecutionDirectories)
+    ExecutionDirectory:=ExecutionDirectory . (SubStr(ExecutionDirectory,0)!="\"?"\":"")
     if (manuscriptpath!="") && !ot.bClosedNoSubmit {
         SplitPath % manuscriptpath,,,, manuscriptName
         return {"sel":sel
@@ -788,6 +894,7 @@ guiShow() {
                     ,"bRemoveObsidianHTMLErrors":bRemoveObsidianHTMLErrors + 0
                     ,"bRestrictOHTMLScope":bRestrictOHTMLScope + 0
                     ,"bStripLocalMarkdownLinks":bStripLocalMarkdownLinks + 0
+                    ,"ExecutionDirectory":ExecutionDirectory
                     ,"bUseOwnOHTMLFork":bUseOwnOHTMLFork + 0}
                 ,"Outputformats":Outputformats
                 ,"filesuffixes":filesuffixes}
@@ -840,6 +947,7 @@ guiSubmit() {
     if !FileExist(manuscriptpath) {
         manuscriptpath:=chooseFile()
     }
+    script.config.LastRun.path_lastmanuscript:=script.config.LastRun.manuscriptpath
     script.config.LastRun.manuscriptpath:=manuscriptpath
     script.config.LastRun.last_output_type:=""
     script.config.LastRun.Verbose:=bVerboseCheckbox+0

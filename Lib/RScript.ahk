@@ -120,13 +120,32 @@ buildRScriptContent(Path,output_filename="",out="") {
     return [Str,FormatOptions,RScriptFolder]
 
 }
-
+rscript_check() {
+    static rscript_on_path:=false
+    static out:=""
+    if !rscript_on_path {
+        GetStdStreams_WithInput("where rscript.exe",,out)
+        out:=strreplace(out,"`n")
+        if !FileExist(out) {
+            rscript_on_path:=false
+        } else {
+            rscript_on_path:=true
+        }
+    }
+    return [rscript_on_path,out]
+}
 runRScript(Path,script_contents,Outputformats,RScript_Path:="") {
     SplitPath % Path,, OutDir
     writeFile(OutDir "\build.R",script_contents,"UTF-8-RAW",,true)
+    if !FileExist(RScript_Path) {
+        RScript_Path:=rscript_check().2
+        if !FileExist(RScript_Path) {
+            MsgBox 0x10,% script.name " - " A_ThisFunc "()", % "Error encountered`; the Path provided for the RScript-Utility ('" RScript_Path "') does not point to a valid file.`nAdditionally, Rscript is not part of the PATH variable, thus 'where rscript' fails as well. The manuscript cannot be compiled to output formats.`nLocate RScript or manually execute the rscript to proceeed."
+            return ["FILENOTFOUND:" RScript_Path,"where rscript",""]
+        }
+    }
     CMD:=Quote_ObsidianHTML(RScript_Path) A_Space Quote_ObsidianHTML(strreplace(OutDir "\build.R","\","\")) ;; works with valid codefile (manually ensured no utf-corruption) from cmd, all three work for paths not containing umlaute with FileAppend
     if DEBUG {
-
         CLipboard:=CMD "`n" OutDir "`n`n`n`n" Quote_ObsidianHTML(InOut)
     }
     GetStdStreams_WithInput(CMD, OutDir, InOut:="`n")
