@@ -9,14 +9,16 @@
     }
 
     ;; get ObsidianHTML_Path
-    GetStdStreams_WithInput("where obsidianhtml",,obsidianhtml_path) ;; works
-    obsidianhtml_path:=Trim(obsidianhtml_path)
-
-    obsidianhtml:=strreplace(obsidianhtml_path,"`r`n")
-    obsidianhtml:=strreplace(obsidianhtml_path,"`n")
-    if (obsidianhtml="") {
-        MsgBox 0x2010, script.name " - ObsidianHTML not found ", "The CLI-Utility ObsidianHTML could not be found via 'where obsidianhtml'.`nAs this script is not functional without it, it will exit now."
-        return false
+    if (bUseOwnOHTMLFork) {
+        obsidianhtml_path:=WorkDir_OwnFork "\obsidianhtml"
+    } else {
+        if obsidianhtml_check().1 {
+            obsidianhtml_path:=obsidianhtml_check().2
+            obsidianhtml_path:=Trim(obsidianhtml_path)
+        } else {
+            MsgBox 0x2010, script.name " - ObsidianHTML not found ", "The CLI-Utility ObsidianHTML could not be found via 'where obsidianhtml'.`nAs this script is not functional without it, it will exit now."
+            return false
+        }
     }
 
     ;; ensure the Working Directory exists before running OHTML
@@ -57,8 +59,10 @@
     }
     ;; validate used version of OHTML
     if bUseOwnOHTMLFork {
-        GetStdStreams_WithInput("python --version",,out)
-        GetStdStreams_WithInput("python -m " command2_getversion,WorkDir_OwnFork,ohtmlversion_modded)
+        if python_check().1 {
+            GetStdStreams_WithInput("python --version",,out)
+            GetStdStreams_WithInput("python -m " command2_getversion,WorkDir_OwnFork,ohtmlversion_modded)
+        }
         if (script.config.config.ConfirmOHTMLCustomBuild && !bAutoSubmitOTGUI) {
             MsgBox 0x2034,% "Is the correct build version used?", % "Has the correct build version been used?`n" ohtmlversion_modded "`n`nCMD:`n" command2, 1 ;; TODO: add config option to skip this, and add option to potentially also or never skip this when debugging.
             IfMsgBox Yes, {
@@ -304,6 +308,38 @@ updateObsidianHTMLToMaster() {
     RunWait % A_Comspec " /k echo y | pip install git+https://github.com/obsidian-html/obsidian-html.git", ,
     MsgBox,, % script.name, % "Successfully updated to Master."
     return
+}
+obsidianhtml_check() {
+    static obsidianhtml_on_path:=false
+    static out:=""
+    if !obsidianhtml_on_path {
+        GetStdStreams_WithInput("where obsidianhtml",,out)
+        out:=strreplace(out,"`n")
+        if !FileExist(out) {
+            obsidianhtml_on_path:=false
+        } else {
+            obsidianhtml_on_path:=true
+        }
+    }
+    return [obsidianhtml_on_path,out]
+}
+python_check() {
+    static python_on_path:=false
+    static out:=""
+    if !python_on_path {
+        GetStdStreams_WithInput("where python.exe",,out)
+        out:=strsplit(out,"`n")
+        for each, path in out {
+            if !FileExist(path) {
+                python_on_path:=false
+            } else {
+                python_on_path:=true
+                out:=path
+                break
+            }
+        }
+    }
+    return [python_on_path,out]
 }
 ; #region:Quote (4179423054)
 ; #region:Metadata:

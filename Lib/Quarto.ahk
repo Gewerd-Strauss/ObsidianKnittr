@@ -7,6 +7,7 @@ convertToQMD(String,bRemoveQuartoReferenceTypesFromCrossrefs) {
     String:=convertBookdownToQuartoReferencing(String,bRemoveQuartoReferenceTypesFromCrossrefs)         ;; modify chunk labels in chunks and references to contain their ref type.
     String:=convertDiagrams(String)                                                                     ;; convert graphviz and mermaid codechunk syntax
     String:=moveEquationreferencesToEndofBlock(String)                                                  ;; latex equation reference keys
+    String:=moveEquationLabelsUpIntoLatexEquation(String)                                               ;; 
     String:=fixCitationpathing(String)                                                                  ;; "csl" and "bibliography" frontmatter keys
     String:=fixNullFields(String)                                                                       ;; fix null-valued yaml fields
     return String
@@ -47,6 +48,15 @@ moveEquationreferencesToEndofBlock(String) {
     }
 
     return Rebuild
+}
+moveEquationLabelsUpIntoLatexEquation(String) {
+    needle:="\$+\s*\{#eq"
+    Matches:=RegexMatchAll(String, "im)" needle)
+    for _, match in Matches {                                                  ;; star, top
+        needle := match[0]
+        String:=strreplace(String,needle,"$$ {#eq",,1)
+    }
+    return String
 }
 convertBookdownToQuartoReferencing(String,bRemoveQuartoReferenceTypesFromCrossrefs) {
 
@@ -170,6 +180,48 @@ modifyQuartobuildscript(script_contents,RScriptFolder,out) {
 
 
 quartogetVersion() {
-    GetStdStreams_WithInput("quarto -V",,out)
-    return Out
+    if quarto_check().1 {
+        GetStdStreams_WithInput("quarto -V",,out)
+        out:=RegexReplace(out,"\s+")
+    }
+    return out
+}
+quarto_check() {
+    static quarto_on_path:=false
+    static out:=""
+    if !quarto_on_path {
+        GetStdStreams_WithInput("where quarto.exe",,out)
+        GetStdStreams_WithInput("where quarto.cmd",,out2)
+        GetStdStreams_WithInput("where quarto.js",,out3)
+        out:=strreplace(out,"`n")
+        out2:=strreplace(out2,"`n")
+        if (!FileExist(out) || !FileExist(out2)) {
+            quarto_on_path:=false
+        } else {
+            quarto_on_path:=true
+        }
+    }
+    return [quarto_on_path,out]
+}
+write_quarto_yaml(output_type,OutDir,yaml_file) {
+    yaml_path:=OutDir "\" yaml_file
+        , String:=""
+    for Parameter, Value in output_type.Arguments {
+        Pair:= Parameter ": " strreplace(Value.Value,"""")
+        String:=String "`n" Pair
+    }
+    String:=Strreplace(String,": no""",": FALSE""")
+    String:=Strreplace(String,": yes""",": TRUE""")
+    String:=Strreplace(String,": yes",": TRUE")
+    String:=Strreplace(String,": 'true'",": TRUE")
+    String:=Strreplace(String,": 'false'",": FALSE")
+    String:=Strreplace(String,": 'FALSEne'",": FALSE")
+    String:=Strreplace(String,": no",": FALSE")
+    String:=Strreplace(String,": FALSEne",": none")
+    String:=Strreplace(String,"date: FALSEw","date: now")
+    String:=Strreplace(String,": true`n",": TRUE`n")
+    String:=Strreplace(String,": false`n",": FALSE`n")
+    ;Clipboard:=String
+    writeFile(yaml_path,String,Encoding:="utf-8",Flags:=0x2,bSafeOverwrite:=true)
+    return
 }
