@@ -134,6 +134,7 @@ main() {
             } else {
 
         }
+            out:=guiShow(true,CLIArgs)
     }
     formats:=""
     bAutoSubmitOTGUI:=false
@@ -596,7 +597,7 @@ processTags(Contents,bRemoveHashTagFromTags) {
     ;;  TODO: regexreplaceall for these patterns: "`{_obsidian_pattern_tag_XXXX}", as they are not found in the frontmatter and thus are not replaced
     return Contents
 }
-guiCreate() {
+guiCreate(runCLI) {
     global
     gui destroy
     if (!FileExist(A_ScriptDir "\INI-Files\DynamicArguments.ini")) {
@@ -669,6 +670,7 @@ guiCreate() {
             }
         }
     }
+    if (!runCLI)
     script.save()
     Gui add, button, gChooseFile, &Choose Manuscript
     DDLRows:=(script.config.Config.HistoryLimit>25?25:script.config.Config.HistoryLimit)
@@ -783,9 +785,9 @@ GCAutoSubmit() {
     return guiSubmit()
 }
 
-guiShow() {
+guiShow(runCLI:=FALSE,CLIArgs:="") {
     global
-    filesuffixes:=guiCreate()
+    filesuffixes:=guiCreate(runCLI)
     x:=(script.config.GuiPositioning.X!=""?script.config.GuiPositioning.X:200)
     y:=(script.config.GuiPositioning.Y!=""?script.config.GuiPositioning.Y:200)
     bAutoSubmitOTGUI:=false
