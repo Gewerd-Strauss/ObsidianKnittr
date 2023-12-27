@@ -94,60 +94,12 @@ main() {
         if (!QUARTO_C[1]) {
             ttip("quarto not available")
         }
-        ;python_check()
-        InputBox given_searchroot, % script.name " - Initiate settings","Please give the search root folder."
-        InitialSettings=
-            (LTrim
-                [Config]
-                backupCount=250
-                bundleStarterScript=1
-                useQuartoCLI=1
-                defaultRelativeLevel=2
-                Destination=0
-                FullLogOnSuccess=0
-                HistoryLimit=25
-                obsidianhtml_configfile=
-                obsidianTagEndChars=():'
-                OHTML_OutputDir=%A_Desktop%\TempTemporal\
-                OHTML_WorkDir=%A_Desktop%\TempTemporal
-                OHTML_WorkDir_OwnFork=D:\Dokumente neu\Repositories\obsidian-html
-                OpenParentfolderInstead=1
-                RScriptPath=%rscript_path%
-                searchroot=%given_searchroot%
-                SetSearchRootToLastRunManuscriptFolder=1
-                confirmOHTMLCustomBuild=1
-                [Version]
-                ObsidianHTML_Version=3.4.1
-                ObsidianKnittr_Version=3.1.5
-                [LastRun]
-                BackupOutput=1
-                bStripLocalMarkdownLinks=0
-                Conversion=
-                ConvertInsteadofRun=1
-                ForceFixPNGFiles=0
-                FullLog=0
-                InsertSetupChunk=0
-                KeepFileName=1
-                last_output_type=
-                manuscriptpath=
-                RemoveHashTagFromTags=1
-                RemoveObsidianHTMLErrors=0
-                RenderRMD=0
-                RestrictOHTMLScope=0
-                UseOwnOHTMLFork=0
-                Verbose=0
-                [GuiPositioning]
-                H=
-                W=
-                X=
-                Y=
-                [DDLHistory]
-            )
         if (!InStr(FileExist(script.configfolder),"D")) {
             FileCreateDir % script.configfolder
         }
-        writeFile(script.configfile,InitialSettings,"UTF-16")
+        setupDefaultConfig(script.configfile,RS_C,OHTML_C,QUARTO_C)
         script.load()
+        writeFile(A_ScriptDir "\INI-Files\ObsidianKnittr_Version.ini",script.config.Version.ObsidianKnittr_Version,"UTF-16")
     }
     FileRead ObsidianKnittr_Version, % A_ScriptDir "\INI-Files\ObsidianKnittr_Version.ini"
     EL.ObsidianKnittr_Version:=script.version:=script.config.version.ObsidianKnittr_Version:=Regexreplace(ObsidianKnittr_Version,"\s*")
@@ -1088,3 +1040,4 @@ fTraySetup() {
 #Include <Quarto>
 #Include <script>
 #Include <ownCLI>
+#Include <Configuration>
