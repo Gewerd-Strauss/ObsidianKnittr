@@ -484,16 +484,14 @@ copyBack(Source,Destination,manuscriptpath) {
     if Destination {
         FileCopyDir % Dir, % Output_Path:=Destination "\" manuscriptname "\", true
         writeFile(Output_Path "\index.md",manuscriptcontent,,,true)
-        global pd:=regexreplace(Output_Path "\" manuscriptname "_vault.md ","\\{2,}","\")
-        pd:=Trim(pd)
+        pd:=Trim(regexreplace(Output_Path "\" manuscriptname "_vault.md ","\\{2,}","\"))
         FileCopy % manuscriptpath, % pd, 1
     } Else {
         FileCopyDir % Dir, % Output_Path:= A_Desktop "\TempTemporal\" manuscriptname "\" , true
         if Errorlevel {
             msgbox % Errorlevel
         }
-        global pd:=regexreplace(Output_Path "\" manuscriptname "_vault.md ","\\{2,}","\")
-        pd:=Trim(pd)
+        pd:=Trim(regexreplace(Output_Path "\" manuscriptname "_vault.md ","\\{2,}","\"))
         FileCopy % manuscriptpath, % pd, 1
     }
     return Output_Path OutFileName
