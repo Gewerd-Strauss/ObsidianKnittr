@@ -41,11 +41,12 @@ CLI_help() {
             , OHTMLLevel:"`t`t-`tInteger, set to number of levels above the manuscript-LOCATION to implement an OHTML-restrictor."
             , "quarto::XXXX.YY":"`t`t-`tPass along parameter modifications for parameter 'YY' of quarto-format 'XXXX'. Use quarto's parameter naming-scheme`n`t`t`t`t`t`tExample: ``quarto::html.number-depth=1``"
             , LastExecutionDirectory:"`t-`tSet to '1' to process in OHTML-output directory, set to '2' to process in vault-subfolder."}
+    name:=script.name
     str=
         (LTRIM
+            CLI-Overview for '%name%':
             -h`tPaste this help
             -v`tPaste Version
-
         )
     for Arg, Explanation in Obj {
         str.="`t`t" Arg  Explanation "`n"
