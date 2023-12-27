@@ -245,19 +245,18 @@ main() {
             }
             EL.temporaryVaultpath:=OHTMLScopeRestrictor_Object.Path
             EL.temporaryVaultpathRemoved:="No - not removed, but not vault root"
-
         }
     }
     EL.ObsidianHTML_Duration:=Codetimer_Log()
-    EL.ObsidianHTML_End:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
-    EL.obsidianhtml_version:=strreplace(ret.obsidianhtml_version,"`n")
-    EL.obsidianhtml_path:=ret.obsidianhtml_path
-    EL.UsedVerb:=(bConvertInsteadofRun?"Convert":"Run")
-    EL.ObsidianHTMLWorkDir:=ret["WorkDir"]
-    EL.ObsidianHTMLOutputpath:=ret["Outputpath"]
-    EL.ObsidianHTMLCopyDir:=ret["ObsidianHTMLCopyDir"]
-    EL.CMD:=ret["CMD"]
-    EL.data_out:=ret["stdOut"]
+        , EL.ObsidianHTML_End:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
+        , EL.obsidianhtml_version:=strreplace(ret.obsidianhtml_version,"`n")
+        , EL.obsidianhtml_path:=ret.obsidianhtml_path
+        , EL.UsedVerb:=(bConvertInsteadofRun?"Convert":"Run")
+        , EL.ObsidianHTMLWorkDir:=ret["WorkDir"]
+        , EL.ObsidianHTMLOutputpath:=ret["Outputpath"]
+        , EL.ObsidianHTMLCopyDir:=ret["ObsidianHTMLCopyDir"]
+        , EL.CMD:=ret["CMD"]
+        , EL.data_out:=ret["stdOut"]
     if RegExMatch(ret["stdOut"], "md: (?<MDPath>.*)(\s*)", v) || FileExist(ret.OutputPath) {
         if FileExist(ret.OutputPath) {
             _:=SubStr(ret.OutputPath,-1)
@@ -396,13 +395,13 @@ main() {
         }
     }
     EL.DocumentSettings:=tmp[2]
-    EL.RScriptExecution_Duration:=Codetimer_Log()
-    EL.RScriptExecution_End:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
-    EL.getTotalDuration(ATC1,A_TickCount)
+        , EL.RScriptExecution_Duration:=Codetimer_Log()
+        , EL.RScriptExecution_End:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
+        , EL.getTotalDuration(ATC1,A_TickCount)
     if InStr(Rdata_out,"[1] ""Total Time for codechunks:""") {
         t:=StrSplit(Rdata_out,"[1] ""Total Time for codechunks:""")
-        t2:=StrSplit(t[2],"`n",,3).2
-        EL.RCodeChunkExecutionTime:=Round(SubStr(t2,5),3)
+            , t2:=StrSplit(t[2],"`n",,3).2
+            , EL.RCodeChunkExecutionTime:=Round(SubStr(t2,5),3)
     }
     ;; final touches - ahk starter, moving shit to output folder
     ttip(TrayString:="Building AHK-Starterscript",5)
