@@ -700,7 +700,7 @@ guiCreate() {
     gui add, checkbox,% "xp yp+20" " vbRestrictOHTMLScope", % "Limit scope of OHTML?"
 
     ;; post-processing
-    gui add, Groupbox, % "xm" +WideControlWidth + 5 " yp" + 35 " w" WideControlWidth " h170", General configuration
+    gui add, Groupbox, % "xm" +WideControlWidth + 5 " yp" + 55 " w" WideControlWidth " h170", General configuration
     gui add, checkbox, % "xp+10 yp+20" " vbRemoveHashTagFromTags", % "Remove '#' from tags?"
     gui add, checkbox, % "xp yp+20" " vbStripLocalMarkdownLinks", % "Strip local markdown links?"
     gui add, checkbox, % "xp yp+20" " vbInsertSetupChunk", % "!Insert Setup-Chunk?"
@@ -710,7 +710,7 @@ guiCreate() {
     gui add, checkbox, % "xp yp+20" " vbBackupOutput", % "Backup Output files before rendering?"
 
     gui add, Groupbox, % "xm" +WideControlWidth + 5 " yp" + 35 " w" WideControlWidth " h70", Engine-Specific Stuff
-    gui add, checkbox, % "xp+10 yp+20" " vbRemoveQuartoReferenceTypesFromCrossrefs", % "Remove ""figure""/""Table""/""Equation"" from`ninline references in quarto-documents?"
+    gui add, checkbox, % "xp+10 yp+20" " vbRemoveQuartoReferenceTypesFromCrossrefs", % "Remove ""figure""/""table""/""equation"" from`ninline references in quarto-documents?"
     gui add, text,xp yp+20 w0
     Gui Font, s7 cWhite, Verdana
     gui add, button, gGCSubmit yp+38 xp-10, &Submit
