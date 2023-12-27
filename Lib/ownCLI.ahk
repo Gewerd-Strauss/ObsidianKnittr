@@ -35,10 +35,11 @@ requireA_Args(Args) {
     }
 }
 CLI_help() {
-    Obj:={Path:"`t`t`t-`treq.: absolute path to the note being processed. The note must lie within an obsidian-Vault, as detected by the presence of an ``.obsidian``-folder somewhere above the note's location."
-            , format:"`t`t`t-`treq.: key of the output-format used. Output format must be defined in 'DynamicArguments.ini'."
+    Obj:={Path:"`t`t`t-`t(req): absolute path to the note being processed. The note must lie within an obsidian-Vault, as detected`n`t`t`t`t`t`tby the presence of an ``.obsidian``-folder somewhere above the note's location."
+            , format:"`t`t`t-`t(req): key of the output-format used. Output format must be defined in 'DynamicArguments.ini'."
             , FullLog:"`t`t`t-`tNOT TESTED"
             , OHTMLLevel:"`t`t-`tInteger, set to number of levels above the manuscript-LOCATION to implement an OHTML-restrictor."
+            , "quarto::XXXX.YY":"`t`t-`tPass along parameter modifications for parameter 'YY' of quarto-format 'XXXX'. Use quarto's parameter naming-scheme`n`t`t`t`t`t`tExample: ``quarto::html.number-depth=1``"
             , LastExecutionDirectory:"`t-`tSet to '1' to process in OHTML-output directory, set to '2' to process in vault-subfolder."}
     str=
         (LTRIM
