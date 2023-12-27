@@ -747,8 +747,8 @@ guiCreate() {
     }
     return filesuffixes
 }
-getPotentialWorkDir(File) {
-    global ExecutionDirectory
+getPotentialWorkDir(File,ExecutionDirectory) {
+    ;global ExecutionDirectory
     gui submit, nohide
     SplitPath % File,, OutDir
 
@@ -853,7 +853,7 @@ guiShow() {
         ot.AssembleFormatString()
         Outputformats[format]:=ot
     }
-    atmp:=getPotentialWorkDir(ChosenFile)
+        atmp:=getPotentialWorkDir(ChosenFile,ExecutionDirectory)
     script.config.LastRun.LastExecutionDirectory:=atmp.relativeToNote
     ExecutionDirectory:=(atmp.relativeToNote=1?script.config.config.OHTML_OutputDir:atmp.ExecutionDirectories)
     ExecutionDirectory:=ExecutionDirectory . (SubStr(ExecutionDirectory,0)!="\"?"\":"")
