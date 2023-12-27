@@ -39,7 +39,6 @@ Output - Formats          : `%formats`%
 Keep Filename             : `%bKeepFilename`%
 SRC_Converter Version     : `%bSRCConverterVersion`% (deprecated, only for completeness)
 Stripped '#' from Tags    : `%bRemoveHashTagFromTags`%
-Full Log                  : `%bFullLogCheckbox`%
 
 ObsidianHTML:
 OHTML - Version           : `%obsidianhtml_version`%

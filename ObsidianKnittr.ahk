@@ -136,7 +136,6 @@ main() {
                 RemoveObsidianHTMLErrors=0
                 RenderRMD=0
                 RestrictOHTMLScope=0
-                UseCustomTOC=0
                 UseOwnOHTMLFork=0
                 Verbose=0
                 [GuiPositioning]
@@ -182,7 +181,6 @@ main() {
         , EL.manuscriptname:=manuscriptname:=out.manuscriptname
         , EL.manuscriptpath:=manuscriptpath:=out.manuscriptpath
         , EL.bVerboseCheckbox:=bVerboseCheckbox:=out.Settings.bVerboseCheckbox
-    ; , EL.bFullLogCheckbox:=bFullLogCheckbox:=out.Settings.bFullLogCheckbox
         , EL.bSRCConverterVersion:=out.Settings.bSRCConverterVersion
         , EL.bKeepFilename:=bKeepFilename:=out.Settings.bKeepFilename
         , EL.bExecuteRScript:=bExecuteRScript:=out.Settings.bExecuteRScript
@@ -699,7 +697,6 @@ guiCreate() {
     gui add, checkbox,% "xp+10 yp+20" " vbConvertInsteadofRun", % "!!Use verb 'Convert' for OHTML-call?"
     gui add, checkbox,% "xp yp+20" " vbUseOwnOHTMLFork", % "!!!Use the personal fork? *CAUTION*"
     gui add, checkbox,% "xp yp+20" " vbRemoveObsidianHTMLErrors", % "!Purge OHTML-Error-strings?"
-    gui add, checkbox,% "xp yp+20" " vbFullLogCheckbox", % "Full Log on successful execution?"
     gui add, checkbox,% "xp yp+20" " vbVerboseCheckbox", % "Set OHTML's Verbose-Flag?"
     gui add, checkbox,% "xp yp+20" " vbRestrictOHTMLScope", % "Limit scope of OHTML?"
 
@@ -732,7 +729,6 @@ guiCreate() {
         SplitPath % OutDir, OutFileName, OutDir,
         guicontrol,, bVerboseCheckbox, % (script.config.LastRun.Verbose)
         guicontrol,, bRestrictOHTMLScope, % (script.config.LastRun.RestrictOHTMLScope)
-        guicontrol,, bFullLogCheckbox, % (script.config.LastRun.FullLog)
         guicontrol,, bSRCConverterVersion, % (script.config.LastRun.Conversion)
         guicontrol,, bKeepFilename, % (script.config.LastRun.KeepFileName)
         guicontrol,, bExecuteRScript, % (script.config.LastRun.RenderRMD)
@@ -866,14 +862,12 @@ guiShow() {
                 ,"manuscriptpath":manuscriptpath
                 ,"manuscriptname":manuscriptName
                 ,Settings:{"bVerboseCheckbox":bVerboseCheckbox + 0
-                    ,"bFullLogCheckbox":bFullLogCheckbox + 0
                     ,"bSRCConverterVersion":bSRCConverterVersion + 0
                     ,"bKeepFilename":bKeepFilename + 0
                     ,"bBackupOutput":bBackupOutput + 0
                     ,"bExecuteRScript":bExecuteRScript + 0
                     ,"bRemoveHashTagFromTags":bRemoveHashTagFromTags + 0
                     ,"bRemoveQuartoReferenceTypesFromCrossrefs":bRemoveQuartoReferenceTypesFromCrossrefs + 0
-                    ,"bUseCustomTOC":bUseCustomTOC + 0
                     ,"bForceFixPNGFiles":bForceFixPNGFiles + 0
                     ,"bInsertSetupChunk":bInsertSetupChunk + 0
                     ,"bConvertInsteadofRun":bConvertInsteadofRun + 0
@@ -916,7 +910,6 @@ guiSubmit() {
     if (script.config.LastRun.manuscriptpath!="") && (manuscriptpath="") {
         manuscriptpath:=script.config.LastRun.manuscriptpath
         bVerboseCheckbox:=bVerboseCheckbox+0
-        bFullLogCheckbox:=bFullLogCheckbox+0
     }
     if (manuscriptpath="") && (sel.count()=0) {
         if (script.config.LastRun.manuscriptpath!="") && (script.config.LastRun.last_output_type!="") {
@@ -927,7 +920,6 @@ guiSubmit() {
             }
             manuscriptpath:=script.config.lastrun.manuscriptpath
             bVerboseCheckbox:=script.config.LastRun.Verbose+0
-            bFullLogCheckbox:=script.config.LastRun.FullLog+0
         }
     }
     if !FileExist(manuscriptpath) {
@@ -938,7 +930,6 @@ guiSubmit() {
     script.config.LastRun.last_output_type:=""
     script.config.LastRun.Verbose:=bVerboseCheckbox+0
     script.config.LastRun.RestrictOHTMLScope:=bRestrictOHTMLScope+0
-    script.config.LastRun.FullLog:=bFullLogCheckbox+0
     script.config.LastRun.Conversion:=bSRCConverterVersion+0
     script.config.LastRun.KeepFileName:=bKeepFilename+0
     script.config.LastRun.RenderRMD:=bExecuteRScript+0
