@@ -50,7 +50,12 @@ CLI_help() {
     for Arg, Explanation in Obj {
         str.="`t`t" Arg  Explanation "`n"
     }
+    str.="`n`nPress [Esc] to close the help."
     ttip(str,5)
-    msgbox % "close when you are finished with the help."
+    while (1) {
+        if GetKeyState("Escape") {
+            break
+        }
+    }
     return
 }
