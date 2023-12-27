@@ -161,6 +161,14 @@ main() {
         if (HasVal(CLIArgs, "-h") || CLIArgs.HasKey("-h")) {
             CLI_help()
             ExitApp
+        } else if (HasVal(CLIArgs,"-v") || CLIArgs.HasKey("-v")) {
+            ttip(script.name " - " script.version,5)
+            while (1) {
+                if GetKeyState("Escape") {
+                    break
+                }
+            }
+            ExitApp
         } else {
             if !requireA_Args(CLIArgs) {
                 msgbox % "error: arguments could not be validated. Missings Args?`n`nExpand upon this error message."
