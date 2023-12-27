@@ -7,3 +7,4 @@ res/About.html
 Tests/*
 **/Excludes/**
 **/dist/**
+INI-Files/**.ini
