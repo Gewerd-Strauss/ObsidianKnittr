@@ -669,7 +669,6 @@ guiCreate() {
             Options.=" cRed"
         }
         LV_Add(Options,output_type)
-        gui Show
     }
     HistoryString:=""
     for each, File in script.config.DDLHistory {
