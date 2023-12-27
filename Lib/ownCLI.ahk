@@ -1,5 +1,4 @@
-﻿
-parseA_Args(Args) {
+﻿parseA_Args(Args) {
     Object:={}
     for _, pair in Args {
         key:=strsplit(pair,"=",,2).1
