@@ -852,7 +852,11 @@ guiShow(runCLI:=FALSE,CLIArgs:="") {
         ot.AssembleFormatString()
         Outputformats[format]:=ot
     }
+    if (!runCLI) {
         atmp:=getPotentialWorkDir(ChosenFile,ExecutionDirectory)
+    } else {
+        atmp:=getPotentialWorkDir(CLIArgs.Path,CLIArgs.LastExecutionDirectory)
+    }
     script.config.LastRun.LastExecutionDirectory:=atmp.relativeToNote
     ExecutionDirectory:=(atmp.relativeToNote=1?script.config.config.OHTML_OutputDir:atmp.ExecutionDirectories)
     ExecutionDirectory:=ExecutionDirectory . (SubStr(ExecutionDirectory,0)!="\"?"\":"")
