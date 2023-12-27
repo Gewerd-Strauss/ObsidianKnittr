@@ -737,6 +737,11 @@ getDefinedOutputFormats(Path) {
         Arr:=PotentialOutputs ;; fallback to hardcoded default
     } else {
         FileRead FileString, % Path
+        if (!InStr(FileString,"`r`n") && InStr(FileString,"`n")) {
+            FileString:=StrReplace(FileString, "`n","`r`n")
+            writeFile(Path,FileString,Encoding:="",Flags:=0x2,bSafeOverwrite:=true)
+            FileRead FileString, % Path
+        }
         Lines:=strsplit(FileString,"`r`n")
         bFindSuffix:=false
         for _, Line in Lines {
