@@ -146,6 +146,9 @@ main() {
                 Y=
                 [DDLHistory]
             )
+        if (!InStr(FileExist(script.configfolder),"D")) {
+            FileCreateDir % script.configfolder
+        }
         writeFile(script.configfile,InitialSettings,"UTF-16")
         script.load()
     }
