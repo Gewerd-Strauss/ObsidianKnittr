@@ -892,6 +892,8 @@ guiShow() {
                 ,"Outputformats":Outputformats
                 ,"filesuffixes":filesuffixes}
     } Else {
+        ttip("Exiting",5)
+        sleep 1700
         ExitApp
     }
 }
