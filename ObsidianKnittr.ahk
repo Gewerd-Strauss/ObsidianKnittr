@@ -194,6 +194,10 @@ main() {
     OHTML_WorkDir:=Deref(script.config.config.OHTML_WorkDir)
     OHTML_WorkDir_OwnFork := script.config.Config.OHTML_WorkDir_OwnFork ; "D:\Dokumente neu\ObsidianPluginDev\obsidian-html"
     if (bRestrictOHTMLScope) {
+        if (CLIArgs!="") && (FileExist(CLIArgs.path)) {
+            if (CLIArgs.OHTMLLevel!="") {
+                OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(manuscriptpath,bAutoSubmitOTGUI,CLIArgs.OHTMLLevel)
+            } else {
         if (manuscriptpath==script.config.LastRun.path_lastmanuscript) {
             OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(manuscriptpath,bAutoSubmitOTGUI,script.config.LastRun.LastRelativeLevel)
         } else {
@@ -201,7 +205,15 @@ main() {
             OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(manuscriptpath,bAutoSubmitOTGUI)
         }
     }
-
+        } else {
+            if (manuscriptpath==script.config.LastRun.path_lastmanuscript) {
+                OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(manuscriptpath,bAutoSubmitOTGUI,script.config.LastRun.LastRelativeLevel)
+            } else {
+                script.config.LastRun.LastRelativeLevel:=-1
+                OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(manuscriptpath,bAutoSubmitOTGUI)
+            }
+        }
+    }
     if (tmpconfig[1] && bConvertInsteadofRun) {
         ret:=ObsidianHtml(,tmpconfig[1],,bUseOwnOHTMLFork,bVerboseCheckbox,OHTML_OutputDir,OHTML_WorkDir,OHTML_WorkDir_OwnFork,OHTMLScopeRestrictor_Object)
     } else {
