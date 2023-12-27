@@ -222,6 +222,7 @@ main() {
     EL.ObsidianHTML_Start:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
     ATC1:=A_TickCount
     Codetimer_Log()
+
     OHTML_OutputDir:=Deref(script.config.config.OHTML_OutputDir)
     OHTML_WorkDir:=Deref(script.config.config.OHTML_WorkDir)
     OHTML_WorkDir_OwnFork := script.config.Config.OHTML_WorkDir_OwnFork ; "D:\Dokumente neu\ObsidianPluginDev\obsidian-html"
@@ -244,10 +245,8 @@ main() {
         if tempOVaultRoot.Removed {
             EL.temporaryVaultpath:=OHTMLScopeRestrictor_Object.Path 
             EL.temporaryVaultpathRemoved:="Yes"
-
         } else {
             if tempOVaultRoot.IsVaultRoot {
-
                 EL.temporaryVaultpath:=OHTMLScopeRestrictor_Object.Path
                 EL.temporaryVaultpathRemoved:="No - vault root"
             } else {
@@ -376,8 +375,9 @@ main() {
             writeFile(OutDir "\build_" out.Outputformats[output_type].filesuffix ".cmd",CMD,"UTF-8-RAW",,true)
         }
         EL.Rdata_out:=ret[1]
-        EL.RCMD:=ret[2]
-        EL.RWD:=ret[3]
+                , EL.RCMD:=ret[2]
+                , EL.RWD:=ret[3]
+        }
     } else {
         if bExecuteRScript {
             ;ttip(" ",5,,,,,,,16)
@@ -392,8 +392,8 @@ main() {
             }
             ret:=runRScript(rmd_Path,script_contents,Outputformats,script.config.config.RScriptPath)
             EL.Rdata_out:=ret[1]
-            EL.RCMD:=ret[2]
-            EL.RWD:=ret[3]
+                , EL.RCMD:=ret[2]
+                , EL.RWD:=ret[3]
         } Else {
             ttip(TrayString:="Opening RMD-File",5)
             Menu Tray,Tip, % TrayString
