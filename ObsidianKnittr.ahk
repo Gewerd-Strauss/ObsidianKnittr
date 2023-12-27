@@ -959,7 +959,7 @@ guiShow(runCLI:=FALSE,CLIArgs:="") {
                 ,"filesuffixes":filesuffixes}
     } Else {
         ttip("Exiting",5)
-        sleep 1700
+        sleep 1300
         ExitApp
     }
 }
