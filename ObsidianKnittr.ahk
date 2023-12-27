@@ -157,7 +157,13 @@ main() {
     if (!clArgs.length()) {
     out:=guiShow()
     } else {
+        CLIArgs:=parseA_Args(clArgs)
+        if (HasVal(CLIArgs, "-h") || CLIArgs.HasKey("-h")) {
+            CLI_help()
+            ExitApp
+        } else {
 
+        }
     }
     formats:=""
     bAutoSubmitOTGUI:=false
