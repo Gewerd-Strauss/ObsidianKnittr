@@ -45,7 +45,7 @@ ExitApp,
 return
 
 main() {
-    global EL := new log(A_ScriptDir "\Executionlog.txt", true)
+    EL := new log(A_ScriptDir "\Executionlog.txt", true)
     fTraySetup()
     script.loadCredits(script.resfolder "\credits.txt")
     script.loadMetadata(script.resfolder "\meta.txt")
