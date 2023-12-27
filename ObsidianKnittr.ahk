@@ -307,6 +307,7 @@ main() {
     script_contents:=tmp.1
     format:=tmp.2
     if (script.config.config.useQuartoCLI) {
+        if (bExecuteRScript) {
         if bBackupOutput {
             ttip(-1)
             ttip(TrayString:="Backing up Files",5)
