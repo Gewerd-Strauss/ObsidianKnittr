@@ -7,3 +7,5 @@ INI-Files/OHTMLconfig_template.yaml
 output/*
 res/About.html
 Tests/*
+**/Excludes/**
+**/dist/**
