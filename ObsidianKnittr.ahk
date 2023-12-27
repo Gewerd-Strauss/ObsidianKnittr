@@ -279,7 +279,7 @@ main() {
     Destination:=(InStr(Deref(ExecutionDirectory),A_Desktop)?0:ExecutionDirectory)
     rmd_Path:=copyBack(rmd_Path,Destination,manuscriptpath)
     SplitPath % rmd_Path,, OutDir
-    rawinputCopyLocation:=regexreplace(OutDir "\" manuscriptName "_vault.md ","\\{2,}","\")
+    rawinputCopyLocation:=regexreplace(OutDir "\" out.manuscriptName "_vault.md ","\\{2,}","\")
     EL.output_path
     EL.rawInputcopyLocation:=rawinputCopyLocation
     ; 7
@@ -317,7 +317,7 @@ main() {
     Menu Tray,Tip, % TrayString
     sleep 200
     if bKeepFilename {
-        tmp:=buildRScriptContent(rmd_Path,manuscriptName,out)
+        tmp:=buildRScriptContent(rmd_Path,out.manuscriptName,out)
     } else {
         tmp:=buildRScriptContent(rmd_Path,,out)
     }
