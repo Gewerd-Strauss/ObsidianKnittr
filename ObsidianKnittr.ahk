@@ -1091,3 +1091,4 @@ fTraySetup() {
 #Include <TemporaryObsidianVaultRoot>
 #Include <Quarto>
 #Include <script>
+#Include <ownCLI>
