@@ -668,7 +668,7 @@ guiCreate() {
     gui add, text, % "yp+20 xp", % "LL: " script.config.LastRun.LastRelativeLevel (script.config.LastRun.LastRelativeLevel=0?" (manuscript-folder)":"") " DL: " script.config.Config.defaultRelativeLevel
     gui add, text, % "ym xm" + WideControlWidth + 5,% " via Obsidian-HTML, RMarkdown and Quarto"
     last_output:=script.config.LastRun.last_output_type
-    for _,output_type in PotentialOutputs { ; TODO: rework this to differentiate "word_document" from "bookdown::word_document2" -> maybe check for next char? If comma or end of string, this would be a base rmd format, if a "2" it would be bookdown
+    for _,output_type in PotentialOutputs {
         Cond:=Instr(last_output,output_type)
         if Cond {
             Options:="Check"
@@ -734,7 +734,7 @@ guiCreate() {
     gui add, button, gGCAbout hwndAbout yp xp+122, &About
     GuiControl +g,%OpenConfig%, % onOpenConfig
     Gui Add, Text,x15 yp,% script.name " v." regexreplace(script.config.version.ObsidianKnittr_Version,"\s*","") " | Obsidian-HTML v." strreplace(script.config.version.ObsidianHTML_Version,"commit:")
-    Gui Add, Text,x15 yp+15,% "Quarto-cli" " v." regexreplace(quartogetVersion(),"\s*","")
+    Gui Add, Text,x15 yp+15,% "Quarto-cli" " v." regexreplace(quartogetVersion(),"\s*","") " | Using " (script.config.config.useQuartoCLI?"quarto-cli":"quarto's R-package")
     script.version:=script.config.version.ObsidianKnittr_Version
 
     if (script.config.LastRun.manuscriptpath!="") && (script.config.LastRun.last_output_type!="") {
