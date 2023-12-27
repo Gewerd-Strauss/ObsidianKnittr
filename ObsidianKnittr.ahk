@@ -134,7 +134,19 @@ main() {
             } else {
 
         }
+            script.config.LastRun.manuscriptpath:=CLIArgs.path
+                , script.config.LastRun.manuscriptpath:=CLIArgs.path
+                , script.config.DDLHistory:=buildHistory(script.config.DDLHistory,script.config.Config.HistoryLimit,script.config.LastRun.manuscriptpath)
+                , script.config.LastRun.last_output_type:=CLIArgs.format
+            global manuscriptpath:=CLIArgs.path
             out:=guiShow(true,CLIArgs)
+            for each,output_type in CLIArgs.format {
+                script.config.LastRun.last_output_type.=output_type
+                if (each<sel.count()) {
+                    script.config.LastRun.last_output_type.=", "
+                }
+            }
+        }
     }
     formats:=""
     bAutoSubmitOTGUI:=false
@@ -839,9 +851,61 @@ guiShow(runCLI:=FALSE,CLIArgs:="") {
     } Else {
         x:=MouseX
     }
+    if (!runCLI) {
     gui 1: show,x%x% y%y% w%guiWidth% h%guiHeight%, % script.name " - Choose manuscript"
     enableGuiDrag(1)
     WinWaitClose % script.name " - Choose manuscript"
+    } else {
+        bAutoSubmitOTGUI:=true
+        gui 1: submit
+        if (IsObject(CLIArgs.format)) {
+            sel:=CLIArgs.format
+        } else {
+            sel:=[CLIArgs.format]
+        }
+        for arg,val in CLIArgs {
+            if (arg=="format") {
+                continue
+            } else if (arg=="cli") {
+                continue
+            }
+            if script.config.LastRun.HasKey(arg) {
+                if (DEBUG) {
+                    msgbox % arg " = " val
+                }
+                script.config.LastRun[arg]:=val
+            } else {
+                if InStr("path,runCLI,OHTMLLevel",arg) {
+                    continue
+                }
+                if (InStr(arg,"quarto::")) {
+                    continue
+                }
+                if (DEBUG) {
+                    msgbox % arg " = " val
+                }
+                MsgBox 0x40030, % script.name " - CLI-processing",% "CLI-Parameter '" arg "' is not implemented as of yet.`nThe parameter will be ignored."
+            }
+        }
+        SplitPath % script.config.lastrun.manuscriptpath, , OutDir
+        SplitPath % OutDir, OutFileName, OutDir,
+        bVerboseCheckbox := (script.config.LastRun.Verbose)
+            , bRestrictOHTMLScope := (script.config.LastRun.RestrictOHTMLScope)
+            , bSRCConverterVersion := (script.config.LastRun.Conversion)
+            , bKeepFilename := (script.config.LastRun.KeepFileName)
+            , bExecuteRScript := (script.config.LastRun.RenderRMD)
+            , bBackupOutput := (script.config.LastRun.BackupOutput)
+            , bRemoveHashTagFromTags := (script.config.LastRun.RemoveHashTagFromTags)
+            , bForceFixPNGFiles := (script.config.LastRun.ForceFixPNGFiles)
+            , bInsertSetupChunk := (script.config.LastRun.InsertSetupChunk)
+            , bConvertInsteadofRun := (script.config.LastRun.ConvertInsteadofRun)
+            , bRemoveObsidianHTMLErrors := (script.config.LastRun.RemoveObsidianHTMLErrors)
+            , bStripLocalMarkdownLinks := (script.config.LastRun.bStripLocalMarkdownLinks)
+            , bUseOwnOHTMLFork := (script.config.LastRun.UseOwnOHTMLFork)
+            , bRemoveQuartoReferenceTypesFromCrossrefs := (script.config.LastRun.RemoveQuartoReferenceTypesFromCrossrefs)
+            , Button2 := (script.config.LastRun.LastExecutionDirectory=1?1:0)
+            , Button3 := (script.config.LastRun.LastExecutionDirectory=1?0:1)
+    }
     Outputformats:={}
     for _, format in sel {
         ot:=new ot(format,A_ScriptDir "\INI-Files\DynamicArguments.ini","-<>-")
@@ -849,6 +913,17 @@ guiShow(runCLI:=FALSE,CLIArgs:="") {
             ot.SkipGUI:=bAutoSubmitOTGUI
         }
         ot.GenerateGUI(x,y,TRUE,"ParamsGUI:",1,1,674,1)
+        if (runCLI) {
+            for param,value in CLIArgs {
+                if !InStr(param,format) {
+                    continue
+                }
+                param_:=strreplace(param,format ".") 
+                if ot.Arguments.HasKey(param_) {
+                    ot.Arguments[param_].Value:=value
+                }
+            }
+        }
         ot.AssembleFormatString()
         Outputformats[format]:=ot
     }
