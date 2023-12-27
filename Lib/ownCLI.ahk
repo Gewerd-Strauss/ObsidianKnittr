@@ -13,6 +13,28 @@ parseA_Args(Args) {
     }
     return Object
 }
+requireA_Args(Args) {
+    required:=["format","path"]
+    found:=[]
+    reqQ:=required.Count()
+    for arg, val in Args {
+        if (HasVal(required,arg)) {
+            if (!HasVal(found,arg)) {
+                found.push(arg)
+            }
+        }
+    }
+    foundQ:=found.Count()
+    if (foundQ=reqQ) {
+        MsgBox % "success"
+        return true
+    } else if (foundQ<reqQ) {
+        MsgBox % "failure"
+        return false
+    } else if (foundQ>reqQ) {
+        MsgBox % "FATAL: this shouldn't happen"
+    }
+}
 CLI_help() {
     Obj:={Path:"`t`t`t-`treq.: absolute path to the note being processed. The note must lie within an obsidian-Vault, as detected by the presence of an ``.obsidian``-folder somewhere above the note's location."
             , format:"`t`t`t-`treq.: key of the output-format used. Output format must be defined in 'DynamicArguments.ini'."

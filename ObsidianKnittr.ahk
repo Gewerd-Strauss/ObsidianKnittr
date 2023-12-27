@@ -162,6 +162,10 @@ main() {
             CLI_help()
             ExitApp
         } else {
+            if !requireA_Args(CLIArgs) {
+                msgbox % "error: arguments could not be validated. Missings Args?`n`nExpand upon this error message."
+                ExitApp
+            }
 
         }
     }
