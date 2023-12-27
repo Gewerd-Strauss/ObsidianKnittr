@@ -153,10 +153,12 @@ main() {
     }
     FileRead ObsidianKnittr_Version, % A_ScriptDir "\INI-Files\ObsidianKnittr_Version.ini"
     EL.ObsidianKnittr_Version:=script.version:=script.config.version.ObsidianKnittr_Version:=Regexreplace(ObsidianKnittr_Version,"\s*")
-
-    ; 2.2
+    clArgs:=A_Args
+    if (!clArgs.length()) {
     out:=guiShow()
+    } else {
 
+    }
     formats:=""
     bAutoSubmitOTGUI:=false
     for _,format in out.Outputformats {
