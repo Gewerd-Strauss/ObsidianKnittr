@@ -175,42 +175,26 @@ main() {
     if (HasVal(output_type,"First in YAML")) {
         output_type:=""
     }
-    manuscriptname:=out.manuscriptname
-    manuscriptpath:=out.manuscriptpath
     ExecutionDirectory:=out.Settings.ExecutionDirectory
-    bVerboseCheckbox:=out.Settings.bVerboseCheckbox
-    bFullLogCheckbox:=out.Settings.bFullLogCheckbox
-    Outputformats:=out.Outputformats
-    bKeepFilename:=out.Settings.bKeepFilename
-    bExecuteRScript:=out.Settings.bExecuteRScript
-    bBackupOutput:=out.Settings.bBackupOutput
-    bRemoveHashTagFromTags:=out.Settings.bRemoveHashTagFromTags
-    ;bUseCustomTOC:=out.3.7
-    bForceFixPNGFiles:=out.Settings.bForceFixPNGFiles
-    bInsertSetupChunk:=out.Settings.bInsertSetupChunk
-    bConvertInsteadofRun:=out.Settings.bConvertInsteadofRun
-    bRemoveObsidianHTMLErrors:=out.Settings.bRemoveObsidianHTMLErrors
-    bStripLocalMarkdownLinks:=out.Settings.bStripLocalMarkdownLinks
-    bUseOwnOHTMLFork:=out.Settings.bUseOwnOHTMLFork
-    bRestrictOHTMLScope:=out.Settings.bRestrictOHTMLScope
-    bRemoveQuartoReferenceTypesFromCrossrefs:=out.Settings.bRemoveQuartoReferenceTypesFromCrossrefs
+        , Outputformats:=out.Outputformats
+        , bBackupOutput:=out.Settings.bBackupOutput
     EL.formats:=formats
-    EL.manuscriptname:=out.manuscriptname
-    EL.manuscriptpath:=out.manuscriptpath
-    EL.bVerboseCheckbox:=out.Settings.bVerboseCheckbox
-    EL.bFullLogCheckbox:=out.Settings.bFullLogCheckbox
-    EL.bSRCConverterVersion:=out.Settings.bSRCConverterVersion
-    EL.bKeepFilename:=out.Settings.bKeepFilename
-    EL.bExecuteRScript:=out.Settings.bExecuteRScript
-    EL.bRemoveHashTagFromTags:=out.Settings.bRemoveHashTagFromTags
-    EL.bForceFixPNGFiles:=out.Settings.bForceFixPNGFiles
-    EL.bInsertSetupChunk:=out.Settings.bInsertSetupChunk
-    EL.bConvertInsteadofRun:=out.Settings.bConvertInsteadofRun
-    EL.bRemoveObsidianHTMLErrors:=out.Settings.bRemoveObsidianHTMLErrors
-    EL.bStripLocalMarkdownLinks:=out.Settings.bStripLocalMarkdownLinks
-    EL.bUseOwnOHTMLFork:=out.Settings.bUseOwnOHTMLFork
-    EL.bRestrictOHTMLScope:=out.Settings.bRestrictOHTMLScope
-    EL.bRemoveQuartoReferenceTypesFromCrossrefs:=out.Settings.bRemoveQuartoReferenceTypesFromCrossrefs
+        , EL.manuscriptname:=manuscriptname:=out.manuscriptname
+        , EL.manuscriptpath:=manuscriptpath:=out.manuscriptpath
+        , EL.bVerboseCheckbox:=bVerboseCheckbox:=out.Settings.bVerboseCheckbox
+    ; , EL.bFullLogCheckbox:=bFullLogCheckbox:=out.Settings.bFullLogCheckbox
+        , EL.bSRCConverterVersion:=out.Settings.bSRCConverterVersion
+        , EL.bKeepFilename:=bKeepFilename:=out.Settings.bKeepFilename
+        , EL.bExecuteRScript:=bExecuteRScript:=out.Settings.bExecuteRScript
+        , EL.bRemoveHashTagFromTags:=bRemoveHashTagFromTags:=out.Settings.bRemoveHashTagFromTags
+        , EL.bForceFixPNGFiles:=bForceFixPNGFiles:=out.Settings.bForceFixPNGFiles
+        , EL.bInsertSetupChunk:=bInsertSetupChunk:=out.Settings.bInsertSetupChunk
+        , EL.bConvertInsteadofRun:=bConvertInsteadofRun:=out.Settings.bConvertInsteadofRun
+        , EL.bRemoveObsidianHTMLErrors:=bRemoveObsidianHTMLErrors:=out.Settings.bRemoveObsidianHTMLErrors
+        , EL.bStripLocalMarkdownLinks:=bStripLocalMarkdownLinks:=out.Settings.bStripLocalMarkdownLinks
+        , EL.bUseOwnOHTMLFork:=bUseOwnOHTMLFork:=out.Settings.bUseOwnOHTMLFork
+        , EL.bRestrictOHTMLScope:=bRestrictOHTMLScope:=out.Settings.bRestrictOHTMLScope
+        , EL.bRemoveQuartoReferenceTypesFromCrossrefs:=bRemoveQuartoReferenceTypesFromCrossrefs:=out.Settings.bRemoveQuartoReferenceTypesFromCrossrefs
     if (output_type="") && (bVerboseCheckbox="") {
         reload
     }
