@@ -25,13 +25,13 @@ requireA_Args(Args) {
     }
     foundQ:=found.Count()
     if (foundQ=reqQ) {
-        MsgBox % "success"
+        MsgBox % "success",,,% 3
         return true
     } else if (foundQ<reqQ) {
-        MsgBox % "failure"
+        MsgBox % "failure",,,% 3
         return false
     } else if (foundQ>reqQ) {
-        MsgBox % "FATAL: this shouldn't happen"
+        MsgBox % "FATAL: this shouldn't happen, error occured in '" A_ThisFunc "'. 'foundQ'>'reqQ'??"
     }
 }
 CLI_help() {
