@@ -591,6 +591,9 @@ processTags(Contents,bRemoveHashTagFromTags) {
 guiCreate() {
     global
     gui destroy
+    if (!FileExist(A_ScriptDir "\INI-Files\DynamicArguments.ini")) {
+        setupDefaultDA(A_ScriptDir "\INI-Files\DynamicArguments.ini")
+    }
     ret:=getDefinedOutputFormats(A_ScriptDir "\INI-Files\DynamicArguments.ini")
     PotentialOutputs:=ret[1]
     filesuffixes:=ret[2]
