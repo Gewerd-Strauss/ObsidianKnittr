@@ -124,6 +124,14 @@ main() {
                 msgbox % "error: arguments could not be validated. Missings Args?`n`nExpand upon this error message."
                 ExitApp
             }
+            if (!CLIArgs.HasKey("LastExecutionDirectory")) {
+                CLIArgs.LastExecutionDirectory:=script.config.LastRun.LastExecutionDirectory
+            } else {
+
+            }
+            if (!CLIArgs.HasKey("OHTMLLevel")) {
+                CLIArgs.OHTMLLevel:=script.config.config.defaultRelativeLevel
+            } else {
 
         }
     }
