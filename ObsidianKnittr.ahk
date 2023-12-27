@@ -91,10 +91,8 @@ main() {
             ;obsidianhtml_path:=OHTML_C[2]
         }
 
-        if (!(QUARTO_C[1])) {
+        if (!QUARTO_C[1]) {
             ttip("quarto not available")
-        } else {
-
         }
         ;python_check()
         InputBox given_searchroot, % script.name " - Initiate settings","Please give the search root folder."
