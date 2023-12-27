@@ -402,9 +402,11 @@ main() {
             , EL.RCodeChunkExecutionTime:=Round(SubStr(t2,5),3)
     }
     ;; final touches - ahk starter, moving shit to output folder
+    if (!script.config.config.useQuartoCLI) {
     ttip(TrayString:="Building AHK-Starterscript",5)
     Menu Tray,Tip, % TrayString
     buildAHKScriptContent(rmd_Path,script.config.config.RScriptPath)
+    }
     SplitPath % Path,, OutDir
     SplitPath % OutDir,, OutDir2
     if script.config.config.OpenParentfolderInstead {
