@@ -190,8 +190,8 @@ main() {
         , EL.bUseOwnOHTMLFork:=bUseOwnOHTMLFork:=out.Settings.bUseOwnOHTMLFork
         , EL.bRestrictOHTMLScope:=bRestrictOHTMLScope:=out.Settings.bRestrictOHTMLScope
         , EL.bRemoveQuartoReferenceTypesFromCrossrefs:=bRemoveQuartoReferenceTypesFromCrossrefs:=out.Settings.bRemoveQuartoReferenceTypesFromCrossrefs
-    if (output_type="") && (bVerboseCheckbox="") {
-        reload
+    if (output_type="") && (bVerboseCheckbox="") && (!A_Args.length()) {
+        ExitApp 0
     }
     obsidianhtml_configfile:=script.config.config.obsidianhtml_configfile
 
@@ -434,6 +434,7 @@ main() {
         }
         }
     } else {
+        script_contents:=tmp.1
         if bExecuteRScript {
             ;ttip(" ",5,,,,,,,16)
             ttip(-1)
@@ -928,7 +929,7 @@ guiShow(runCLI:=FALSE,CLIArgs:="") {
     } Else {
         x:=MouseX
     }
-    if (!runCLI) {
+    if (!CLIArgs.count()) {
     gui 1: show,x%x% y%y% w%guiWidth% h%guiHeight%, % script.name " - Choose manuscript"
     enableGuiDrag(1)
     WinWaitClose % script.name " - Choose manuscript"
@@ -993,7 +994,7 @@ guiShow(runCLI:=FALSE,CLIArgs:="") {
             ot.SkipGUI:=bAutoSubmitOTGUI
         }
         ot.GenerateGUI(x,y,TRUE,"ParamsGUI:",1,1,674,1)
-        if (runCLI) {
+        if (A_Args.length()) {
             for param,value in CLIArgs {
                 if !InStr(param,format) {
                     continue
@@ -1007,14 +1008,21 @@ guiShow(runCLI:=FALSE,CLIArgs:="") {
         ot.AssembleFormatString()
         Outputformats[format]:=ot
     }
-    if (!runCLI) {
+    if (!A_Args.length()) {
         atmp:=getPotentialWorkDir(ChosenFile,ExecutionDirectory)
     } else {
+        if (CLIArgs.noMove) {
+            atmp:=getPotentialWorkDir(CLIArgs.Path,CLIArgs.LastExecutionDirectory)
+            script.config.LastRun.LastExecutionDirectory:=atmp.relativeToNote
+            SplitPath % CLIArgs.path, , OutDir
+            ExecutionDirectory:=OutDir . (SubStr(OutDir,0)!="\"?"\":"")
+    } else {
         atmp:=getPotentialWorkDir(CLIArgs.Path,CLIArgs.LastExecutionDirectory)
-    }
     script.config.LastRun.LastExecutionDirectory:=atmp.relativeToNote
     ExecutionDirectory:=(atmp.relativeToNote=1?script.config.config.OHTML_OutputDir:atmp.ExecutionDirectories)
     ExecutionDirectory:=ExecutionDirectory . (SubStr(ExecutionDirectory,0)!="\"?"\":"")
+        }
+    }
     if (manuscriptpath!="") && !ot.bClosedNoSubmit {
         SplitPath % manuscriptpath,,,, manuscriptName
         return {"sel":sel
