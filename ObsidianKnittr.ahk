@@ -477,8 +477,9 @@ main() {
     FileMove % EL.__path, % OutDir "\Executionlog.txt",true
     removeTempDir(md_Path)
     removeTempDir(ret.OutputPath)
-
+    if (!A_Args.length()) { ;; only change config when running in GUI mode
     script.save()
+    }
     return
 }
 
@@ -746,8 +747,9 @@ guiCreate(runCLI) {
             }
         }
     }
-    if (!runCLI)
+    if (!A_Args.length()) { ;; only change config when running in GUI mode
     script.save()
+    }
     Gui add, button, gChooseFile, &Choose Manuscript
     DDLRows:=(script.config.Config.HistoryLimit>25?25:script.config.Config.HistoryLimit)
     gui add, DDL,% "w" WideControlWidth " vChosenFile hwndChsnFile r" DDLRows " ggetPotentialWorkDir", % HistoryString
@@ -1084,7 +1086,9 @@ guiSubmit() {
         }
 
     }
+    if (!A_Args.length()) { ;; only change config when running in GUI mode
     script.save()
+    }
     return [DDLval,manuscriptpath,sel]
 }
 buildHistory(History,NumberOfRecords,manuscriptpath:="") {
