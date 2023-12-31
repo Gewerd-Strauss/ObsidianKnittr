@@ -498,7 +498,7 @@ main() {
     } else {
         EL.output_path:=OutDir2
     }
-    if !DEBUG {
+    if !DEBUG && !CLIArgs.HasKey("--noOpen") {
         openFolder(rmd_Path)
     }
     SplitPath % rmd_Path, , OutDir
