@@ -10,7 +10,6 @@ DetectHiddenWindows On
 SetKeyDelay -1,-1
 SetBatchLines -1
 SetTitleMatchMode 2
-
 FileGetTime ModDate,%A_ScriptFullPath%,M
 FileGetTime CrtDate,%A_ScriptFullPath%,C
 CrtDate:=SubStr(CrtDate,7, 2) "." SubStr(CrtDate,5,2) "." SubStr(CrtDate,1,4)
@@ -100,7 +99,7 @@ main() {
     EL.ObsidianKnittr_Version:=script.version:=script.config.version.ObsidianKnittr_Version:=Regexreplace(ObsidianKnittr_Version,"\s*")
     clArgs:=A_Args
     if (!clArgs.length()) {
-    out:=guiShow()
+        out:=guiShow()
     } else {
         CLIArgs:=parseA_Args(clArgs)
         if (HasVal(CLIArgs, "-h") || CLIArgs.HasKey("-h")) {
@@ -143,7 +142,7 @@ main() {
                 CLIArgs.noIntermediates:=0
             } else {
                 CLIArgs.noIntermediates:=1
-        }
+            }
             script.config.LastRun.manuscriptpath:=CLIArgs.path
                 , script.config.LastRun.manuscriptpath:=CLIArgs.path
                 , script.config.DDLHistory:=buildHistory(script.config.DDLHistory,script.config.Config.HistoryLimit,script.config.LastRun.manuscriptpath)
@@ -207,7 +206,7 @@ main() {
     if (CLIArgs!="") {
         Menu Tray,Tip, % TrayString  "`n" CLIArgs.path
     } else {
-    Menu Tray,Tip, % TrayString
+        Menu Tray,Tip, % TrayString
     }
     if (obsidianhtml_configfile="") {
         obsidianhtml_configfile:=script.config.config.obsidianhtml_configfile
@@ -224,13 +223,13 @@ main() {
             if (CLIArgs.OHTMLLevel!="") {
                 OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(manuscriptpath,bAutoSubmitOTGUI,CLIArgs.OHTMLLevel)
             } else {
-        if (manuscriptpath==script.config.LastRun.path_lastmanuscript) {
-            OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(manuscriptpath,bAutoSubmitOTGUI,script.config.LastRun.LastRelativeLevel)
-        } else {
-            script.config.LastRun.LastRelativeLevel:=-1
-            OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(manuscriptpath,bAutoSubmitOTGUI)
-        }
-    }
+                if (manuscriptpath==script.config.LastRun.path_lastmanuscript) {
+                    OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(manuscriptpath,bAutoSubmitOTGUI,script.config.LastRun.LastRelativeLevel)
+                } else {
+                    script.config.LastRun.LastRelativeLevel:=-1
+                    OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(manuscriptpath,bAutoSubmitOTGUI)
+                }
+            }
         } else {
             if (manuscriptpath==script.config.LastRun.path_lastmanuscript) {
                 OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(manuscriptpath,bAutoSubmitOTGUI,script.config.LastRun.LastRelativeLevel)
@@ -300,7 +299,7 @@ main() {
     if (CLIArgs!="") {
         Menu Tray,Tip, % TrayString  "`n" CLIArgs.path
     } else {
-    Menu Tray,Tip, % TrayString
+        Menu Tray,Tip, % TrayString
     }
     rmd_Path:=convertMDToRMD(vMDPath,"index")
     ; 5, 6
@@ -308,7 +307,7 @@ main() {
     if (CLIArgs!="") {
         Menu Tray,Tip, % TrayString  "`n" CLIArgs.path
     } else {
-    Menu Tray,Tip, % TrayString
+        Menu Tray,Tip, % TrayString
     }
     Destination:=(InStr(Deref(ExecutionDirectory),A_Desktop)?0:ExecutionDirectory)
     rmd_Path:=copyBack(rmd_Path,Destination,manuscriptpath)
@@ -321,21 +320,21 @@ main() {
     if (CLIArgs!="") {
         Menu Tray,Tip, % TrayString  "`n" CLIArgs.path
     } else {
-    Menu Tray,Tip, % TrayString
+        Menu Tray,Tip, % TrayString
     }
     NewContents:=ConvertSRC_SYNTAX_V4(rmd_Path,bInsertSetupChunk,bRemoveObsidianHTMLErrors,bStripLocalMarkdownLinks)
     ttip(TrayString:="Processing Tags",5)
     if (CLIArgs!="") {
         Menu Tray,Tip, % TrayString  "`n" CLIArgs.path
     } else {
-    Menu Tray,Tip, % TrayString
+        Menu Tray,Tip, % TrayString
     }
     NewContents:=processTags(NewContents,bRemoveHashTagFromTags)
     ttip(TrayString:="Processing Abstract",5)
     if (CLIArgs!="") {
         Menu Tray,Tip, % TrayString  "`n" CLIArgs.path
     } else {
-    Menu Tray,Tip, % TrayString
+        Menu Tray,Tip, % TrayString
     }
     NewContents:=processAbstract(NewContents)
     for _, format in out.Outputformats {                        ;; rmd → qmd conversion
@@ -344,7 +343,7 @@ main() {
             if (CLIArgs!="") {
                 Menu Tray,Tip, % TrayString  "`n" CLIArgs.path
             } else {
-            Menu Tray,Tip, % TrayString
+                Menu Tray,Tip, % TrayString
             }
             qmdContents:=convertToQMD(NewContents,bRemoveQuartoReferenceTypesFromCrossrefs)
             qmd_Path:=strreplace(rmd_Path,".rmd",".qmd")
@@ -377,65 +376,65 @@ main() {
     if (CLIArgs!="") {
         Menu Tray,Tip, % TrayString  "`n" CLIArgs.path
     } else {
-    Menu Tray,Tip, % TrayString
+        Menu Tray,Tip, % TrayString
     }
     sleep 200
     if (CLIArgs.HasKey("--noRender") && CLIArgs.HasKey("--noMove")) {
 
     } else {
-    if bKeepFilename {
-        tmp:=buildRScriptContent(rmd_Path,out.manuscriptName,out)
-    } else {
-        tmp:=buildRScriptContent(rmd_Path,,out)
-    }
-    if (qmd_Path!="") {
-        tmp.1:=modifyQuartobuildscript(tmp.1,tmp.3,out)
-        EL.Quarto_Version:=quartogetVersion()
-    }
+        if bKeepFilename {
+            tmp:=buildRScriptContent(rmd_Path,out.manuscriptName,out)
+        } else {
+            tmp:=buildRScriptContent(rmd_Path,,out)
+        }
+        if (qmd_Path!="") {
+            tmp.1:=modifyQuartobuildscript(tmp.1,tmp.3,out)
+            EL.Quarto_Version:=quartogetVersion()
+        }
     }
     format:=tmp.2
     if (script.config.config.useQuartoCLI) {
         if (CLIArgs.HasKey("--noRender")) {
 
         } else {
-        if (bExecuteRScript) {
+            if (bExecuteRScript) {
                 if bBackupOutput && ((!CLIArgs.HasKey("--noMove"))) {
-            ttip(-1)
-            ttip(TrayString:="Backing up Files",5)
+                    ttip(-1)
+                    ttip(TrayString:="Backing up Files",5)
                     if (CLIArgs!="") {
                         Menu Tray,Tip, % TrayString  "`n" CLIArgs.path
                     } else {
-            Menu Tray,Tip, % TrayString
+                        Menu Tray,Tip, % TrayString
                     }
-            BackupDirectory:=backupOutput(rmd_Path,out)
-        }
-        if script.config.config.backupCount {
-            limitBackups(BackupDirectory,script.config.config.backupCount)
-        }
-        ttip(-1)
-        ttip(TrayString:="Executing quarto-CLI",5)
+                    BackupDirectory:=backupOutput(rmd_Path,out)
+                }
+                if script.config.config.backupCount {
+                    limitBackups(BackupDirectory,script.config.config.backupCount)
+                }
+                ttip(-1)
+                ttip(TrayString:="Executing quarto-CLI",5)
                 if (CLIArgs!="") {
                     Menu Tray,Tip, % TrayString  "`n" CLIArgs.path
                 } else {
-        Menu Tray,Tip, % TrayString
+                    Menu Tray,Tip, % TrayString
                 }
-        SplitPath % rmd_Path,, OutDir
-        ret:=["","",OutDir]
-        for _, output_type in out.sel {
-            write_quarto_yaml(out.Outputformats[output_type],OutDir,"qCLI_yaml_" out.Outputformats[output_type].filesuffix ".yaml")
-            cmd:="quarto render index.qmd --to " out.Outputformats[output_type].filesuffix 
-            cmd.=" --metadata-file=""qCLI_yaml_" out.Outputformats[output_type].filesuffix ".yaml"""
-            cmd.=" --output """ out.Outputformats[output_type].Filename out.Outputformats[output_type].FilenameMod "."  out.Outputformats[output_type].filesuffix """"
-            GetStdStreams_WithInput(CMD, OutDir, InOut:="`n")
-                , ret[1].="`nFormat " output_type ":`n" InOut
-                , ret[2].=CMD
-                , Clipboard:=InOut
-            writeFile(OutDir "\build_" out.Outputformats[output_type].filesuffix ".cmd",CMD,"UTF-8-RAW",,true)
-        }
-        EL.Rdata_out:=ret[1]
-                , EL.RCMD:=ret[2]
-                , EL.RWD:=ret[3]
-        }
+                SplitPath % rmd_Path,, OutDir
+                ret:=["","",OutDir]
+                for _, output_type in out.sel {
+                    write_quarto_yaml(out.Outputformats[output_type],OutDir,"qCLI_yaml_" out.Outputformats[output_type].filesuffix ".yaml")
+                    cmd:="quarto render index.qmd --to " out.Outputformats[output_type].filesuffix 
+                    cmd.=" --metadata-file=""qCLI_yaml_" out.Outputformats[output_type].filesuffix ".yaml"""
+                    cmd.=" --output """ out.Outputformats[output_type].Filename out.Outputformats[output_type].FilenameMod "."  out.Outputformats[output_type].filesuffix """"
+                    GetStdStreams_WithInput(CMD, OutDir, InOut:="`n")
+                        , ret[1].="`nFormat " output_type ":`n" InOut
+                        , ret[2].=CMD
+                        , Clipboard:=InOut
+                    writeFile(OutDir "\build_" out.Outputformats[output_type].filesuffix ".cmd",CMD,"UTF-8-RAW",,true)
+                }
+                EL.Rdata_out:=ret[1]
+                    , EL.RCMD:=ret[2]
+                    , EL.RWD:=ret[3]
+            }
         }
     } else {
         script_contents:=tmp.1
@@ -446,7 +445,7 @@ main() {
             if (CLIArgs!="") {
                 Menu Tray,Tip, % TrayString  "`n" CLIArgs.path
             } else {
-            Menu Tray,Tip, % TrayString
+                Menu Tray,Tip, % TrayString
             }
             if bBackupOutput {
                 BackupDirectory:=backupOutput(rmd_Path,out)
@@ -463,7 +462,7 @@ main() {
             if (CLIArgs!="") {
                 Menu Tray,Tip, % TrayString  "`n" CLIArgs.path
             } else {
-            Menu Tray,Tip, % TrayString
+                Menu Tray,Tip, % TrayString
             }
             SplitPath % rmd_Path,, OutDir
             writeFile(OutDir "\build.R",script_contents,"UTF-8-RAW",,true)
@@ -483,13 +482,13 @@ main() {
     }
     ;; final touches - ahk starter, moving shit to output folder
     if (!script.config.config.useQuartoCLI) {
-    ttip(TrayString:="Building AHK-Starterscript",5)
+        ttip(TrayString:="Building AHK-Starterscript",5)
         if (CLIArgs!="") {
             Menu Tray,Tip, % TrayString  "`n" CLIArgs.path
         } else {
-    Menu Tray,Tip, % TrayString
+            Menu Tray,Tip, % TrayString
         }
-    buildAHKScriptContent(rmd_Path,script.config.config.RScriptPath)
+        buildAHKScriptContent(rmd_Path,script.config.config.RScriptPath)
     }
     SplitPath % Path,, OutDir
     SplitPath % OutDir,, OutDir2
@@ -506,7 +505,7 @@ main() {
     removeTempDir(md_Path)
     removeTempDir(ret.OutputPath)
     if (!A_Args.length()) { ;; only change config when running in GUI mode
-    script.save()
+        script.save()
     }
     return
 }
@@ -776,7 +775,7 @@ guiCreate(runCLI) {
         }
     }
     if (!A_Args.length()) { ;; only change config when running in GUI mode
-    script.save()
+        script.save()
     }
     Gui add, button, gChooseFile, &Choose Manuscript
     DDLRows:=(script.config.Config.HistoryLimit>25?25:script.config.Config.HistoryLimit)
@@ -934,9 +933,9 @@ guiShow(runCLI:=FALSE,CLIArgs:="") {
         x:=MouseX
     }
     if (!CLIArgs.count()) {
-    gui 1: show,x%x% y%y% w%guiWidth% h%guiHeight%, % script.name " - Choose manuscript"
-    enableGuiDrag(1)
-    WinWaitClose % script.name " - Choose manuscript"
+        gui 1: show,x%x% y%y% w%guiWidth% h%guiHeight%, % script.name " - Choose manuscript"
+        enableGuiDrag(1)
+        WinWaitClose % script.name " - Choose manuscript"
     } else {
         bAutoSubmitOTGUI:=true
         gui 1: submit
@@ -1020,11 +1019,11 @@ guiShow(runCLI:=FALSE,CLIArgs:="") {
             script.config.LastRun.LastExecutionDirectory:=atmp.relativeToNote
             SplitPath % CLIArgs.path, , OutDir
             ExecutionDirectory:=OutDir . (SubStr(OutDir,0)!="\"?"\":"")
-    } else {
-        atmp:=getPotentialWorkDir(CLIArgs.Path,CLIArgs.LastExecutionDirectory)
-    script.config.LastRun.LastExecutionDirectory:=atmp.relativeToNote
-    ExecutionDirectory:=(atmp.relativeToNote=1?script.config.config.OHTML_OutputDir:atmp.ExecutionDirectories)
-    ExecutionDirectory:=ExecutionDirectory . (SubStr(ExecutionDirectory,0)!="\"?"\":"")
+        } else {
+            atmp:=getPotentialWorkDir(CLIArgs.Path,CLIArgs.LastExecutionDirectory)
+            script.config.LastRun.LastExecutionDirectory:=atmp.relativeToNote
+            ExecutionDirectory:=(atmp.relativeToNote=1?script.config.config.OHTML_OutputDir:atmp.ExecutionDirectories)
+            ExecutionDirectory:=ExecutionDirectory . (SubStr(ExecutionDirectory,0)!="\"?"\":"")
         }
     }
     if (manuscriptpath!="") && !ot.bClosedNoSubmit {
@@ -1125,7 +1124,7 @@ guiSubmit() {
 
     }
     if (!A_Args.length()) { ;; only change config when running in GUI mode
-    script.save()
+        script.save()
     }
     return [DDLval,manuscriptpath,sel]
 }
