@@ -39,7 +39,10 @@ CLI_help() {
             , format:"`t`t`t-`t(req): key of the output-format used. Output format must be defined in 'DynamicArguments.ini'."
             , FullLog:"`t`t`t-`tNOT TESTED"
             , OHTMLLevel:"`t`t-`tInteger, set to number of levels above the manuscript-LOCATION to implement an OHTML-restrictor."
+            , Log:"`t`t`t-`tDD"
             , "quarto::XXXX.YY":"`t`t-`tPass along parameter modifications for parameter 'YY' of quarto-format 'XXXX'. Use quarto's parameter naming-scheme`n`t`t`t`t`t`tExample: ``quarto::html.number-depth=1``"
+            , RenderToOutputs:"`t-`tSet to '1' to execute file-compilation via quarto-cli/`rscript`"
+            , noMove:"`t-SEt to '1' to convert the note locally and create the '.qmd'-file at the location of the root."
             , LastExecutionDirectory:"`t-`tSet to '1' to process in OHTML-output directory, set to '2' to process in vault-subfolder."}
     name:=script.name
     str=
