@@ -35,7 +35,7 @@ script := {base : script.base
         , blank : "" }
 global DEBUG:=IsDebug()
 main()
-ExitApp, 1
+ExitApp 0
 return
 
 main() {
@@ -98,6 +98,14 @@ main() {
     FileRead ObsidianKnittr_Version, % A_ScriptDir "\INI-Files\ObsidianKnittr_Version.ini"
     EL.ObsidianKnittr_Version:=script.version:=script.config.version.ObsidianKnittr_Version:=Regexreplace(ObsidianKnittr_Version,"\s*")
     clArgs:=A_Args
+    ; clArgs:=["-h"]
+    ; clArgs:=["cli=true","path=D:\Dokumente neu\Obsidian NoteTaking\The Universe\019-Bugtesting-Subvault\019-ObsHTML_EmbeddedTitleStripping_Main.md","format=quarto::html","format=quarto::docx","LastExecutionDirectory=0","OHTMLLevel=2"]
+    ; clArgs:=["cli=true","path=D:\Dokumente neu\Obsidian NoteTaking\The Universe\200 University\06 Interns and Unis\BE28 Internship Report\Submission\BE28 Internship Report.md","format=quarto::html","format=quarto::docx","LastExecutionDirectory=0","OHTMLLevel=2"]
+    ; clArgs:=["path=D:\Dokumente neu\Obsidian NoteTaking\The Universe\200 University\06 Interns and Unis\BE28 Internship Report\Submission\BE28 Internship Report.md","format=quarto::html","FullLog=0","Verbose=0","UseOwnOHTMLFork=1","LastExecutionDirectory=1","OHTMLLevel=1","quarto::html.number-depth=1","quarto::html.author=Professor E. Gadd","quarto::html.toc=1"]
+    ; clArgs:=["path=D:\Dokumente neu\Obsidian NoteTaking\BE31-Thesis\100 Thesis\Submission\BE31 Thesis Report.md","format=quarto::html","FullLog=0","Verbose=0","UseOwnOHTMLFork=1","LastExecutionDirectory=1","OHTMLLevel=2","quarto::html.number-depth=2","quarto::html.author=Manfred von Karma","quarto::html.toc=1","quarto::html.toc-location=left"]
+    ; clArgs:=["path=C:\Users\Claudius Main\Desktop\TempTemporal\BE31-Thesis-quarto\Report\___manuscript.md","format=quarto::html","FullLog=0","Verbose=0","UseOwnOHTMLFork=1","LastExecutionDirectory=1","OHTMLLevel=99","RenderToOutputs=0","--noMove","--noRender","--noOpen","--noIntermediates"]
+    ; clArgs:=["path=C:/Users/Claudius Main/Desktop/TempTemporal/BE31-Thesis-quarto/documentation/methods/___grain-success.md","format=quarto::html","FullLog=0","Verbose=0","UseOwnOHTMLFork=1","LastExecutionDirectory=1","OHTMLLevel=99","RenderToOutputs=0","--noMove","--noRender","--noOpen","--noIntermediates"]
+    ; clArgs:=["path=""C:\Users\Claudius Main\Desktop\TempTemporal\BE31-Thesis-quarto\Report\___manuscript.md""","format=quarto::html","FullLog=0","Verbose=0","UseOwnOHTMLFork=1","LastExecutionDirectory=1","OHTMLLevel=99","RenderToOutputs=0","--noMove","--noRender","--noOpen","--notify"]
     if (!clArgs.length()) {
         out:=guiShow()
     } else {
@@ -116,7 +124,7 @@ main() {
         } else {
             if !requireA_Args(CLIArgs) {
                 msgbox % "error: arguments could not be validated. Missings Args?`n`nExpand upon this error message."
-                ExitApp 0
+                ExitApp -1
             }
             if (!CLIArgs.HasKey("LastExecutionDirectory")) {
                 CLIArgs.LastExecutionDirectory:=script.config.LastRun.LastExecutionDirectory
@@ -165,7 +173,7 @@ main() {
         }
         if format.HasKey("Error") && (format.Error.ID=0) {
             Reload
-            ExitApp 0 ;; fucking weird bug. DO NOT remove this exitapp below the reload-command. for some reason, removing it results in the script just ignoring the reload and continuing on as normal under certain situations
+            ExitApp -1 ;; fucking weird bug. DO NOT remove this exitapp below the reload-command. for some reason, removing it results in the script just ignoring the reload and continuing on as normal under certain situations
         }
         formats.=_ ", "
     }
@@ -194,7 +202,7 @@ main() {
         , EL.bRestrictOHTMLScope:=bRestrictOHTMLScope:=out.Settings.bRestrictOHTMLScope
         , EL.bRemoveQuartoReferenceTypesFromCrossrefs:=bRemoveQuartoReferenceTypesFromCrossrefs:=out.Settings.bRemoveQuartoReferenceTypesFromCrossrefs
     if (output_type="") && (bVerboseCheckbox="") && (!A_Args.length()) {
-        ExitApp 0
+        ExitApp -1
     }
     obsidianhtml_configfile:=script.config.config.obsidianhtml_configfile
 
@@ -1051,7 +1059,7 @@ guiShow(runCLI:=FALSE,CLIArgs:="") {
     } Else {
         ttip("Exiting",5)
         sleep 1300
-        ExitApp, 2
+        ExitApp 2
     }
 }
 

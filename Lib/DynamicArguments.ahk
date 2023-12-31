@@ -11,7 +11,7 @@ Class ot {
             ID:=-1
             this.Error:=this.Errors[ID] ;.String
             MsgBox 0x40031,% this.ClassName " > " A_ThisFunc "()" ,% (this.Errors.HasKey(ID)?this.Errors[ID].String:"Fatal: Undefined Error with ID '" ID "'") "'" ConfigFile "'" (this.Errors[ID].HasKey("EndString")?this.Errors[ID].EndString:"Fatal: Undefined Error with ID '" ID "'")
-            ExitApp 0
+            ExitApp -1
             return
         }
 
