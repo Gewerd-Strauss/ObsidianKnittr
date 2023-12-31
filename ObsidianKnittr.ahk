@@ -139,6 +139,10 @@ main() {
             } else {
                 CLIArgs.RenderToOutputs:=1
             }
+            if (!CLIArgs.HasKey("--noIntermediates")) {
+                CLIArgs.noIntermediates:=0
+            } else {
+                CLIArgs.noIntermediates:=1
         }
             script.config.LastRun.manuscriptpath:=CLIArgs.path
                 , script.config.LastRun.manuscriptpath:=CLIArgs.path
