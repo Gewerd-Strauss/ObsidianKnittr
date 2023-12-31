@@ -189,7 +189,11 @@ main() {
     EL.configtemplate_path:=obsidianhtml_configfile
     EL.configfile_contents:=tmpconfig[2]
     ttip(TrayString:="Running ObsidianHTML",5)
+    if (CLIArgs!="") {
+        Menu Tray,Tip, % TrayString  "`n" CLIArgs.path
+    } else {
     Menu Tray,Tip, % TrayString
+    }
     if (obsidianhtml_configfile="") {
         obsidianhtml_configfile:=script.config.config.obsidianhtml_configfile
     }
@@ -278,11 +282,19 @@ main() {
     EL.Intermediary_Start:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
     Codetimer_Log()
     ttip(TrayString:="Converting to .rmd-file",5)
+    if (CLIArgs!="") {
+        Menu Tray,Tip, % TrayString  "`n" CLIArgs.path
+    } else {
     Menu Tray,Tip, % TrayString
+    }
     rmd_Path:=convertMDToRMD(vMDPath,"index")
     ; 5, 6
     ttip(TrayString:="Moving to output folder",5)
+    if (CLIArgs!="") {
+        Menu Tray,Tip, % TrayString  "`n" CLIArgs.path
+    } else {
     Menu Tray,Tip, % TrayString
+    }
     Destination:=(InStr(Deref(ExecutionDirectory),A_Desktop)?0:ExecutionDirectory)
     rmd_Path:=copyBack(rmd_Path,Destination,manuscriptpath)
     SplitPath % rmd_Path,, OutDir
@@ -291,18 +303,34 @@ main() {
     EL.rawInputcopyLocation:=rawinputCopyLocation
     ; 7
     ttip(TrayString:="Converting Image SRC's")
+    if (CLIArgs!="") {
+        Menu Tray,Tip, % TrayString  "`n" CLIArgs.path
+    } else {
     Menu Tray,Tip, % TrayString
+    }
     NewContents:=ConvertSRC_SYNTAX_V4(rmd_Path,bInsertSetupChunk,bRemoveObsidianHTMLErrors,bStripLocalMarkdownLinks)
     ttip(TrayString:="Processing Tags",5)
+    if (CLIArgs!="") {
+        Menu Tray,Tip, % TrayString  "`n" CLIArgs.path
+    } else {
     Menu Tray,Tip, % TrayString
+    }
     NewContents:=processTags(NewContents,bRemoveHashTagFromTags)
     ttip(TrayString:="Processing Abstract",5)
+    if (CLIArgs!="") {
+        Menu Tray,Tip, % TrayString  "`n" CLIArgs.path
+    } else {
     Menu Tray,Tip, % TrayString
+    }
     NewContents:=processAbstract(NewContents)
     for _, format in out.Outputformats {                        ;; rmd → qmd conversion
         if (format.package="quarto") {
             ttip(TrayString:="Convert to QMD",5)
+            if (CLIArgs!="") {
+                Menu Tray,Tip, % TrayString  "`n" CLIArgs.path
+            } else {
             Menu Tray,Tip, % TrayString
+            }
             qmdContents:=convertToQMD(NewContents,bRemoveQuartoReferenceTypesFromCrossrefs)
             qmd_Path:=strreplace(rmd_Path,".rmd",".qmd")
             break                                               ;; if a format is of quarto, run the quarto-conversion once, then continue on.
@@ -321,7 +349,11 @@ main() {
         writeFile(qmd_Path,qmdContents,"UTF-8-RAW",,true)
     }
     ttip(TrayString:="Creating R-BuildScript",5)
+    if (CLIArgs!="") {
+        Menu Tray,Tip, % TrayString  "`n" CLIArgs.path
+    } else {
     Menu Tray,Tip, % TrayString
+    }
     sleep 200
     if bKeepFilename {
         tmp:=buildRScriptContent(rmd_Path,out.manuscriptName,out)
@@ -347,7 +379,11 @@ main() {
         }
         ttip(-1)
         ttip(TrayString:="Executing quarto-CLI",5)
+                if (CLIArgs!="") {
+                    Menu Tray,Tip, % TrayString  "`n" CLIArgs.path
+                } else {
         Menu Tray,Tip, % TrayString
+                }
         SplitPath % rmd_Path,, OutDir
         ret:=["","",OutDir]
         for _, output_type in out.sel {
@@ -370,7 +406,11 @@ main() {
             ;ttip(" ",5,,,,,,,16)
             ttip(-1)
             ttip(TrayString:="Executing R-BuildScript",5)
+            if (CLIArgs!="") {
+                Menu Tray,Tip, % TrayString  "`n" CLIArgs.path
+            } else {
             Menu Tray,Tip, % TrayString
+            }
             if bBackupOutput {
                 BackupDirectory:=backupOutput(rmd_Path,out)
             }
@@ -383,7 +423,11 @@ main() {
                 , EL.RWD:=ret[3]
         } Else {
             ttip(TrayString:="Opening RMD-File",5)
+            if (CLIArgs!="") {
+                Menu Tray,Tip, % TrayString  "`n" CLIArgs.path
+            } else {
             Menu Tray,Tip, % TrayString
+            }
             SplitPath % rmd_Path,, OutDir
             writeFile(OutDir "\build.R",script_contents,"UTF-8-RAW",,true)
             if (!DEBUG) {
@@ -403,7 +447,11 @@ main() {
     ;; final touches - ahk starter, moving shit to output folder
     if (!script.config.config.useQuartoCLI) {
     ttip(TrayString:="Building AHK-Starterscript",5)
+        if (CLIArgs!="") {
+            Menu Tray,Tip, % TrayString  "`n" CLIArgs.path
+        } else {
     Menu Tray,Tip, % TrayString
+        }
     buildAHKScriptContent(rmd_Path,script.config.config.RScriptPath)
     }
     SplitPath % Path,, OutDir
