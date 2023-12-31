@@ -36,7 +36,7 @@ script := {base : script.base
         , blank : "" }
 global DEBUG:=IsDebug()
 main()
-ExitApp,
+ExitApp, 1
 return
 
 main() {
@@ -105,7 +105,7 @@ main() {
         CLIArgs:=parseA_Args(clArgs)
         if (HasVal(CLIArgs, "-h") || CLIArgs.HasKey("-h")) {
             CLI_help()
-            ExitApp
+            ExitApp 2
         } else if (HasVal(CLIArgs,"-v") || CLIArgs.HasKey("-v")) {
             ttip(script.name " - " script.version,5)
             while (1) {
@@ -113,11 +113,11 @@ main() {
                     break
                 }
             }
-            ExitApp
+            ExitApp 2
         } else {
             if !requireA_Args(CLIArgs) {
                 msgbox % "error: arguments could not be validated. Missings Args?`n`nExpand upon this error message."
-                ExitApp
+                ExitApp 0
             }
             if (!CLIArgs.HasKey("LastExecutionDirectory")) {
                 CLIArgs.LastExecutionDirectory:=script.config.LastRun.LastExecutionDirectory
@@ -166,7 +166,7 @@ main() {
         }
         if format.HasKey("Error") && (format.Error.ID=0) {
             Reload
-            ExitApp ;; fucking weird bug. DO NOT remove this exitapp below the reload-command. for some reason, removing it results in the script just ignoring the reload and continuing on as normal under certain situations
+            ExitApp 0 ;; fucking weird bug. DO NOT remove this exitapp below the reload-command. for some reason, removing it results in the script just ignoring the reload and continuing on as normal under certain situations
         }
         formats.=_ ", "
     }
@@ -1052,7 +1052,7 @@ guiShow(runCLI:=FALSE,CLIArgs:="") {
     } Else {
         ttip("Exiting",5)
         sleep 1300
-        ExitApp
+        ExitApp, 2
     }
 }
 
