@@ -25,10 +25,10 @@ requireA_Args(Args) {
     }
     foundQ:=found.Count()
     if (foundQ=reqQ) {
-        MsgBox % "success",,,% 3
+        ttip("success")
         return true
     } else if (foundQ<reqQ) {
-        MsgBox % "failure",,,% 3
+        ttip("failure")
         return false
     } else if (foundQ>reqQ) {
         MsgBox % "FATAL: this shouldn't happen, error occured in '" A_ThisFunc "'. 'foundQ'>'reqQ'??"
