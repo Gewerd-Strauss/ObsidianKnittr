@@ -128,6 +128,11 @@ main() {
                 CLIArgs.OHTMLLevel:=script.config.config.defaultRelativeLevel
             } else {
 
+            if (CLIArgs.HasKey("--noRender")) {
+                CLIArgs.RenderToOutputs:=0
+            } else {
+                CLIArgs.RenderToOutputs:=1
+            }
         }
             script.config.LastRun.manuscriptpath:=CLIArgs.path
                 , script.config.LastRun.manuscriptpath:=CLIArgs.path
@@ -367,6 +372,9 @@ main() {
     script_contents:=tmp.1
     format:=tmp.2
     if (script.config.config.useQuartoCLI) {
+        if (CLIArgs.HasKey("--noRender")) {
+
+        } else {
         if (bExecuteRScript) {
         if bBackupOutput {
             ttip(-1)
@@ -400,6 +408,7 @@ main() {
         EL.Rdata_out:=ret[1]
                 , EL.RCMD:=ret[2]
                 , EL.RWD:=ret[3]
+        }
         }
     } else {
         if bExecuteRScript {
@@ -781,7 +790,7 @@ guiCreate(runCLI) {
         guicontrol,, bRestrictOHTMLScope, % (script.config.LastRun.RestrictOHTMLScope)
         guicontrol,, bSRCConverterVersion, % (script.config.LastRun.Conversion)
         guicontrol,, bKeepFilename, % (script.config.LastRun.KeepFileName)
-        guicontrol,, bExecuteRScript, % (script.config.LastRun.RenderRMD)
+        guicontrol,, bExecuteRScript, % (script.config.LastRun.RenderToOutputs)
         guicontrol,, bBackupOutput, % (script.config.LastRun.BackupOutput)
         guicontrol,, bRemoveHashTagFromTags, % (script.config.LastRun.RemoveHashTagFromTags)
         guicontrol,, bForceFixPNGFiles, % (script.config.LastRun.ForceFixPNGFiles)
@@ -936,7 +945,7 @@ guiShow(runCLI:=FALSE,CLIArgs:="") {
             , bRestrictOHTMLScope := (script.config.LastRun.RestrictOHTMLScope)
             , bSRCConverterVersion := (script.config.LastRun.Conversion)
             , bKeepFilename := (script.config.LastRun.KeepFileName)
-            , bExecuteRScript := (script.config.LastRun.RenderRMD)
+            , bExecuteRScript := (script.config.LastRun.RenderToOutputs)
             , bBackupOutput := (script.config.LastRun.BackupOutput)
             , bRemoveHashTagFromTags := (script.config.LastRun.RemoveHashTagFromTags)
             , bForceFixPNGFiles := (script.config.LastRun.ForceFixPNGFiles)
@@ -1056,7 +1065,7 @@ guiSubmit() {
     script.config.LastRun.RestrictOHTMLScope:=bRestrictOHTMLScope+0
     script.config.LastRun.Conversion:=bSRCConverterVersion+0
     script.config.LastRun.KeepFileName:=bKeepFilename+0
-    script.config.LastRun.RenderRMD:=bExecuteRScript+0
+    script.config.LastRun.RenderToOutputs:=bExecuteRScript+0
     script.config.LastRun.BackupOutput:=bBackupOutput+0
     script.config.LastRun.RemoveHashTagFromTags:=bRemoveHashTagFromTags+0
     script.config.LastRun.ForceFixPNGFiles:=bForceFixPNGFiles+0

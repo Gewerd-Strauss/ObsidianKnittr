@@ -37,7 +37,7 @@
             manuscriptpath=
             RemoveHashTagFromTags=1
             RemoveObsidianHTMLErrors=0
-            RenderRMD=0
+            RenderToOutputs=0
             RestrictOHTMLScope=0
             UseOwnOHTMLFork=0
             Verbose=0
