@@ -128,6 +128,12 @@ main() {
                 CLIArgs.OHTMLLevel:=script.config.config.defaultRelativeLevel
             } else {
 
+            }
+            if (!CLIArgs.HasKey("--noMove")) {
+                CLIArgs.noMove:=0
+            } else {
+                CLIArgs.noMove:=1
+            }
             if (CLIArgs.HasKey("--noRender")) {
                 CLIArgs.RenderToOutputs:=0
             } else {
@@ -351,6 +357,16 @@ main() {
     Codetimer_Log()
     writeFile(rmd_Path,NewContents,"UTF-8",,true)
     if (qmd_Path!="") {
+        if (CLIArgs.HasKey("--noMove")) {
+            qmd_Path:=Regexreplace(manuscriptpath,".md$",".qmd")
+            qmdContents:=quartopurgeTags(qmdContents)
+            if (CLIArgs.HasKey("--noIntermediates")) {
+                d:=strreplace(manuscriptpath,"/","\")
+                d:=strreplace(d,".md")
+                d:=strreplace(d,".qmd")
+                FileRemoveDir % d, % true
+            }
+        }
         writeFile(qmd_Path,qmdContents,"UTF-8-RAW",,true)
     }
     ttip(TrayString:="Creating R-BuildScript",5)
@@ -360,6 +376,9 @@ main() {
     Menu Tray,Tip, % TrayString
     }
     sleep 200
+    if (CLIArgs.HasKey("--noRender") && CLIArgs.HasKey("--noMove")) {
+
+    } else {
     if bKeepFilename {
         tmp:=buildRScriptContent(rmd_Path,out.manuscriptName,out)
     } else {
@@ -369,17 +388,21 @@ main() {
         tmp.1:=modifyQuartobuildscript(tmp.1,tmp.3,out)
         EL.Quarto_Version:=quartogetVersion()
     }
-    script_contents:=tmp.1
+    }
     format:=tmp.2
     if (script.config.config.useQuartoCLI) {
         if (CLIArgs.HasKey("--noRender")) {
 
         } else {
         if (bExecuteRScript) {
-        if bBackupOutput {
+                if bBackupOutput && ((!CLIArgs.HasKey("--noMove"))) {
             ttip(-1)
             ttip(TrayString:="Backing up Files",5)
+                    if (CLIArgs!="") {
+                        Menu Tray,Tip, % TrayString  "`n" CLIArgs.path
+                    } else {
             Menu Tray,Tip, % TrayString
+                    }
             BackupDirectory:=backupOutput(rmd_Path,out)
         }
         if script.config.config.backupCount {
@@ -925,11 +948,14 @@ guiShow(runCLI:=FALSE,CLIArgs:="") {
             }
             if script.config.LastRun.HasKey(arg) {
                 if (DEBUG) {
-                    msgbox % arg " = " val
+                    msgbox ,,,% arg " = " val,% "0.5"
                 }
                 script.config.LastRun[arg]:=val
             } else {
-                if InStr("path,runCLI,OHTMLLevel",arg) {
+                if InStr("path,runCLI,OHTMLLevel,noMove,nointermediates",arg) {
+                    continue
+                }
+                if ((SubStr(arg,1,2)="--") && !InStr(arg,"=")) { ;; generalise don't filter out flags
                     continue
                 }
                 if (InStr(arg,"quarto::")) {
