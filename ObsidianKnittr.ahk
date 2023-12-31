@@ -1233,3 +1233,4 @@ fTraySetup() {
 #Include <script>
 #Include <ownCLI>
 #Include <Configuration>
+#Include <messageboxes>
