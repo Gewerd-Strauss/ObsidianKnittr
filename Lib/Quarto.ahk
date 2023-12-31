@@ -97,6 +97,21 @@ convertDiagrams(String) {
     return String
 }
 
+quartopurgeTags(String) {
+    return String
+    Lines:=strsplit(String,"`n")
+    isFrontmatter:=!isTags:=false
+
+    for each, line in Lines {
+        if (InStr(line,"tags:")) {
+            isTags:=true
+            if (strLen(trim(line))>5) {
+                Lines[each]:="tags: [" strreplace(line,"tags:") "]"
+            }
+        }
+    }
+    return String
+}
 fixCitationpathing(String) {
     needle1:="mi)(bibliography:(?<match>\N+))"
     if RegexMatch(String,needle1,v) {
