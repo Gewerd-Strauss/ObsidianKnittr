@@ -1021,6 +1021,8 @@ guiShow(runCLI:=FALSE,CLIArgs:="") {
     }
     if (!A_Args.length()) {
         atmp:=getPotentialWorkDir(ChosenFile,ExecutionDirectory)
+        ExecutionDirectory:=(atmp.relativeToNote=1?script.config.config.OHTML_OutputDir:atmp.ExecutionDirectories)
+        ExecutionDirectory:=ExecutionDirectory . (SubStr(ExecutionDirectory,0)!="\"?"\":"")
     } else {
         if (CLIArgs.noMove) {
             atmp:=getPotentialWorkDir(CLIArgs.Path,CLIArgs.LastExecutionDirectory)
