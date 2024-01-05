@@ -229,13 +229,13 @@ main() {
     if (bRestrictOHTMLScope) {
         if (CLIArgs!="") && (FileExist(CLIArgs.path)) {
             if (CLIArgs.OHTMLLevel!="") {
-                OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(manuscriptpath,bAutoSubmitOTGUI,CLIArgs.OHTMLLevel)
+                OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(manuscriptpath,bAutoSubmitOTGUI,CLIArgs.OHTMLLevel,CLIArgs)
             } else {
                 if (manuscriptpath==script.config.LastRun.path_lastmanuscript) {
-                    OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(manuscriptpath,bAutoSubmitOTGUI,script.config.LastRun.LastRelativeLevel)
+                    OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(manuscriptpath,bAutoSubmitOTGUI,script.config.LastRun.LastRelativeLevel,CLIArgs)
                 } else {
                     script.config.LastRun.LastRelativeLevel:=-1
-                    OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(manuscriptpath,bAutoSubmitOTGUI)
+                    OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(manuscriptpath,bAutoSubmitOTGUI,,CLIArgs)
                 }
             }
         } else {

@@ -1,4 +1,4 @@
-createTemporaryObsidianVaultRoot(manuscript_location,bAutoSubmitOTGUI,LastRelativeLevel:=-1) {
+createTemporaryObsidianVaultRoot(manuscript_location,bAutoSubmitOTGUI,LastRelativeLevel:=-1,CLIArgs:="") {
     if (bAutoSubmitOTGUI) {
         if (script.config.Config.defaultRelativeLevel!="") && (script.config.Config.defaultRelativeLevel >0) {
             Level:=script.config.Config.defaultRelativeLevel + 0
@@ -16,7 +16,7 @@ createTemporaryObsidianVaultRoot(manuscript_location,bAutoSubmitOTGUI,LastRelati
     }
     Graph:=findObsidianVaultRootFromNote(manuscript_location,true)
     TV_String:=AssembleTV_String(Graph[2])
-    ret:=chooseTV_Element(TV_String,Graph,Level,bAutoSubmitOTGUI)
+    ret:=chooseTV_Element(TV_String,Graph,Level,bAutoSubmitOTGUI,CLIArgs)
     return {IsVaultRoot:ret.IsVaultRoot,Path:ret.Path,Graph:Graph}
 }
 
@@ -81,7 +81,7 @@ findObsidianVaultRootFromNote(path,reset:=false) {
     return -2 ;; unreachable and just here for my own OCD sake
 }
 
-chooseTV_Element(TV_String,Graph,Level,bAutoSubmitOTGUI) {
+chooseTV_Element(TV_String,Graph,Level,bAutoSubmitOTGUI,CLIArgs) {
     global
     /*
     1. render the TV_GUI (callback of main GUI or TV-subGUI, depending on implementation)
@@ -145,7 +145,9 @@ chooseTV_Element(TV_String,Graph,Level,bAutoSubmitOTGUI) {
         }
     }
     if !(TVIDs.Count() = 1) {
-        gui show, w600 Autosize, % script.name  " - Set limiting '.obsidian'-folder"
+        if (!CLIArgs.path) {
+            gui show, w600 Autosize, % script.name  " - Set limiting '.obsidian'-folder"
+        }
         objTOVRHK_Handler:=Func("TOVRHK_Handler").Bind(TVIDs)
         Hotkey ifWinActive, % "ahk_id " TOVRGUI
         loop, 9 {

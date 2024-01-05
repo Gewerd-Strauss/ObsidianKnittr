@@ -571,12 +571,14 @@ Class ot {
         }
         ;  }
         if (this.StepsizedGuishow) || ShowGui {
-            if (x!="") && (y!="") {
-                gui %GUI_ID% Show,x%x% y%y% w%guiWidth% h%guiHeight%,% GUIName:=this.GUITitle this.type
-            } else {
-                gui %GUI_ID% Show,w%guiWidth% h%guiHeight%,% GUIName:=this.GUITitle this.type
+            if (!this.SkipGUI) {
+                if (x!="") && (y!="") {
+                    gui %GUI_ID% Show,x%x% y%y% w%guiWidth% h%guiHeight%,% GUIName:=this.GUITitle this.type
+                } else {
+                    gui %GUI_ID% Show,w%guiWidth% h%guiHeight%,% GUIName:=this.GUITitle this.type
+                }
+                WinWait % GUIName
             }
-            WinWait % GUIName
             if this.SkipGUI {
                 this.SubmitDynamicArguments() ;; auto-submit the GUI
             } Else {
