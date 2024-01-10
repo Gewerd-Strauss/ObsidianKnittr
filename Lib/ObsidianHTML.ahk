@@ -92,6 +92,7 @@
     OutputDebug % "`n`n" command2 "`n`n"
     OutputDebug % "`n`n" WorkDir "`n`n"
     OutputDebug % "`n`n" WorkDir_OwnFork "`n`n"
+    OutputDebug % "`n`n" data_out "`n`n"
 
     if (data!="") {
         OHTML_Output:=getObsidianHTML_WD(data)
@@ -174,6 +175,8 @@ createTemporaryObsidianHTML_Config(manuscriptpath, obsidianhtml_configfile,Conve
                 %A_Space%%A_Space%- "".vscode""
                 %A_Space%%A_Space%- "".DS_Store""
                 %A_Space%%A_Space%- ""002 templates""
+                %A_Space%%A_Space%- "".Rproj.user""
+                %A_Space%%A_Space%- ""renv""
                 exclude_subfolders:
                 %A_Space%%A_Space%- "".git""
                 %A_Space%%A_Space%- "".obsidian""
@@ -181,6 +184,8 @@ createTemporaryObsidianHTML_Config(manuscriptpath, obsidianhtml_configfile,Conve
                 %A_Space%%A_Space%- "".vscode""
                 %A_Space%%A_Space%- "".DS_Store""
                 %A_Space%%A_Space%- ""002 templates""
+                %A_Space%%A_Space%- "".Rproj.user""
+                %A_Space%%A_Space%- ""renv""
 
 
 
