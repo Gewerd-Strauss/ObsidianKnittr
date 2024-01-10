@@ -19,6 +19,7 @@ requireA_Args(Args) {
     for arg, val in Args {
         if (HasVal(required,arg)) {
             if (arg="path") {
+                val:=strreplace(val,"""")
                 if (!FileExist(val)) {
                     message:="Fatal error: CLI run without providing required argument '" arg "'.`nThis program will exit now."
                     AppError("Fatal argument-error occured", Message, Options := 0, TitlePrefix := A_ThisFunc "()")
