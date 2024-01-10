@@ -151,6 +151,7 @@ main() {
             } else {
                 CLIArgs.noIntermediates:=1
             }
+            CLIArgs.path:=StrReplace(CLIArgs.path, "/","\")
             script.config.LastRun.manuscriptpath:=CLIArgs.path
                 , script.config.LastRun.manuscriptpath:=CLIArgs.path
                 , script.config.DDLHistory:=buildHistory(script.config.DDLHistory,script.config.Config.HistoryLimit,script.config.LastRun.manuscriptpath)
@@ -513,6 +514,7 @@ main() {
     removeTempDir(md_Path)
     removeTempDir(ret.OutputPath)
     if (!A_Args.length()) { ;; only change config when running in GUI mode
+        script.config.LastRun.manuscriptpath:=StrReplace(script.config.LastRun.manuscriptpath, "/","\")
         script.save()
     }
     return
@@ -781,6 +783,7 @@ guiCreate(runCLI) {
         }
     }
     if (!A_Args.length()) { ;; only change config when running in GUI mode
+        script.config.LastRun.manuscriptpath:=StrReplace(script.config.LastRun.manuscriptpath, "/","\")
         script.save()
     }
     Gui add, button, gChooseFile, &Choose Manuscript
@@ -1084,6 +1087,7 @@ guiSubmit() {
     if Instr(ChosenFile,"-<>-") {
         ChosenFile:=Trim(StrSplit(chosenFile,"-<>-").2)
     }
+    ChosenFile:=strreplace(ChosenFile,"/","\")
     manuscriptpath:=ChosenFile
     if (script.config.LastRun.manuscriptpath!="") && (manuscriptpath="") {
         manuscriptpath:=script.config.LastRun.manuscriptpath
@@ -1130,6 +1134,7 @@ guiSubmit() {
 
     }
     if (!A_Args.length()) { ;; only change config when running in GUI mode
+        script.config.LastRun.manuscriptpath:=StrReplace(script.config.LastRun.manuscriptpath, "/","\")
         script.save()
     }
     return [DDLval,manuscriptpath,sel]
