@@ -47,29 +47,6 @@
             X=
             Y=
             [DDLHistory]
-            1=D:\Dokumente neu\Obsidian NoteTaking\The Universe\200 University\06 Interns and Unis\BE28 Internship Report\Submission\BE28 Internship Report.md
-            2=D:\Dokumente neu\Obsidian NoteTaking\The Universe\200 University\06 Interns and Unis\BE28 Internship Report\Methods\Exp2 Grünflächenanalyse.md
-            3=D:\Dokumente neu\Obsidian NoteTaking\The Universe\019-Bugtesting-Subvault\019-ObsHTML_EmbeddedTitleStripping_Main.md
-            4=D:\Dokumente neu\Obsidian NoteTaking\The Universe\300 Personal\311 Programming\GFA-Utilities.md
-            5=D:\Dokumente neu\Obsidian NoteTaking\BE31-Thesis\100 Thesis\Submission\BE31 Thesis Report.md
-            6=D:\Dokumente neu\Obsidian NoteTaking\BE31-Thesis\100 Thesis\Methods\BE31 Introduction.md
-            7=D:\Dokumente neu\Obsidian NoteTaking\The Universe\007 Quarto\Quarto uninterrupted nested list-enumeration.md
-            8=D:\Dokumente neu\Obsidian NoteTaking\The Universe\300 Personal\311 Programming\Quarto Eval.md
-            9=D:\Dokumente neu\Obsidian NoteTaking\The Universe\007 Quarto\Quarto Equation Referencing.md
-            10=D:\Dokumente neu\Obsidian NoteTaking\The Universe\019-Bugtesting-Subvault\RMD Bookdown how to reference equations.md
-            11=D:\Dokumente neu\Obsidian NoteTaking\The Universe\200 University\06 Interns and Unis\BE28 Internship Report\Methods\Exp2 Watering.md
-            12=D:\Dokumente neu\Obsidian NoteTaking\The Universe\019-Bugtesting-Subvault\Cross Ref equations.md
-            13=D:\Dokumente neu\Obsidian NoteTaking\The Universe\019-Bugtesting-Subvault\Latex PDF testing.md
-            14=D:\Dokumente neu\Obsidian NoteTaking\The Universe\200 University\06 Interns and Unis\01 Internships\Applications\bex-biotec\bex-biotec.md
-            15=D:\Dokumente neu\Obsidian NoteTaking\The Universe\300 Personal\301 DailyNotes\2023\10 October\18.10.2023.md
-            16=D:\Dokumente neu\Obsidian NoteTaking\The Universe\019-Bugtesting-Subvault\Callout Testing.md
-            17=D:\Dokumente neu\Obsidian NoteTaking\The Universe\019-Bugtesting-Subvault\Callout Testing 2.md
-            18=D:\Dokumente neu\Obsidian NoteTaking\The Universe\200 University\07 Thesis\BE31 Thesis\Misc\BE31 Thesis Topic.md
-            19=D:\Dokumente neu\Obsidian NoteTaking\The Universe\300 Personal\311 Programming\Introduction Tips for new winter terms.md
-            20=D:\Dokumente neu\Obsidian NoteTaking\The Universe\300 Personal\311 Programming\TOC callout testing.md
-            21=D:\Dokumente neu\Obsidian NoteTaking\The Universe\100 Knowledge\Chemical Oxygen Demand.md
-            22=D:\Dokumente neu\Obsidian NoteTaking\The Universe - Kopie\100 Knowledge\Chemical Oxygen Demand.md
-            23=D:\Dokumente neu\Obsidian NoteTaking\The Universe\200 University\05\BE26 Integrated Management System and Quality Management\BE26 Exam Preparation_embedded.md
 
         )
     writeFile(Path,InitialSettings,"UTF-16")
