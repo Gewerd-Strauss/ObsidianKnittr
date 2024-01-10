@@ -15,6 +15,9 @@ createTemporaryObsidianVaultRoot(manuscript_location,bAutoSubmitOTGUI,LastRelati
         }
     }
     Graph:=findObsidianVaultRootFromNote(manuscript_location,true)
+    if (Graph="0") {
+        AppError(A_ThisFunc " - Graph-object not found", "The program could not find an obsidian root folder`n(``.obsidian\``) above or at the location of """ manuscript_location """.",,"")
+    }
     TV_String:=AssembleTV_String(Graph[2])
     ret:=chooseTV_Element(TV_String,Graph,Level,bAutoSubmitOTGUI,CLIArgs)
     return {IsVaultRoot:ret.IsVaultRoot,Path:ret.Path,Graph:Graph}
