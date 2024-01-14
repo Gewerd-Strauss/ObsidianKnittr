@@ -58,7 +58,7 @@ main() {
                 rscript_path:=StrReplace(rscript_path, "`r`n")
                 rscript_path:=StrSplit(rscript_path)
                 found:=false
-                for , path in rscript_path { ;; check if an installation of rscript is found; then check if there are multiple
+                for _, path in rscript_path { ;; check if an installation of rscript is found; then check if there are multiple
                     if !InStr(path,".exe") { ;; skip wrong file formats.
                         continue
                     }
