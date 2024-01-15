@@ -838,7 +838,7 @@ guiShow(runCLI:=FALSE,CLIArgs:="") {
     } Else {
         x:=MouseX
     }
-    if (!CLIArgs.count()) {
+    if (!A_Args.length()) {
         gui 1: show,x%x% y%y% w%guiWidth% h%guiHeight%, % script.name " - Choose manuscript"
         enableGuiDrag(1)
         WinWaitClose % script.name " - Choose manuscript"
