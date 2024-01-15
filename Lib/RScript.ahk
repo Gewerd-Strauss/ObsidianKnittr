@@ -1,5 +1,5 @@
 buildRScriptContent(Path,output_filename="",out="") {
-    SplitPath % Path, , Path2, , Name
+    SplitPath % Path,, Path2,, Name
     RScriptFilePath:=strreplace(Path2,"\","\\")
         , RScriptFolder:=strreplace(Path2,"\","/")
     OutputType_Print:=""

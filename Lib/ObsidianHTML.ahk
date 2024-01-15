@@ -337,14 +337,14 @@ fixYAMLSyntax(template) {
 }
 
 updateObsidianHTMLToLastRelease() {
-    RunWait % A_Comspec " /k echo y | pip uninstall obsidianhtml", ,
-    RunWait % A_Comspec " /k echo y | pip install obsidianhtml", ,
+    RunWait % A_Comspec " /k echo y | pip uninstall obsidianhtml",,
+    RunWait % A_Comspec " /k echo y | pip install obsidianhtml",,
     MsgBox,, % script.name, % "Successfully updated to last Release."
     return
 }
 updateObsidianHTMLToMaster() {
-    RunWait % A_Comspec " /k echo y | pip uninstall obsidianhtml", ,
-    RunWait % A_Comspec " /k echo y | pip install git+https://github.com/obsidian-html/obsidian-html.git", ,
+    RunWait % A_Comspec " /k echo y | pip uninstall obsidianhtml",,
+    RunWait % A_Comspec " /k echo y | pip install git+https://github.com/obsidian-html/obsidian-html.git",,
     MsgBox,, % script.name, % "Successfully updated to Master."
     return
 }

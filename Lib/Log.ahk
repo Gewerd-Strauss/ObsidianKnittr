@@ -96,7 +96,7 @@ stdOut                    : `%Rdata_out`%
         ObjRawSet(this, "__path", Path)
             , ObjRawSet(this, "__encoding", Encoding)
             , ObjRawSet(this, "__Cache", false)
-            , writeFile_Log(Path, this.tpl, Encoding, , true)
+            , writeFile_Log(Path, this.tpl, Encoding,, true)
             , tempfile:=FileOpen(Path,"rw",Encoding)
             , ObjRawSet(this,"content",tempfile.read())
             , tempfile.close()

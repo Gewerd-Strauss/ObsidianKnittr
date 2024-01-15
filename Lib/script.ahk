@@ -262,7 +262,7 @@ class script {
             }
 
             if !FileExist(A_ScriptDir "\res\script_templates\_template.html") {
-                SplitPath % A_LineFile, , LibPath ;; then in directory of the class `script` itself
+                SplitPath % A_LineFile,, LibPath ;; then in directory of the class `script` itself
                 LibPath.="\script_templates\"
                 if !FileExist(LibPath "\_template.html") {
                     LibPath .= "\res\script_templates\"
@@ -310,7 +310,7 @@ class script {
                 ; metadata_element
 
                 if !FileExist(A_ScriptDir "\res\script_templates\" metadata_type ".html") {
-                    SplitPath % A_LineFile, , About_type_path ;; then in directory of the class `script` itself
+                    SplitPath % A_LineFile,, About_type_path ;; then in directory of the class `script` itself
                     About_type_path.="\script_templates\"
 
                     if !FileExist(strreplace(About_type_path "\_template.html","\\","\")) {

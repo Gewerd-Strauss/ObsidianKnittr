@@ -1,5 +1,5 @@
 backupOutput(Path, out) {
-    SplitPath % Path, ,OutputRoot
+    SplitPath % Path,,OutputRoot
     BackupDirectory:=OutputRoot "\Old_Versions"
     Copied:=0
     MT:=""
