@@ -99,7 +99,7 @@ main() {
     EL.ObsidianKnittr_Version:=script.version:=script.config.version.ObsidianKnittr_Version:=Regexreplace(ObsidianKnittr_Version,"\s*")
     clArgs:=A_Args
     if (!clArgs.length()) {
-        out:=guiShow()
+        guiOut:=guiShow()
     } else {
         CLIArgs:=parseA_Args(clArgs)
         if (HasVal(CLIArgs, "-h") || CLIArgs.HasKey("-h")) {
@@ -145,7 +145,7 @@ main() {
                 , script.config.DDLHistory:=buildHistory(script.config.DDLHistory,script.config.Config.HistoryLimit,script.config.LastRun.manuscriptpath)
                 , script.config.LastRun.last_output_type:=CLIArgs.format
             global manuscriptpath:=CLIArgs.path
-            out:=guiShow(true,CLIArgs)
+            guiOut:=guiShow(true,CLIArgs)
             for each,output_type in CLIArgs.format {
                 script.config.LastRun.last_output_type.=output_type
                 if (each<sel.count()) {
@@ -156,7 +156,7 @@ main() {
     }
     formats:=""
         , bAutoSubmitOTGUI:=false
-    for _,format in out.Outputformats {
+    for _,format in guiOut.Outputformats {
         if format.SkipGUI {
             bAutoSubmitOTGUI:=format.SkipGUI
         }
@@ -167,36 +167,36 @@ main() {
         formats.=_ ", "
     }
     formats:=SubStr(formats,1,StrLen(formats)-2)
-        , output_type:=out.sel
+        , output_type:=guiOut.sel
     if (HasVal(output_type,"First in YAML")) {
         output_type:=""
     }
-    ExecutionDirectory:=out.Settings.ExecutionDirectory
-        , Outputformats:=out.Outputformats
-        , bBackupOutput:=out.Settings.bBackupOutput
+    ExecutionDirectory:=guiOut.Settings.ExecutionDirectory
+        , Outputformats:=guiOut.Outputformats
+        , bBackupOutput:=guiOut.Settings.bBackupOutput
     EL.formats:=formats
-        , EL.manuscriptname:=manuscriptname:=out.manuscriptname
-        , EL.manuscriptpath:=manuscriptpath:=out.manuscriptpath
-        , EL.bVerboseCheckbox:=bVerboseCheckbox:=out.Settings.bVerboseCheckbox
-        , EL.bSRCConverterVersion:=out.Settings.bSRCConverterVersion
-        , EL.bKeepFilename:=bKeepFilename:=out.Settings.bKeepFilename
-        , EL.bExecuteRScript:=bExecuteRScript:=out.Settings.bExecuteRScript
-        , EL.bRemoveHashTagFromTags:=bRemoveHashTagFromTags:=out.Settings.bRemoveHashTagFromTags
-        , EL.bForceFixPNGFiles:=bForceFixPNGFiles:=out.Settings.bForceFixPNGFiles
-        , EL.bInsertSetupChunk:=bInsertSetupChunk:=out.Settings.bInsertSetupChunk
-        , EL.bConvertInsteadofRun:=bConvertInsteadofRun:=out.Settings.bConvertInsteadofRun
-        , EL.bRemoveObsidianHTMLErrors:=bRemoveObsidianHTMLErrors:=out.Settings.bRemoveObsidianHTMLErrors
-        , EL.bStripLocalMarkdownLinks:=bStripLocalMarkdownLinks:=out.Settings.bStripLocalMarkdownLinks
-        , EL.bUseOwnOHTMLFork:=bUseOwnOHTMLFork:=out.Settings.bUseOwnOHTMLFork
-        , EL.bRestrictOHTMLScope:=bRestrictOHTMLScope:=out.Settings.bRestrictOHTMLScope
-        , EL.bRemoveQuartoReferenceTypesFromCrossrefs:=bRemoveQuartoReferenceTypesFromCrossrefs:=out.Settings.bRemoveQuartoReferenceTypesFromCrossrefs
+        , EL.manuscriptname:=manuscriptname:=guiOut.manuscriptname
+        , EL.manuscriptpath:=manuscriptpath:=guiOut.manuscriptpath
+        , EL.bVerboseCheckbox:=bVerboseCheckbox:=guiOut.Settings.bVerboseCheckbox
+        , EL.bSRCConverterVersion:=guiOut.Settings.bSRCConverterVersion
+        , EL.bKeepFilename:=bKeepFilename:=guiOut.Settings.bKeepFilename
+        , EL.bExecuteRScript:=bExecuteRScript:=guiOut.Settings.bExecuteRScript
+        , EL.bRemoveHashTagFromTags:=bRemoveHashTagFromTags:=guiOut.Settings.bRemoveHashTagFromTags
+        , EL.bForceFixPNGFiles:=bForceFixPNGFiles:=guiOut.Settings.bForceFixPNGFiles
+        , EL.bInsertSetupChunk:=bInsertSetupChunk:=guiOut.Settings.bInsertSetupChunk
+        , EL.bConvertInsteadofRun:=bConvertInsteadofRun:=guiOut.Settings.bConvertInsteadofRun
+        , EL.bRemoveObsidianHTMLErrors:=bRemoveObsidianHTMLErrors:=guiOut.Settings.bRemoveObsidianHTMLErrors
+        , EL.bStripLocalMarkdownLinks:=bStripLocalMarkdownLinks:=guiOut.Settings.bStripLocalMarkdownLinks
+        , EL.bUseOwnOHTMLFork:=bUseOwnOHTMLFork:=guiOut.Settings.bUseOwnOHTMLFork
+        , EL.bRestrictOHTMLScope:=bRestrictOHTMLScope:=guiOut.Settings.bRestrictOHTMLScope
+        , EL.bRemoveQuartoReferenceTypesFromCrossrefs:=bRemoveQuartoReferenceTypesFromCrossrefs:=guiOut.Settings.bRemoveQuartoReferenceTypesFromCrossrefs
     if (output_type="") && (bVerboseCheckbox="") && (!A_Args.length()) {
         ExitApp -1
     }
     obsidianhtml_configfile:=script.config.config.obsidianhtml_configfile
 
 
-    tmpconfig:=createTemporaryObsidianHTML_Config(manuscriptpath, obsidianhtml_configfile,bConvertInsteadofRun)
+    tmpconfig:=createTemporaryObsidianHTML_Config(guiOut.manuscriptpath, obsidianhtml_configfile,bConvertInsteadofRun)
         , EL.configtemplate_path:=obsidianhtml_configfile
         , EL.configfile_contents:=tmpconfig[2]
     notify("Running ObsidianHTML",CLIArgs)
@@ -213,21 +213,21 @@ main() {
     if (bRestrictOHTMLScope) {
         if (CLIArgs!="") && (FileExist(CLIArgs.path)) {
             if (CLIArgs.OHTMLLevel!="") {
-                OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(manuscriptpath,bAutoSubmitOTGUI,CLIArgs.OHTMLLevel,CLIArgs)
+                OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(guiOut.manuscriptpath,bAutoSubmitOTGUI,CLIArgs.OHTMLLevel,CLIArgs)
             } else {
-                if (manuscriptpath==script.config.LastRun.path_lastmanuscript) {
-                    OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(manuscriptpath,bAutoSubmitOTGUI,script.config.LastRun.LastRelativeLevel,CLIArgs)
+                if (guiOut.manuscriptpath==script.config.LastRun.path_lastmanuscript) {
+                    OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(guiOut.manuscriptpath,bAutoSubmitOTGUI,script.config.LastRun.LastRelativeLevel,CLIArgs)
                 } else {
                     script.config.LastRun.LastRelativeLevel:=-1
-                    OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(manuscriptpath,bAutoSubmitOTGUI,,CLIArgs)
+                    OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(guiOut.manuscriptpath,bAutoSubmitOTGUI,,CLIArgs)
                 }
             }
         } else {
-            if (manuscriptpath==script.config.LastRun.path_lastmanuscript) {
-                OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(manuscriptpath,bAutoSubmitOTGUI,script.config.LastRun.LastRelativeLevel)
+            if (guiOut.manuscriptpath==script.config.LastRun.path_lastmanuscript) {
+                OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(guiOut.manuscriptpath,bAutoSubmitOTGUI,script.config.LastRun.LastRelativeLevel)
             } else {
                 script.config.LastRun.LastRelativeLevel:=-1
-                OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(manuscriptpath,bAutoSubmitOTGUI)
+                OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(guiOut.manuscriptpath,bAutoSubmitOTGUI)
             }
         }
     }
@@ -271,9 +271,9 @@ main() {
     ; 5, 6
     notify("Moving to output folder",CLIArgs)
     Destination:=(InStr(Deref(ExecutionDirectory),A_Desktop)?0:ExecutionDirectory)
-        , rmd_Path:=copyBack(rmd_Path,Destination,manuscriptpath)
+        , rmd_Path:=copyBack(rmd_Path,Destination,guiOut.manuscriptpath)
     SplitPath % rmd_Path,, OutDir
-    rawinputCopyLocation:=regexreplace(OutDir "\" out.manuscriptName "_vault.md ","\\{2,}","\")
+    rawinputCopyLocation:=regexreplace(OutDir "\" guiOut.manuscriptName "_vault.md ","\\{2,}","\")
         , EL.output_path
         , EL.rawInputcopyLocation:=rawinputCopyLocation
     ; 7
@@ -283,10 +283,10 @@ main() {
     NewContents:=processTags(NewContents,guiOut.Settings.bRemoveHashTagFromTags)
     notify("Processing Abstract",CLIArgs)
     NewContents:=processAbstract(NewContents)
-    for _, format in out.Outputformats {                        ;; rmd → qmd conversion
+    for _, format in guiOut.Outputformats {                        ;; rmd → qmd conversion
         if (format.package="quarto") {
-            qmdContents:=convertToQMD(NewContents,bRemoveQuartoReferenceTypesFromCrossrefs)
             notify("Convert to QMD",CLIArgs)
+            qmdContents:=convertToQMD(NewContents,guiOut.Settings.bRemoveQuartoReferenceTypesFromCrossrefs)
                 , qmd_Path:=strreplace(rmd_Path,".rmd",".qmd")
             break                                               ;; if a format is of quarto, run the quarto-conversion once, then continue on.
         }
@@ -302,10 +302,10 @@ main() {
         , writeFile(rmd_Path,NewContents,"UTF-8",,true)
     if (qmd_Path!="") {
         if (CLIArgs.HasKey("--noMove")) {
-            qmd_Path:=Regexreplace(manuscriptpath,".md$",".qmd")
+            qmd_Path:=Regexreplace(guiOut.manuscriptpath,".md$",".qmd")
                 , qmdContents:=quartopurgeTags(qmdContents)
             if (CLIArgs.HasKey("--noIntermediates")) {
-                d:=strreplace(manuscriptpath,"/","\")
+                d:=strreplace(guiOut.manuscriptpath,"/","\")
                     , d:=strreplace(d,".md")
                     , d:=strreplace(d,".qmd")
                 FileRemoveDir % d, % true
@@ -318,12 +318,12 @@ main() {
 
     } else {
         if bKeepFilename {
-            tmp:=buildRScriptContent(rmd_Path,out.manuscriptName,out)
+            tmp:=buildRScriptContent(rmd_Path,guiOut.manuscriptName,guiOut)
         } else {
-            tmp:=buildRScriptContent(rmd_Path,,out)
+            tmp:=buildRScriptContent(rmd_Path,,guiOut)
         }
         if (qmd_Path!="") {
-            tmp.1:=modifyQuartobuildscript(tmp.1,tmp.3,out)
+            tmp.1:=modifyQuartobuildscript(tmp.1,tmp.3,guiOut)
                 , EL.Quarto_Version:=quartogetVersion()
         }
     }
@@ -336,6 +336,7 @@ main() {
                 if bBackupOutput && ((!CLIArgs.HasKey("--noMove"))) {
                     ttip(-1)
                     notify("Backing up Files",CLIArgs)
+                    BackupDirectory:=backupOutput(rmd_Path,guiOut)
                 }
                 if script.config.config.backupCount {
                     limitBackups(BackupDirectory,script.config.config.backupCount)
@@ -344,16 +345,16 @@ main() {
                 notify("Executing quarto-CLI",CLIArgs)
                 SplitPath % rmd_Path,, OutDir
                 ret:=["","",OutDir]
-                for _, output_type in out.sel {
-                    write_quarto_yaml(out.Outputformats[output_type],OutDir,"qCLI_yaml_" out.Outputformats[output_type].filesuffix ".yaml")
-                        , cmd:="quarto render index.qmd --to " out.Outputformats[output_type].filesuffix 
-                        , cmd.=" --metadata-file=""qCLI_yaml_" out.Outputformats[output_type].filesuffix ".yaml"""
-                        , cmd.=" --output """ out.Outputformats[output_type].Filename out.Outputformats[output_type].FilenameMod "."  out.Outputformats[output_type].filesuffix """"
+                for _, output_type in guiOut.sel {
+                    write_quarto_yaml(guiOut.Outputformats[output_type],OutDir,"qCLI_yaml_" guiOut.Outputformats[output_type].filesuffix ".yaml")
+                        , CMD:="quarto render index.qmd --to " guiOut.Outputformats[output_type].filesuffix 
+                        , CMD.=" --metadata-file=""qCLI_yaml_" guiOut.Outputformats[output_type].filesuffix ".yaml"""
+                        , CMD.=" --output """ guiOut.Outputformats[output_type].Filename guiOut.Outputformats[output_type].FilenameMod "."  guiOut.Outputformats[output_type].filesuffix """"
                         , GetStdStreams_WithInput(CMD, OutDir, InOut:="`n")
                         , ret[1].="`nFormat " output_type ":`n" InOut
                         , ret[2].=CMD
                         , Clipboard:=InOut
-                        , writeFile(OutDir "\build_" out.Outputformats[output_type].filesuffix ".cmd",CMD,"UTF-8-RAW",,true)
+                        , writeFile(OutDir "\build_" guiOut.Outputformats[output_type].filesuffix ".cmd",CMD,"UTF-8-RAW",,true)
                 }
                 EL.Rdata_out:=ret[1]
                     , EL.RCMD:=ret[2]
@@ -367,7 +368,7 @@ main() {
             ttip(-1)
             notify("Executing R-BuildScript",CLIArgs)
             if bBackupOutput {
-                BackupDirectory:=backupOutput(rmd_Path,out)
+                BackupDirectory:=backupOutput(rmd_Path,guiOut)
             }
             if script.config.config.backupCount {
                 limitBackups(BackupDirectory,script.config.config.backupCount)
