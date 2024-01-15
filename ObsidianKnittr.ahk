@@ -750,8 +750,8 @@ getPotentialWorkDir(File,ExecutionDirectory) {
 }
 getDefinedOutputFormats(Path) {
     PotentialOutputs:=["bookdown::word_document2", "html_document", "bookdown::html_document2", "bookdown::pdf_document2", "odt_document", "rtf_document", "md_document", "tufte::tufte_html", "github_document"]
-    Arr:=[]
-    filesuffixes:=[]
+        , Arr:=[]
+        , filesuffixes:=[]
     if !FileExist(Path) {
         Gui +OwnDialogs
         Title:="File not found"
