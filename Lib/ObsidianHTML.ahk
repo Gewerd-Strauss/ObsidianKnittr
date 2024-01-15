@@ -5,7 +5,6 @@
     }
     if (WorkDir_OwnFork="") {
         WorkDir_OwnFork:= A_Desktop "\ObsidianHTMLOutput"
-
     }
 
     ;; get ObsidianHTML_Path
@@ -65,9 +64,7 @@
         }
         if (script.config.config.ConfirmOHTMLCustomBuild && !bAutoSubmitOTGUI) {
             MsgBox 0x2034,% "Is the correct build version used?", % "Has the correct build version been used?`n" ohtmlversion_modded "`n`nCMD:`n" command2, 1 ;; TODO: add config option to skip this, and add option to potentially also or never skip this when debugging.
-            IfMsgBox Yes, {
-
-            } Else IfMsgBox No, {
+            IfMsgBox No, {
                 if (FileExist(ScopeRestrictorObject.Path) && !ScopeRestrictorObject.IsVaultRoot) {
                     FileRemoveDir % ScopeRestrictorObject.Path
                 }
