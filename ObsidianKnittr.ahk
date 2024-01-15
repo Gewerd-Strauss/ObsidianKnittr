@@ -1080,7 +1080,9 @@ editMainConfig(configfile) {
     WinWaitClose % "ahk_PID" PID
     Gui +OwnDialogs
     OnMessage(0x44, "DA_OnMsgBox")
-    MsgBox 0x40044, % this.ClassName " > " A_ThisFunc "()", You modified the configuration for this class.`nReload?
+    Title:=this.ClassName " > " A_ThisFunc
+    Message:="You modified the configuration for this class.`nReload?"
+    AppError(Title, Message, 0x40044,"",Timeout:=0)
     OnMessage(0x44, "")
     IfMsgBox Yes, {
         reload
