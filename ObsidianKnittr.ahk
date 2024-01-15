@@ -873,7 +873,9 @@ guiShow(runCLI:=FALSE,CLIArgs:="") {
                 if (DEBUG) {
                     msgbox % arg " = " val
                 }
-                MsgBox 0x40030, % script.name " - CLI-processing",% "CLI-Parameter '" arg "' is not implemented as of yet.`nThe parameter will be ignored."
+                Title:=": CLI-processing"
+                Message:="CLI-Parameter '" arg "' is not implemented as of yet.`nThe parameter will be ignored."
+                AppError(Title, Message,0x40030," > " A_ThisFunc)
             }
         }
         SplitPath % script.config.lastrun.manuscriptpath,, OutDir
