@@ -631,20 +631,14 @@ guiCreate(runCLI) {
     Gui Font, s11 cWhite, Segoe UI
     gui add, text,xm ym, ObsidianKnittr - automate Obsidian.md conversion
     WideControlWidth:=330
-    LVRows:=(ret[1].Count()>35
-        ? 3
-        : ret[1].Count())
-
     gui add, listview,% "vvLV1 LV0x8 w" WideControlWidth " h245 checked NoSortHdr " , % "Chooses an output Type"
     gui add, Groupbox, % "xm" " yp" + 248 " w" WideControlWidth " h170", Execution Directories
-    ExecutionDirectories:=""
     for each, File in script.config.DDLHistory {
         if (!FileExist(File)) {
             script.config.DDLHistory.RemoveAt(each,1)
         }
     }
-    ExecutionDirectories:=script.config.config.OHTML_OutputDir "||"
-        , DDLRows:=(script.config.Config.HistoryLimit>25?25:script.config.Config.HistoryLimit)
+    DDLRows:=(script.config.Config.HistoryLimit>25?25:script.config.Config.HistoryLimit)
     gui add, text, % "yp+25 xp+10 w" WideControlWidth -  3*5, % "Choose execution directory for OHTML"
     gui add, Radio,% "vExecutionDirectory Checked",% "&1. OHTML-Output-Dir"
     gui add, Radio,,% "&2. subfolder of note-location in vault"
@@ -660,7 +654,7 @@ guiCreate(runCLI) {
         Cond:=Instr(last_output,output_type)
         if Cond {
             Options:="Check"
-            last_output:=strreplace(last_output,output_type)
+                , last_output:=strreplace(last_output,output_type)
         } else {
             Options:="-Check"
         }
