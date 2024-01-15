@@ -485,13 +485,17 @@ removeTempDir(Path,RemoveParent:=TRUE) {
     if RemoveParent {
         FileRemoveDir % OutDir,1
         if FileExist(OutDir) {
-            MsgBox % "Error occured - Directory '" OutDir "' could not be removed"
+            Title:=": folder is busy"
+            Message:="The temp-directory '" OutDir "' could not be removed"
+            AppError(Title, Message,0x40010," > " A_ThisFunc)
             Run % "explorer " OutDir
         }
     } else {
         FileRemoveDir % Path,1
         if FileExist(Path) {
-            MsgBox % "Error occured - Directory '" Path "' could not be removed"
+            Title:=": folder is busy"
+            Message:="The temp-directory '" OutDir "' could not be removed"
+            AppError(Title, Message,0x40010," > " A_ThisFunc)
             Run % "explorer " Path
         }
     }
@@ -755,7 +759,7 @@ getDefinedOutputFormats(Path) {
         Gui +OwnDialogs
         Title:="File not found"
         Message:="A required file containing the GUI definitions for the output formats does not exist under `n`n'" Path "`n`nThis script will only use the default options for any format not found in this file"
-        AppError(Title, Message,0x40010," > " A_ThisFunc)
+        AppError(Title, Message,0x40030," > " A_ThisFunc)
         Arr:=PotentialOutputs ;; fallback to hardcoded default
     } else {
         FileRead FileString, % Path
