@@ -588,13 +588,9 @@ Class ot {
         OnMessage(0x44, "DA_OnMsgBox")
         MsgBox 0x40044, % this.ClassName " > " A_ThisFunc "()", You modified the configuration for this class.`nReload?
         OnMessage(0x44, "")
-
         IfMsgBox Yes, {
             reload
-        } Else IfMsgBox No, {
-
         }
-
     }
     SubmitDynamicArguments() {
         static
