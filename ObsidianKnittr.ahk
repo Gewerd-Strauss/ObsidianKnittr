@@ -48,7 +48,6 @@ main() {
         , exh:=Func("fonExit").Bind(DEBUG)
         , onExit(exh)
     if !script.load() {
-        ;InputBox, given_obsidianhtml_configfile, % script.name " - Initiate settings","Please give the path of your configfile for obsidianhtml."
         RS_C:=rscript_check()
             , OHTML_C:=obsidianhtml_check()
             , QUARTO_C:=quarto_check()
