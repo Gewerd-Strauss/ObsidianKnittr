@@ -2,10 +2,9 @@
     Object:={}
     for _, pair in Args {
         key:=strsplit(pair,"=",,2).1
-        val:=strsplit(pair,"=",,2).2
+            , val:=strsplit(pair,"=",,2).2
         if (Object.HasKey(key)) {
-            a:=[Object[key],val]
-            Object[key]:=a
+            Object[key]:=[Object[key],val]
         } else {
             Object[key]:=val
         }

@@ -199,7 +199,7 @@ TOVRHK_Handler(TVIDs:="") {
     guicontrol check entry id
     return
     */
-    dfg:=A_DefaultGUI
+    ;dfg:=A_DefaultGUI
     gui TOVR: default
     if RegexMatch(A_ThisHotkey,"(?<Count>\d+)",v) {
         loop, % vCount {

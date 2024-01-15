@@ -40,31 +40,31 @@ return
 
 main() {
     EL := new log(A_ScriptDir "\Executionlog.txt", true)
-    fTraySetup()
-    script.loadCredits(script.resfolder "\credits.txt")
-    script.loadMetadata(script.resfolder "\meta.txt")
-    erh:=Func("fonError").Bind(DEBUG)
-    onError(erh)
-    exh:=Func("fonExit").Bind(DEBUG)
-    onExit(exh)
+        , fTraySetup()
+        , script.loadCredits(script.resfolder "\credits.txt")
+        , script.loadMetadata(script.resfolder "\meta.txt")
+        , erh:=Func("fonError").Bind(DEBUG)
+        , onError(erh)
+        , exh:=Func("fonExit").Bind(DEBUG)
+        , onExit(exh)
     if !script.load() {
         ;InputBox, given_obsidianhtml_configfile, % script.name " - Initiate settings","Please give the path of your configfile for obsidianhtml."
         RS_C:=rscript_check()
-        OHTML_C:=obsidianhtml_check()
-        QUARTO_C:=quarto_check()
+            , OHTML_C:=obsidianhtml_check()
+            , QUARTO_C:=quarto_check()
         if (!RS_C[1]) {
             ttip("rscript not available")
             if (InStr(rscript_path,"`n")){
                 rscript_path:=StrReplace(rscript_path, "`r`n")
-                rscript_path:=StrSplit(rscript_path)
-                found:=false
+                    , rscript_path:=StrSplit(rscript_path)
+                    , found:=false
                 for _, path in rscript_path { ;; check if an installation of rscript is found; then check if there are multiple
                     if !InStr(path,".exe") { ;; skip wrong file formats.
                         continue
                     }
                     if (FileExist(path)) { ;; if a qualified hit is found, reassign it to the required variable, then break out.
                         found:=true
-                        rscript_path:=path
+                            , rscript_path:=path
                         break
                     }
                 }
@@ -92,8 +92,8 @@ main() {
             FileCreateDir % script.configfolder
         }
         setupDefaultConfig(script.configfile,RS_C,OHTML_C,QUARTO_C)
-        script.load()
-        writeFile(A_ScriptDir "\INI-Files\ObsidianKnittr_Version.ini",script.config.Version.ObsidianKnittr_Version,"UTF-16")
+            , script.load()
+            , writeFile(A_ScriptDir "\INI-Files\ObsidianKnittr_Version.ini",script.config.Version.ObsidianKnittr_Version,"UTF-16")
     }
     FileRead ObsidianKnittr_Version, % A_ScriptDir "\INI-Files\ObsidianKnittr_Version.ini"
     EL.ObsidianKnittr_Version:=script.version:=script.config.version.ObsidianKnittr_Version:=Regexreplace(ObsidianKnittr_Version,"\s*")
@@ -144,7 +144,7 @@ main() {
                 CLIArgs.noIntermediates:=1
             }
             CLIArgs.path:=StrReplace(CLIArgs.path, "/","\")
-            script.config.LastRun.manuscriptpath:=CLIArgs.path
+                , script.config.LastRun.manuscriptpath:=CLIArgs.path
                 , script.config.LastRun.manuscriptpath:=CLIArgs.path
                 , script.config.DDLHistory:=buildHistory(script.config.DDLHistory,script.config.Config.HistoryLimit,script.config.LastRun.manuscriptpath)
                 , script.config.LastRun.last_output_type:=CLIArgs.format
@@ -159,7 +159,7 @@ main() {
         }
     }
     formats:=""
-    bAutoSubmitOTGUI:=false
+        , bAutoSubmitOTGUI:=false
     for _,format in out.Outputformats {
         if format.SkipGUI {
             bAutoSubmitOTGUI:=format.SkipGUI
@@ -171,7 +171,7 @@ main() {
         formats.=_ ", "
     }
     formats:=SubStr(formats,1,StrLen(formats)-2)
-    output_type:=out.sel
+        , output_type:=out.sel
     if (HasVal(output_type,"First in YAML")) {
         output_type:=""
     }
@@ -201,8 +201,8 @@ main() {
 
 
     tmpconfig:=createTemporaryObsidianHTML_Config(manuscriptpath, obsidianhtml_configfile,bConvertInsteadofRun)
-    EL.configtemplate_path:=obsidianhtml_configfile
-    EL.configfile_contents:=tmpconfig[2]
+        , EL.configtemplate_path:=obsidianhtml_configfile
+        , EL.configfile_contents:=tmpconfig[2]
     ttip(TrayString:="Running ObsidianHTML",5)
     if (CLIArgs!="") {
         Menu Tray,Tip, % TrayString  "`n" CLIArgs.path
@@ -217,8 +217,8 @@ main() {
     Codetimer_Log()
 
     OHTML_OutputDir:=Deref(script.config.config.OHTML_OutputDir)
-    OHTML_WorkDir:=Deref(script.config.config.OHTML_WorkDir)
-    OHTML_WorkDir_OwnFork := script.config.Config.OHTML_WorkDir_OwnFork ; "D:\Dokumente neu\ObsidianPluginDev\obsidian-html"
+        , OHTML_WorkDir:=Deref(script.config.config.OHTML_WorkDir)
+        , OHTML_WorkDir_OwnFork := script.config.Config.OHTML_WorkDir_OwnFork ; "D:\Dokumente neu\ObsidianPluginDev\obsidian-html"
     if (bRestrictOHTMLScope) {
         if (CLIArgs!="") && (FileExist(CLIArgs.path)) {
             if (CLIArgs.OHTMLLevel!="") {
@@ -249,16 +249,16 @@ main() {
         tempOVaultRoot:=removeTemporaryObsidianVaultRoot(OHTMLScopeRestrictor_Object.Path,OHTMLScopeRestrictor_Object.Graph)
         if tempOVaultRoot.Removed {
             EL.temporaryVaultpath:=OHTMLScopeRestrictor_Object.Path 
-            EL.temporaryVaultpathRemoved:="Yes"
+                , EL.temporaryVaultpathRemoved:="Yes"
         } else {
             if tempOVaultRoot.IsVaultRoot {
                 EL.temporaryVaultpath:=OHTMLScopeRestrictor_Object.Path
-                EL.temporaryVaultpathRemoved:="No - vault root"
+                    , EL.temporaryVaultpathRemoved:="No - vault root"
             } else {
 
             }
             EL.temporaryVaultpath:=OHTMLScopeRestrictor_Object.Path
-            EL.temporaryVaultpathRemoved:="No - not removed, but not vault root"
+                , EL.temporaryVaultpathRemoved:="No - not removed, but not vault root"
         }
     }
     EL.ObsidianHTML_Duration:=Codetimer_Log()
@@ -275,10 +275,10 @@ main() {
         if FileExist(ret.OutputPath) {
             _:=SubStr(ret.OutputPath,-1)
             vMDPath:=strreplace(ret.OutputPath (SubStr(ret.OutputPath,-1)="md"?"":"/md"),"//","\")
-            vMDPath:=strreplace(vMDPath ,"/","\")
+                , vMDPath:=strreplace(vMDPath ,"/","\")
         }
         vMDPath:=Trim(vMDPath)
-        vMDPath:=strreplace(vMDPath,"`n")
+            , vMDPath:=strreplace(vMDPath,"`n")
         script.config.version.ObsidianHTML_Version:=strreplace(ret.obsidianhtml_Version,"`n")
         if !FileExist(vMDPath) {
             MsgBox 0x40010, % script.name, % "File md_Path does not seem to exist. Please check manually."
@@ -313,11 +313,11 @@ main() {
         Menu Tray,Tip, % TrayString
     }
     Destination:=(InStr(Deref(ExecutionDirectory),A_Desktop)?0:ExecutionDirectory)
-    rmd_Path:=copyBack(rmd_Path,Destination,manuscriptpath)
+        , rmd_Path:=copyBack(rmd_Path,Destination,manuscriptpath)
     SplitPath % rmd_Path,, OutDir
     rawinputCopyLocation:=regexreplace(OutDir "\" out.manuscriptName "_vault.md ","\\{2,}","\")
-    EL.output_path
-    EL.rawInputcopyLocation:=rawinputCopyLocation
+        , EL.output_path
+        , EL.rawInputcopyLocation:=rawinputCopyLocation
     ; 7
     ttip(TrayString:="Converting Image SRC's")
     if (CLIArgs!="") {
@@ -349,27 +349,27 @@ main() {
                 Menu Tray,Tip, % TrayString
             }
             qmdContents:=convertToQMD(NewContents,bRemoveQuartoReferenceTypesFromCrossrefs)
-            qmd_Path:=strreplace(rmd_Path,".rmd",".qmd")
+                , qmd_Path:=strreplace(rmd_Path,".rmd",".qmd")
             break                                               ;; if a format is of quarto, run the quarto-conversion once, then continue on.
         }
     }
     NewContents:=cleanLatexEnvironmentsforRMarkdown(NewContents)
-    NewContents:=fixNullFields(NewContents)
-    EL.Intermediary_Duration:=Codetimer_Log()
-    EL.Intermediary_End:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
+        , NewContents:=fixNullFields(NewContents)
+        , EL.Intermediary_Duration:=Codetimer_Log()
+        , EL.Intermediary_End:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
 
     ;; R
     EL.RScriptExecution_Start:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
-    Codetimer_Log()
-    writeFile(rmd_Path,NewContents,"UTF-8",,true)
+        , Codetimer_Log()
+        , writeFile(rmd_Path,NewContents,"UTF-8",,true)
     if (qmd_Path!="") {
         if (CLIArgs.HasKey("--noMove")) {
             qmd_Path:=Regexreplace(manuscriptpath,".md$",".qmd")
-            qmdContents:=quartopurgeTags(qmdContents)
+                , qmdContents:=quartopurgeTags(qmdContents)
             if (CLIArgs.HasKey("--noIntermediates")) {
                 d:=strreplace(manuscriptpath,"/","\")
-                d:=strreplace(d,".md")
-                d:=strreplace(d,".qmd")
+                    , d:=strreplace(d,".md")
+                    , d:=strreplace(d,".qmd")
                 FileRemoveDir % d, % true
             }
         }
@@ -392,7 +392,7 @@ main() {
         }
         if (qmd_Path!="") {
             tmp.1:=modifyQuartobuildscript(tmp.1,tmp.3,out)
-            EL.Quarto_Version:=quartogetVersion()
+                , EL.Quarto_Version:=quartogetVersion()
         }
     }
     format:=tmp.2
@@ -425,14 +425,14 @@ main() {
                 ret:=["","",OutDir]
                 for _, output_type in out.sel {
                     write_quarto_yaml(out.Outputformats[output_type],OutDir,"qCLI_yaml_" out.Outputformats[output_type].filesuffix ".yaml")
-                    cmd:="quarto render index.qmd --to " out.Outputformats[output_type].filesuffix 
-                    cmd.=" --metadata-file=""qCLI_yaml_" out.Outputformats[output_type].filesuffix ".yaml"""
-                    cmd.=" --output """ out.Outputformats[output_type].Filename out.Outputformats[output_type].FilenameMod "."  out.Outputformats[output_type].filesuffix """"
-                    GetStdStreams_WithInput(CMD, OutDir, InOut:="`n")
+                        , cmd:="quarto render index.qmd --to " out.Outputformats[output_type].filesuffix 
+                        , cmd.=" --metadata-file=""qCLI_yaml_" out.Outputformats[output_type].filesuffix ".yaml"""
+                        , cmd.=" --output """ out.Outputformats[output_type].Filename out.Outputformats[output_type].FilenameMod "."  out.Outputformats[output_type].filesuffix """"
+                        , GetStdStreams_WithInput(CMD, OutDir, InOut:="`n")
                         , ret[1].="`nFormat " output_type ":`n" InOut
                         , ret[2].=CMD
                         , Clipboard:=InOut
-                    writeFile(OutDir "\build_" out.Outputformats[output_type].filesuffix ".cmd",CMD,"UTF-8-RAW",,true)
+                        , writeFile(OutDir "\build_" out.Outputformats[output_type].filesuffix ".cmd",CMD,"UTF-8-RAW",,true)
                 }
                 EL.Rdata_out:=ret[1]
                     , EL.RCMD:=ret[2]
@@ -478,11 +478,6 @@ main() {
         , EL.RScriptExecution_Duration:=Codetimer_Log()
         , EL.RScriptExecution_End:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
         , EL.getTotalDuration(ATC1,A_TickCount)
-    if InStr(Rdata_out,"[1] ""Total Time for codechunks:""") {
-        t:=StrSplit(Rdata_out,"[1] ""Total Time for codechunks:""")
-            , t2:=StrSplit(t[2],"`n",,3).2
-            , EL.RCodeChunkExecutionTime:=Round(SubStr(t2,5),3)
-    }
     ;; final touches - ahk starter, moving shit to output folder
     if (!script.config.config.useQuartoCLI) {
         ttip(TrayString:="Building AHK-Starterscript",5)
@@ -531,8 +526,8 @@ buildAHKScriptContent(Path,RScript_Path:="") {
     SplitPath % Path,, OutDir
     if script.config.config.bundleStarterScript && (RScript_Path!="") {
         RSCRIPT_PATH:=RScript_Path
-        BUILD_RPATH:=strreplace(OutDir "\build.R","\","\\")
-        OUTDIR_PATH:=OutDir
+            , BUILD_RPATH:=strreplace(OutDir "\build.R","\","\\")
+            , OUTDIR_PATH:=OutDir
         AHK_Build=
             (Join`s LTRIM
                 #Requires AutoHotkey v1.1.36+
@@ -564,7 +559,7 @@ copyBack(Source,Destination,manuscriptpath) {
 }
 convertMDToRMD(md_Path,notename) {
     OldName:=md_Path "\" notename ".md"
-    NewName:=md_Path "\" notename ".rmd"
+        , NewName:=md_Path "\" notename ".rmd"
     FileCopy % OldName, % NewName, true
     return NewName
 }
@@ -612,7 +607,6 @@ processTags(Contents,bRemoveHashTagFromTags) {
     AlreadyReplaced:=""
     if Instr(Contents,"_obsidian_pattern") {
         Tags:=Strsplit(Contents,"tags:").2
-
         ;; eliminate duplicates
         Lines:=strsplit(Tags,"`r`n")
         Tags:=""
@@ -691,13 +685,13 @@ processTags(Contents,bRemoveHashTagFromTags) {
             }
             ;rebuild.="---"
             Contents:=strreplace(Contents,OrigTags,rebuild)
-            Contents:=StrReplace(Contents,"---`r`n---", "`r`n---`r`n",,1)
-            Contents:=StrReplace(Contents,"`r`n`r`n", "`r`n",,1)
+                , Contents:=StrReplace(Contents,"---`r`n---", "`r`n---`r`n",,1)
+                , Contents:=StrReplace(Contents,"`r`n`r`n", "`r`n",,1)
         }
         Matches:=RegexMatchAll(Contents,"(?<IDStart>\{_obsidian_pattern_tag_)(?<Tag>.+)(?<IDEnd>}`)")
         for _, match in Matches {
             _match:=match[0]
-            Contents:=strreplace(Contents,"``" _match "``",(bRemoveHashTagFromTags?"":"#") match[2])
+                , Contents:=strreplace(Contents,"``" _match "``",(bRemoveHashTagFromTags?"":"#") match[2])
         }
     }
     ;;  TODO: regexreplaceall for these patterns: "`{_obsidian_pattern_tag_XXXX}", as they are not found in the frontmatter and thus are not replaced
@@ -710,8 +704,8 @@ guiCreate(runCLI) {
         setupDefaultDA(A_ScriptDir "\INI-Files\DynamicArguments.ini")
     }
     ret:=getDefinedOutputFormats(A_ScriptDir "\INI-Files\DynamicArguments.ini")
-    PotentialOutputs:=ret[1]
-    filesuffixes:=ret[2]
+        , PotentialOutputs:=ret[1]
+        , filesuffixes:=ret[2]
     Gui Margin, 16, 16
     Gui +AlwaysOnTop -SysMenu -ToolWindow -caption +Border +LabelGC +hwndOKGui
     Gui Color, 1d1f21, 373b41,
@@ -731,7 +725,7 @@ guiCreate(runCLI) {
         }
     }
     ExecutionDirectories:=script.config.config.OHTML_OutputDir "||"
-    DDLRows:=(script.config.Config.HistoryLimit>25?25:script.config.Config.HistoryLimit)
+        , DDLRows:=(script.config.Config.HistoryLimit>25?25:script.config.Config.HistoryLimit)
     gui add, text, % "yp+25 xp+10 w" WideControlWidth -  3*5, % "Choose execution directory for OHTML"
     gui add, Radio,% "vExecutionDirectory Checked",% "&1. OHTML-Output-Dir"
     gui add, Radio, ,% "&2. subfolder of note-location in vault"
@@ -857,7 +851,7 @@ getDefinedOutputFormats(Path) {
         FileRead FileString, % Path
         if (!InStr(FileString,"`r`n") && InStr(FileString,"`n")) {
             FileString:=StrReplace(FileString, "`n","`r`n")
-            writeFile(Path,FileString,Encoding:="",Flags:=0x2,bSafeOverwrite:=true)
+            writeFile(Path,FileString,,,true)
             FileRead FileString, % Path
         }
         Lines:=strsplit(FileString,"`r`n")
@@ -871,9 +865,9 @@ getDefinedOutputFormats(Path) {
             } else {
                 if (RegexMatch(Line,"m)^\S")) {
                     Pos:=HasVal(PotentialOutputs,Line)
-                    PotentialOutputs.RemoveAt(Pos,1)
-                    Arr.push(Line)
-                    bFindSuffix:=true
+                        , PotentialOutputs.RemoveAt(Pos,1)
+                        , Arr.push(Line)
+                        , bFindSuffix:=true
                 }
             }
             if (bFindSuffix) {
@@ -895,12 +889,12 @@ GCAutoSubmit() {
 guiShow(runCLI:=FALSE,CLIArgs:="") {
     global
     filesuffixes:=guiCreate(runCLI)
-    x:=(script.config.GuiPositioning.X!=""?script.config.GuiPositioning.X:200)
-    y:=(script.config.GuiPositioning.Y!=""?script.config.GuiPositioning.Y:200)
-    bAutoSubmitOTGUI:=false
-    guiWidth:=2*WideControlWidth + 32
-    guiHeight:=595
-    currentMonitor:=MWAGetMonitor()+0
+        , x:=(script.config.GuiPositioning.X!=""?script.config.GuiPositioning.X:200)
+        , y:=(script.config.GuiPositioning.Y!=""?script.config.GuiPositioning.Y:200)
+        , bAutoSubmitOTGUI:=false
+        , guiWidth:=2*WideControlWidth + 32
+        , guiHeight:=595
+        , currentMonitor:=MWAGetMonitor()+0
     SysGet MonCount, MonitorCount
     if (MonCount>1) {
         SysGet Mon, Monitor,% currentMonitor
@@ -1015,8 +1009,8 @@ guiShow(runCLI:=FALSE,CLIArgs:="") {
     }
     if (!A_Args.length()) {
         atmp:=getPotentialWorkDir(ChosenFile,ExecutionDirectory)
-        ExecutionDirectory:=(atmp.relativeToNote=1?script.config.config.OHTML_OutputDir:atmp.ExecutionDirectories)
-        ExecutionDirectory:=ExecutionDirectory . (SubStr(ExecutionDirectory,0)!="\"?"\":"")
+            , ExecutionDirectory:=(atmp.relativeToNote=1?script.config.config.OHTML_OutputDir:atmp.ExecutionDirectories)
+            , ExecutionDirectory:=ExecutionDirectory . (SubStr(ExecutionDirectory,0)!="\"?"\":"")
     } else {
         if (CLIArgs.noMove) {
             atmp:=getPotentialWorkDir(CLIArgs.Path,CLIArgs.LastExecutionDirectory)
@@ -1025,9 +1019,9 @@ guiShow(runCLI:=FALSE,CLIArgs:="") {
             ExecutionDirectory:=OutDir . (SubStr(OutDir,0)!="\"?"\":"")
         } else {
             atmp:=getPotentialWorkDir(CLIArgs.Path,CLIArgs.LastExecutionDirectory)
-            script.config.LastRun.LastExecutionDirectory:=atmp.relativeToNote
-            ExecutionDirectory:=(atmp.relativeToNote=1?script.config.config.OHTML_OutputDir:atmp.ExecutionDirectories)
-            ExecutionDirectory:=ExecutionDirectory . (SubStr(ExecutionDirectory,0)!="\"?"\":"")
+                , script.config.LastRun.LastExecutionDirectory:=atmp.relativeToNote
+                , ExecutionDirectory:=(atmp.relativeToNote=1?script.config.config.OHTML_OutputDir:atmp.ExecutionDirectories)
+                , ExecutionDirectory:=ExecutionDirectory . (SubStr(ExecutionDirectory,0)!="\"?"\":"")
         }
     }
     if (manuscriptpath!="") && !ot.bClosedNoSubmit {
@@ -1082,10 +1076,10 @@ guiSubmit() {
         ChosenFile:=Trim(StrSplit(chosenFile,"-<>-").2)
     }
     ChosenFile:=strreplace(ChosenFile,"/","\")
-    manuscriptpath:=ChosenFile
+        , manuscriptpath:=ChosenFile
     if (script.config.LastRun.manuscriptpath!="") && (manuscriptpath="") {
         manuscriptpath:=script.config.LastRun.manuscriptpath
-        bVerboseCheckbox:=bVerboseCheckbox+0
+            , bVerboseCheckbox:=bVerboseCheckbox+0
     }
     if (manuscriptpath="") && (sel.count()=0) {
         if (script.config.LastRun.manuscriptpath!="") && (script.config.LastRun.last_output_type!="") {
@@ -1095,30 +1089,30 @@ guiSubmit() {
                 sel:=script.config.lastrun.last_output_type
             }
             manuscriptpath:=script.config.lastrun.manuscriptpath
-            bVerboseCheckbox:=script.config.LastRun.Verbose+0
+                , bVerboseCheckbox:=script.config.LastRun.Verbose+0
         }
     }
     if !FileExist(manuscriptpath) {
         manuscriptpath:=chooseFile()
     }
     script.config.LastRun.path_lastmanuscript:=script.config.LastRun.manuscriptpath
-    script.config.LastRun.manuscriptpath:=manuscriptpath
-    script.config.LastRun.last_output_type:=""
-    script.config.LastRun.Verbose:=bVerboseCheckbox+0
-    script.config.LastRun.RestrictOHTMLScope:=bRestrictOHTMLScope+0
-    script.config.LastRun.Conversion:=bSRCConverterVersion+0
-    script.config.LastRun.KeepFileName:=bKeepFilename+0
-    script.config.LastRun.RenderToOutputs:=bExecuteRScript+0
-    script.config.LastRun.BackupOutput:=bBackupOutput+0
-    script.config.LastRun.RemoveHashTagFromTags:=bRemoveHashTagFromTags+0
-    script.config.LastRun.ForceFixPNGFiles:=bForceFixPNGFiles+0
-    script.config.LastRun.InsertSetupChunk:=bInsertSetupChunk+0
-    script.config.LastRun.ConvertInsteadofRun:=bConvertInsteadofRun+0
-    script.config.LastRun.RemoveObsidianHTMLErrors:=bRemoveObsidianHTMLErrors+0
-    script.config.LastRun.bStripLocalMarkdownLinks:=bStripLocalMarkdownLinks+0
-    script.config.LastRun.UseOwnOHTMLFork:=bUseOwnOHTMLFork+0
-    script.config.LastRun.RemoveQuartoReferenceTypesFromCrossrefs:=bRemoveQuartoReferenceTypesFromCrossrefs+0
-    script.config.DDLHistory:=buildHistory(script.config.DDLHistory,script.config.Config.HistoryLimit,script.config.LastRun.manuscriptpath)
+        , script.config.LastRun.manuscriptpath:=manuscriptpath
+        , script.config.LastRun.last_output_type:=""
+        , script.config.LastRun.Verbose:=bVerboseCheckbox+0
+        , script.config.LastRun.RestrictOHTMLScope:=bRestrictOHTMLScope+0
+        , script.config.LastRun.Conversion:=bSRCConverterVersion+0
+        , script.config.LastRun.KeepFileName:=bKeepFilename+0
+        , script.config.LastRun.RenderToOutputs:=bExecuteRScript+0
+        , script.config.LastRun.BackupOutput:=bBackupOutput+0
+        , script.config.LastRun.RemoveHashTagFromTags:=bRemoveHashTagFromTags+0
+        , script.config.LastRun.ForceFixPNGFiles:=bForceFixPNGFiles+0
+        , script.config.LastRun.InsertSetupChunk:=bInsertSetupChunk+0
+        , script.config.LastRun.ConvertInsteadofRun:=bConvertInsteadofRun+0
+        , script.config.LastRun.RemoveObsidianHTMLErrors:=bRemoveObsidianHTMLErrors+0
+        , script.config.LastRun.bStripLocalMarkdownLinks:=bStripLocalMarkdownLinks+0
+        , script.config.LastRun.UseOwnOHTMLFork:=bUseOwnOHTMLFork+0
+        , script.config.LastRun.RemoveQuartoReferenceTypesFromCrossrefs:=bRemoveQuartoReferenceTypesFromCrossrefs+0
+        , script.config.DDLHistory:=buildHistory(script.config.DDLHistory,script.config.Config.HistoryLimit,script.config.LastRun.manuscriptpath)
 
     for each,output_type in sel {
         script.config.LastRun.last_output_type.=output_type
@@ -1129,7 +1123,7 @@ guiSubmit() {
     }
     if (!A_Args.length()) { ;; only change config when running in GUI mode
         script.config.LastRun.manuscriptpath:=StrReplace(script.config.LastRun.manuscriptpath, "/","\")
-        script.save()
+            , script.save()
     }
     return [DDLval,manuscriptpath,sel]
 }
@@ -1147,14 +1141,14 @@ buildHistory(History,NumberOfRecords,manuscriptpath:="") {
 }
 getSelectedLVEntries() {
     vRowNum:=0
-    sel:=[]
+        , sel:=[]
     loop {
         vRowNum:=LV_GetNext(vRowNum,"C")
         if not vRowNum {
             break ; The above returned zero, so there are no more selected rows.
         }
         LV_GetText(sCurrText1,vRowNum,1)
-        sel.push(sCurrText1)
+            , sel.push(sCurrText1)
     }
     return sel
 }
@@ -1169,8 +1163,6 @@ editMainConfig(configfile) {
     OnMessage(0x44, "")
     IfMsgBox Yes, {
         reload
-    } Else IfMsgBox No, {
-
     }
 }
 chooseFile() {
@@ -1195,7 +1187,7 @@ chooseFile() {
         }
     }
     script.config.DDLHistory:=buildHistory(script.config.DDLHistory,script.config.Config.HistoryLimit,manuscriptpath)
-    HistoryString:=""
+        , HistoryString:=""
     for each, File in script.config.DDLHistory {
         SplitPath % File, , OutDir, , FileName
         SplitPath % OutDir,OutFileName
