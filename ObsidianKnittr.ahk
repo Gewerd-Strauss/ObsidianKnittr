@@ -344,21 +344,21 @@ main() {
                 ttip(-1)
                 notify("Executing quarto-CLI",CLIArgs)
                 SplitPath % rmd_Path,, OutDir
-                ret:=["","",OutDir]
+                quarto_ret:=["","",OutDir]
                 for _, output_type in guiOut.sel {
                     write_quarto_yaml(guiOut.Outputformats[output_type],OutDir,"qCLI_yaml_" guiOut.Outputformats[output_type].filesuffix ".yaml")
                         , CMD:="quarto render index.qmd --to " guiOut.Outputformats[output_type].filesuffix 
                         , CMD.=" --metadata-file=""qCLI_yaml_" guiOut.Outputformats[output_type].filesuffix ".yaml"""
                         , CMD.=" --output """ guiOut.Outputformats[output_type].Filename guiOut.Outputformats[output_type].FilenameMod "."  guiOut.Outputformats[output_type].filesuffix """"
                         , GetStdStreams_WithInput(CMD, OutDir, InOut:="`n")
-                        , ret[1].="`nFormat " output_type ":`n" InOut
-                        , ret[2].=CMD
+                        , quarto_ret[1].="`nFormat " output_type ":`n" InOut
+                        , quarto_ret[2].=CMD
                         , Clipboard:=InOut
                         , writeFile(OutDir "\build_" guiOut.Outputformats[output_type].filesuffix ".cmd",CMD,"UTF-8-RAW",,true)
                 }
-                EL.Rdata_out:=ret[1]
-                    , EL.RCMD:=ret[2]
-                    , EL.RWD:=ret[3]
+                EL.Rdata_out:=quarto_ret[1]
+                    , EL.RCMD:=quarto_ret[2]
+                    , EL.RWD:=quarto_ret[3]
             }
         }
     } else {
@@ -373,10 +373,10 @@ main() {
             if script.config.config.backupCount {
                 limitBackups(BackupDirectory,script.config.config.backupCount)
             }
-            ret:=runRScript(rmd_Path,script_contents,Outputformats,script.config.config.RScriptPath)
-            EL.Rdata_out:=ret[1]
-                , EL.RCMD:=ret[2]
-                , EL.RWD:=ret[3]
+            rscript_ret:=runRScript(rmd_Path,script_contents,Outputformats,script.config.config.RScriptPath)
+            EL.Rdata_out:=rscript_ret[1]
+                , EL.RCMD:=rscript_ret[2]
+                , EL.RWD:=rscript_ret[3]
         } Else {
             notify("Opening RMD-File",CLIArgs)
             SplitPath % rmd_Path,, OutDir
@@ -408,7 +408,11 @@ main() {
     SplitPath % rmd_Path,, OutDir
     FileMove % EL.__path, % OutDir "\Executionlog.txt",true
     removeTempDir(md_Path)
-    removeTempDir(ret.OutputPath)
+    if (FileExist(quarto_ret.Output_Path)) {
+        removeTempDir(quarto_ret.OutputPath)
+    } else if (FileExist(rscript_ret.Output_Path)) {
+        removeTempDir(rscript_ret.OutputPath)
+    }
     if (!A_Args.length()) { ;; only change config when running in GUI mode
         script.config.LastRun.manuscriptpath:=StrReplace(script.config.LastRun.manuscriptpath, "/","\")
         script.save()
