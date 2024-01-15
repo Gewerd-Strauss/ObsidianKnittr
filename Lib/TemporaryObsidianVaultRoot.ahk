@@ -49,7 +49,7 @@ findObsidianVaultRootFromNote(path,reset:=false) {
     if (SubStr(path,0)="\") ;; remove "\" from folder path if present
         path:=SubStr(path,1,StrLen(path)-1)
 
-    SplitPath % path,OutFileName, OutDir
+    SplitPath % quote(path),OutFileName, OutDir
     OutputDebug % (InStr(FileExist(path),"D")?"Directory":"File")
     if !InStr(FileExist(path),"D") { ;; path is a file, so use OutDir as path
         path:=OutDir
