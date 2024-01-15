@@ -132,12 +132,8 @@ modifyQuartobuildscript(script_contents,RScriptFolder,out) {
             , yaml_fnmod:=[]
             , match:=Matches[1]
             , fullmatch:=match[0]
-        ; , fullchunk:=match[1]
             , yamlpart:=match[2]
-        ; , a:=match[3]
             , b:=match[4]
-        ; , c:=match[5]
-        ; , d:=match[6]
             , replacablepart:=strsplit(fullmatch,"`n`n").1
             , yamlPath:=RScriptFolder "/yaml"
             , Format:=Trim(Trim(strsplit(b,""",""").1))
@@ -154,8 +150,6 @@ modifyQuartobuildscript(script_contents,RScriptFolder,out) {
                 . out.Outputformats[val]["filenameMod"]
                 . "."
                 . out.Outputformats[val]["filesuffix"]
-
-
         }
         script_contents:=StrReplace(script_contents,replacablepart,"pandoc_args = c(""--metadata-file"",""%YAMLPATH%"")"",output_format = """ Format """,output_file = ""%manuscriptname%"")" )
         yamlcode:= "`n"               "yaml::write_yaml(%yamlpart%,""%yamlPath%"")"
