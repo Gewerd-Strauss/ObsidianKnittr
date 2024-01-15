@@ -79,11 +79,11 @@ main() {
             rscript_path:=RS_C[2]
         }
         if (!OHTML_C[1]) {
-            ttip("ObsidianHTML not available")
-        } else {
-            ;obsidianhtml_path:=OHTML_C[2]
+            ttip()
+            Message:="The external python 3.11-package ObsidianHTML was not found.`nWithout this package, this program cannot function. Please set up ObsidianHTML first, then rerun this program."
+                , Title:="External Dependency not found."
+            AppError(Title, Message)
         }
-
         if (!QUARTO_C[1]) {
             ttip("quarto not available")
         }
