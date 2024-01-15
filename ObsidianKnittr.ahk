@@ -266,29 +266,6 @@ main() {
         , EL.ObsidianHTMLCopyDir:=ret["ObsidianHTMLCopyDir"]
         , EL.CMD:=ret["CMD"]
         , EL.data_out:=ret["stdOut"]
-    if RegExMatch(ret["stdOut"], "md: (?<MDPath>.*)(\s*)", v) || FileExist(ret.OutputPath) {
-        if FileExist(ret.OutputPath) {
-            _:=SubStr(ret.OutputPath,-1)
-            vMDPath:=strreplace(ret.OutputPath (SubStr(ret.OutputPath,-1)="md"?"":"/md"),"//","\")
-                , vMDPath:=strreplace(vMDPath ,"/","\")
-        }
-        vMDPath:=Trim(vMDPath)
-            , vMDPath:=strreplace(vMDPath,"`n")
-        script.config.version.ObsidianHTML_Version:=strreplace(ret.obsidianhtml_Version,"`n")
-        if !FileExist(vMDPath) {
-            MsgBox 0x40010, % script.name, % "File md_Path does not seem to exist. Please check manually."
-        }
-    } else {
-        if RegExMatch(ret["stdOut"], "Created empty output folder path (?<MDPath>.*)(\s*)", v) {
-            if !FileExist(vMDPath) {
-                MsgBox 0x40010, % script.name, % "File md_Path does not seem to exist. Please check manually."
-            }
-        } else {
-            MsgBox 0x40010, % script.name " - Output could not be parsed.", % "DO NOT CONTINUE WITHOUT FULLY READING THIS!`n`nThe command line output of obsidianhtml does not contain the required information.`nThe output has been copied to the clipboard, and written to file under '" A_ScriptDir "\Executionlog.txt" "'`n`nTo carry on, find the path of the md-file and copy it to your clipboard.`nONLY THEN close this window."
-            Clipboard:=ttip_Obj2Str(ret)
-
-        }
-    }
 
     ;; Intermediary
     EL.Intermediary_Start:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec

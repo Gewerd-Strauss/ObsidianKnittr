@@ -114,7 +114,37 @@
             ,"OutputPath":OHTML_Output
             ,"ObsidianHTMLCopyDir":ObsidianHTMLCopyDir}
 }
-
+getObsidianHTML_MDPath(obsidianhtml_ret) {
+    if RegExMatch(obsidianhtml_ret["stdOut"], "md: (?<MDPath>.*)(\s*)", v) || FileExist(obsidianhtml_ret.OutputPath) {
+        if FileExist(obsidianhtml_ret.OutputPath) {
+            _:=SubStr(obsidianhtml_ret.OutputPath,-1)
+            vMDPath:=strreplace(obsidianhtml_ret.OutputPath (SubStr(obsidianhtml_ret.OutputPath,-1)="md"?"":"/md"),"//","\")
+                , vMDPath:=strreplace(vMDPath ,"/","\")
+        }
+        vMDPath:=Trim(vMDPath)
+            , vMDPath:=strreplace(vMDPath,"`n")
+        script.config.version.ObsidianHTML_Version:=strreplace(obsidianhtml_ret.obsidianhtml_Version,"`n")
+        if !FileExist(vMDPath) {
+            Title:="'md_Path' not found in stdOut"
+            Message:="File md_Path does not seem to exist. Please check manually."
+            AppError(Title, Message,," > " A_ThisFunc)
+        }
+    } else {
+        if RegExMatch(obsidianhtml_ret["stdOut"], "Created empty output folder path (?<MDPath>.*)(\s*)", v) {
+            if !FileExist(vMDPath) {
+                Title:="'md_Path' not found in stdOut"
+                Message:="File md_Path does not seem to exist. Please check manually."
+                AppError(Title, Message,," > " A_ThisFunc)
+            }
+        } else {
+            Title:="Output could not be parsed."
+            Message:="DO NOT CONTINUE WITHOUT FULLY READING THIS!`n`nThe command line output of obsidianhtml does not contain the required information.`nThe output has been copied to the clipboard, and written to file under '" A_ScriptDir "\Executionlog.txt" "'`n`nTo carry on, find the path of the md-file and copy it to your clipboard.`nONLY THEN close this window."
+            AppError(Title, Message,," > " A_ThisFunc)
+            Clipboard:=ttip_Obj2Str(obsidianhtml_ret)
+        }
+    }
+    return vMDPath
+}
 getObsidianHTML_WD(String) {
     NeedleTxt:="
         (LTRIM
