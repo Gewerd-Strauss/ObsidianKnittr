@@ -1137,6 +1137,11 @@ buildHistory(History,NumberOfRecords,manuscriptpath:="") {
     if (History.Count()>NumberOfRecords) {
         History.Delete(NumberOfRecords+1,History.Count())
     }
+    h:=[]
+    for _, file in History {
+        h.push(file)
+    }
+    History:=h.clone()
     return History
 }
 getSelectedLVEntries() {
