@@ -893,8 +893,8 @@ guiShow(runCLI:=FALSE,CLIArgs:="") {
             , bStripLocalMarkdownLinks := (script.config.LastRun.bStripLocalMarkdownLinks)
             , bUseOwnOHTMLFork := (script.config.LastRun.UseOwnOHTMLFork)
             , bRemoveQuartoReferenceTypesFromCrossrefs := (script.config.LastRun.RemoveQuartoReferenceTypesFromCrossrefs)
-            , Button2 := (script.config.LastRun.LastExecutionDirectory=1?1:0)
-            , Button3 := (script.config.LastRun.LastExecutionDirectory=1?0:1)
+        ; , Button2 := (script.config.LastRun.LastExecutionDirectory=1?1:0)
+        ; , Button3 := (script.config.LastRun.LastExecutionDirectory=1?0:1)
     }
     Outputformats:={}
     for _, format in sel {
