@@ -990,7 +990,7 @@ guiSubmit() {
     gui submit
     gui destroy
     if Instr(ChosenFile,"-<>-") {
-        ChosenFile:=Trim(StrSplit(chosenFile,"-<>-").2)
+        ChosenFile:=Trim(StrSplit(ChosenFile,"-<>-").2)
     }
     ChosenFile:=strreplace(ChosenFile,"/","\")
         , manuscriptpath:=ChosenFile
