@@ -1,5 +1,4 @@
 ﻿ObsidianHtml(manuscript_path:="",config_path:="",bUseConvert:=true,bUseOwnOHTMLFork:=false,bVerbose:=false,OutputDir="",WorkDir:="",WorkDir_OwnFork:="",ScopeRestrictorObject:="") {
-
     if (WorkDir="") {
         WorkDir:= A_Desktop "\ObsidianHTMLOutput"
     }
@@ -15,7 +14,9 @@
             obsidianhtml_path:=obsidianhtml_check().2
             obsidianhtml_path:=Trim(obsidianhtml_path)
         } else {
-            MsgBox 0x2010, script.name " - ObsidianHTML not found ", "The CLI-Utility ObsidianHTML could not be found via 'where obsidianhtml'.`nAs this script is not functional without it, it will exit now."
+            Message:="The external python 3.11-CLI-utility ObsidianHTML could not be found via 'where obsidianhtml'.`nAs this script is not functional without it, it will exit now.`nWithout this package, this program cannot function. Please set up ObsidianHTML first, then rerun this program."
+            Title:="External Dependency not found."
+            AppError(Title, Message,," > " A_ThisFunc)
             return false
         }
     }
@@ -30,14 +31,16 @@
 
     ;; Validate config file.
     if (!FileExist(config_path)) {
-        MsgBox 0x2010, script.name " - provided Config file does not exist ", % "The config-file provided to 'obsidianhtml convert - i <config_file> does not exist. Returning early."
+        Message:="The config-file provided to 'obsidianhtml convert - i <config_file> does not exist. Returning early."
+        Title:="provided Config file does not exist"
+        AppError(Title, Message,," > " A_ThisFunc)
         return false
     } else {
         FileRead config_contents, % config_path
         if !Instr(config_contents,"obsidian_entrypoint_path_str: '") && bUseConvert {
-            MsgBox 0x2010
-                , % script.name " - config-field 'obsidian_entrypoint_path_str' not found "
-                , % "The config-file provided does not contain the setting 'obsidian_entrypoint_path_str', which is required for running the 'convert'-option. Please check the code. The script will reload now."
+            Title:="config-field 'obsidian_entrypoint_path_str' not found "
+            Message:="The config-file provided does not contain the setting 'obsidian_entrypoint_path_str', which is required for running the 'convert'-option. Please check the code. The script will reload now."
+            AppError(Title, Message,," > " A_ThisFunc)
             reload
         }
     }
@@ -47,7 +50,9 @@
         command2:= "obsidianhtml convert -i " Quote_ObsidianHTML(Trim(config_path))
     } else {
         if (manuscript_path="") {
-            MsgBox 0x2010, script.name " > " A_ThisFunc, No manuscript_path was provided to the run-verb execution. The script will reload. `n`nPlease provide a valid note-path or choose to convert.
+            Title:="manuscript_path not provided"
+            Message:="No manuscript_path was provided to the run-verb execution. The script will reload. `n`nPlease provide a valid note-path or choose to convert."
+            AppError(Title, Message,," > " A_ThisFunc)
             reload
         }
         command2:= "obsidianhtml run -f " Quote_ObsidianHTML(Trim(manuscript_path)) " -i " Quote_ObsidianHTML(Trim(config_path))
@@ -63,7 +68,9 @@
             GetStdStreams_WithInput("python -m " command2_getversion,WorkDir_OwnFork,ohtmlversion_modded)
         }
         if (script.config.config.ConfirmOHTMLCustomBuild && !bAutoSubmitOTGUI) {
-            MsgBox 0x2034,% "Is the correct build version used?", % "Has the correct build version been used?`n" ohtmlversion_modded "`n`nCMD:`n" command2, 1 ;; TODO: add config option to skip this, and add option to potentially also or never skip this when debugging.
+            Title:="Is the correct build version used?"
+            Message:="Has the correct build version been used?`n" ohtmlversion_modded "`n`nCMD:`n" command2
+            AppError(Title, Message, 0x2034," > " A_ThisFunc,1)
             IfMsgBox No, {
                 if (FileExist(ScopeRestrictorObject.Path) && !ScopeRestrictorObject.IsVaultRoot) {
                     FileRemoveDir % ScopeRestrictorObject.Path
