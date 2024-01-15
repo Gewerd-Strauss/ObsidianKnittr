@@ -236,9 +236,9 @@ main() {
         }
     }
     if (tmpconfig[1] && bConvertInsteadofRun) {
-        ret:=ObsidianHtml(,tmpconfig[1],,bUseOwnOHTMLFork,bVerboseCheckbox,OHTML_OutputDir,OHTML_WorkDir,OHTML_WorkDir_OwnFork,OHTMLScopeRestrictor_Object)
+        obsidianhtml_ret:=ObsidianHtml(,tmpconfig[1],,bUseOwnOHTMLFork,bVerboseCheckbox,OHTML_OutputDir,OHTML_WorkDir,OHTML_WorkDir_OwnFork,OHTMLScopeRestrictor_Object)
     } else {
-        ret:=ObsidianHtml(manuscriptpath,tmpconfig[1],,bUseOwnOHTMLFork,bVerboseCheckbox,OHTML_OutputDir,OHTML_WorkDir,OHTML_WorkDir_OwnFork,OHTMLScopeRestrictor_Object)
+        obsidianhtml_ret:=ObsidianHtml(manuscriptpath,tmpconfig[1],,bUseOwnOHTMLFork,bVerboseCheckbox,OHTML_OutputDir,OHTML_WorkDir,OHTML_WorkDir_OwnFork,OHTMLScopeRestrictor_Object)
     }
     if (bRestrictOHTMLScope) {
         tempOVaultRoot:=removeTemporaryObsidianVaultRoot(OHTMLScopeRestrictor_Object.Path,OHTMLScopeRestrictor_Object.Graph)
@@ -258,15 +258,14 @@ main() {
     }
     EL.ObsidianHTML_Duration:=Codetimer_Log()
         , EL.ObsidianHTML_End:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
-        , EL.obsidianhtml_version:=strreplace(ret.obsidianhtml_version,"`n")
-        , EL.obsidianhtml_path:=ret.obsidianhtml_path
+        , EL.obsidianhtml_version:=strreplace(obsidianhtml_ret.obsidianhtml_version,"`n")
+        , EL.obsidianhtml_path:=obsidianhtml_ret.obsidianhtml_path
         , EL.UsedVerb:=(bConvertInsteadofRun?"Convert":"Run")
-        , EL.ObsidianHTMLWorkDir:=ret["WorkDir"]
-        , EL.ObsidianHTMLOutputpath:=ret["Outputpath"]
-        , EL.ObsidianHTMLCopyDir:=ret["ObsidianHTMLCopyDir"]
-        , EL.CMD:=ret["CMD"]
-        , EL.data_out:=ret["stdOut"]
-
+        , EL.ObsidianHTMLWorkDir:=obsidianhtml_ret["WorkDir"]
+        , EL.ObsidianHTMLOutputpath:=obsidianhtml_ret["Outputpath"]
+        , EL.ObsidianHTMLCopyDir:=obsidianhtml_ret["ObsidianHTMLCopyDir"]
+        , EL.CMD:=obsidianhtml_ret["CMD"]
+        , EL.data_out:=obsidianhtml_ret["stdOut"]
     ;; Intermediary
     EL.Intermediary_Start:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
     Codetimer_Log()
