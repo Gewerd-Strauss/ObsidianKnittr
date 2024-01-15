@@ -762,7 +762,9 @@ getDefinedOutputFormats(Path) {
     filesuffixes:=[]
     if !FileExist(Path) {
         Gui +OwnDialogs
-        MsgBox 0x40010, % script.name " - File not found",% "A required file containing the GUI definitions for the output formats does not exist under `n`n'" Path "`n`nThis script will only use the default options for any format not found in this file"
+        Title:="File not found"
+        Message:="A required file containing the GUI definitions for the output formats does not exist under `n`n'" Path "`n`nThis script will only use the default options for any format not found in this file"
+        AppError(Title, Message,0x40010," > " A_ThisFunc)
         Arr:=PotentialOutputs ;; fallback to hardcoded default
     } else {
         FileRead FileString, % Path
