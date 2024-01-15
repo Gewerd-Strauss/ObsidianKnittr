@@ -2,17 +2,10 @@ backupOutput(Path, out) {
     SplitPath % Path, ,OutputRoot
     BackupDirectory:=OutputRoot "\Old_Versions"
     Copied:=0
-    ;Lastoutputs:=strsplit(script.config.LastRun.last_output_type,",")
-    ;for ind, format in Lastoutputs {
-    ;    Lastoutputs[ind]:=Trim(format) ;; remove leftover spaces
-    ;}
     MT:=""
     for format, Filesuffix in out.filesuffixes {
-        ;if !(out.Outputformats.HasKey(format)) {
-        ;    continue
-        ;}
         package:=strsplit(format,"::").1
-        Loop, Files, % OutputRoot "\*" FileSuffix 
+        Loop, Files, % OutputRoot "\*" Filesuffix 
         {
             if (MT="") {
                 FileGetTime MT,% A_LoopFileFullPath,M
@@ -29,7 +22,7 @@ backupOutput(Path, out) {
                 }
             }
             FileMove % A_LoopFileFullPath, % A_LoopFileFullPath
-            SplitPath % A_LoopFileFullPath, OutFileName, OutDir, OutExtension, OutNameNoExt, OutDrive
+            SplitPath % A_LoopFileFullPath, OutFileName
             fileisAccessible:=!ErrorLevel
             if (package!="") {
                 if fileisAccessible {
@@ -39,9 +32,9 @@ backupOutput(Path, out) {
                 }
             } else {
                 if fileisAccessible {
-                    FileMove % A_LoopFileFullPath, % BackupDirectory "\" MT "\" Name "." FileSuffix
+                    FileMove % A_LoopFileFullPath, % BackupDirectory "\" MT "\" Name "." Filesuffix
                 } else {
-                    FileCopy % A_LoopFileFullPath, % BackupDirectory "\" MT "\" Name "." FileSuffix
+                    FileCopy % A_LoopFileFullPath, % BackupDirectory "\" MT "\" Name "." Filesuffix
                 }
             }
             Copied++
