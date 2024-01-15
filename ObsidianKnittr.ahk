@@ -245,10 +245,9 @@ main() {
                 EL.temporaryVaultpath:=OHTMLScopeRestrictor_Object.Path
                     , EL.temporaryVaultpathRemoved:="No - vault root"
             } else {
-
+                EL.temporaryVaultpath:=OHTMLScopeRestrictor_Object.Path
+                    , EL.temporaryVaultpathRemoved:="No - not removed, but not vault root"
             }
-            EL.temporaryVaultpath:=OHTMLScopeRestrictor_Object.Path
-                , EL.temporaryVaultpathRemoved:="No - not removed, but not vault root"
         }
     }
     EL.ObsidianHTML_Duration:=Codetimer_Log()
