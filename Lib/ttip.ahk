@@ -143,15 +143,15 @@ ttip(text:="TTIP: Test",mode:=1,to:=4000,xp:="NaN",yp:="NaN",CoordMode:=-1,to2:=
 
 ttip_Obj2Str(Obj,FullPath:=1,BottomBlank:=0){
 	static String,Blank
-	if(FullPath=1)
-	String:=FullPath:=Blank:=""
+	if (FullPath=1)
+		String:=FullPath:=Blank:=""
 	if(IsObject(Obj)){
 		for a,b in Obj{
-			if(IsObject(b))
-			ttip_Obj2Str(b,FullPath "." a,BottomBlank)
+			if (IsObject(b))
+				ttip_Obj2Str(b,FullPath "." a,BottomBlank)
 			else{
-				if(BottomBlank=0)
-				String.=FullPath "." a " = " b "`n"
+				if (BottomBlank=0)
+					String.=FullPath "." a " = " b "`n"
 				else if(b!="")
 					String.=FullPath "." a " = " b "`n"
 				else

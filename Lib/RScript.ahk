@@ -46,7 +46,7 @@ buildRScriptContent(Path,output_filename="",out="") {
         , FormatOptions:=""
     for _, Class in out.Outputformats { 
         Class.FilenameMod:=" (" Class.package ")"
-        Class.Filename:=Name
+            , Class.Filename:=Name
     }
     for _,Class in out.Outputformats {
         format:=Class.AssembledFormatString
@@ -64,8 +64,8 @@ buildRScriptContent(Path,output_filename="",out="") {
             Str3:=format
         }
         Str3:=Strreplace(Str3,"%Name%",Name Class.FilenameMod)
-        Str.="`n`n" Str3
-        FormatOptions.= A_Tab strreplace(format,"`n",A_Tab "`n") "`n`n"
+            , Str.="`n`n" Str3
+            , FormatOptions.= A_Tab strreplace(format,"`n",A_Tab "`n") "`n`n"
     }
     ;; pdf handling
     for _, Class in out.Outputformats { 
@@ -108,7 +108,7 @@ buildRScriptContent(Path,output_filename="",out="") {
             ;Str2:="`n" Str3 "`n"
         }
         Str.="`n`n" Str3
-        FormatOptions.= A_Tab strreplace(format,"`n",A_Tab "`n") "`n`n"
+            , FormatOptions.= A_Tab strreplace(format,"`n",A_Tab "`n") "`n`n"
     }
     Str2=
         (LTRIM

@@ -1,4 +1,4 @@
-﻿ObsidianHtml(manuscript_path:="",config_path:="",bUseConvert:=true,bUseOwnOHTMLFork:=false,bVerbose:=false,WD="",WorkDir:="",WorkDir_OwnFork:="",ScopeRestrictorObject:="") {
+﻿ObsidianHtml(manuscript_path:="",config_path:="",bUseConvert:=true,bUseOwnOHTMLFork:=false,bVerbose:=false,OutputDir="",WorkDir:="",WorkDir_OwnFork:="",ScopeRestrictorObject:="") {
 
     if (WorkDir="") {
         WorkDir:= A_Desktop "\ObsidianHTMLOutput"
@@ -22,8 +22,8 @@
     }
 
     ;; ensure the Working Directory exists before running OHTML
-    if (!FileExist(WD)) {
-        FileCreateDir % WD
+    if (!FileExist(OutputDir)) {
+        FileCreateDir % OutputDir
     }
 
     ;; if no manuscript is provided, we must assume the config to contain it and use convert
@@ -256,7 +256,7 @@ readObsidianHTML_Config(configpath) {
         }
         if RegExMatch(Line, "(?<Key>.*):(?<Value>.*)", v) {
             conf[vKey]:=vValue
-            confstr.= vKey "=" vValue "`n"
+                , confstr.= vKey "=" vValue "`n"
         }
     }
     if (confstr="") {
@@ -278,7 +278,7 @@ fixYAMLSyntax(template) {
         } else {
             if (!bInTogglesSection && RegexMatch(Line,"mi)^toggles")) {
                 out.=Line "`n"
-                bInTogglesSection:=true
+                    , bInTogglesSection:=true
                 Continue
             }
         }
@@ -290,7 +290,7 @@ fixYAMLSyntax(template) {
             } else { ;; an actual toggle
                 if (SubStr(Line,1,2)!=" ") {
                     Line:=A_Space A_Space Line
-                    out.=Line "`n"
+                        , out.=Line "`n"
                 } else {
                     out.=Line "`n"
                 }
@@ -334,7 +334,7 @@ python_check() {
     if !python_on_path {
         GetStdStreams_WithInput("where python.exe",,out)
         out:=strsplit(out,"`n")
-        for each, path in out {
+        for _, path in out {
             if !FileExist(path) {
                 python_on_path:=false
             } else {
