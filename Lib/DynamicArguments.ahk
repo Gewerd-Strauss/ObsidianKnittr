@@ -10,7 +10,7 @@ Class ot {
         } else {
             ID:=-1
             this.Error:=this.Errors[ID] ;.String
-            MsgBox 0x40031,% this.ClassName " > " A_ThisFunc "()" ,% (this.Errors.HasKey(ID)?this.Errors[ID].String:"Fatal: Undefined Error with ID '" ID "'") "'" ConfigFile "'" (this.Errors[ID].HasKey("EndString")?this.Errors[ID].EndString:"Fatal: Undefined Error with ID '" ID "'")
+            MsgBox 0x40031,% this.ClassName " > " A_ThisFunc, % (this.Errors.HasKey(ID)?this.Errors[ID].String:"Fatal: Undefined Error with ID '" ID "'") "'" ConfigFile "'" (this.Errors[ID].HasKey("EndString")?this.Errors[ID].EndString:"Fatal: Undefined Error with ID '" ID "'")
             ExitApp -1
             return
         }
@@ -23,7 +23,7 @@ Class ot {
             this.Result:=this.type:=Format "()"
                 , ID:=+2
                 , this.Error:=this.Errors[ID] ;.String
-            MsgBox 0x40031,% this.ClassName " > " A_ThisFunc "()" ,% (this.Errors.HasKey(ID)?this.Errors[ID].String:"Fatal: Undefined Error with ID '" ID "'")
+            MsgBox 0x40031,% this.ClassName " > " A_ThisFunc, % (this.Errors.HasKey(ID)?this.Errors[ID].String:"Fatal: Undefined Error with ID '" ID "'")
             return this
         }
         for _, Line in Lines {
@@ -287,7 +287,7 @@ Class ot {
             if !(SubStr(ID,1,1)="-") {
                 return this
             }
-            MsgBox 0x40031,% this.ClassName " > " A_ThisFunc "()" ,% (this.Errors.HasKey(ID)?this.Errors[ID].String:"Fatal: Undefined Error with ID '" ID "'")
+            MsgBox 0x40031,% this.ClassName " > " A_ThisFunc, % (this.Errors.HasKey(ID)?this.Errors[ID].String:"Fatal: Undefined Error with ID '" ID "'")
             return this
         }
         if (destroyGUI) {
@@ -586,7 +586,7 @@ Class ot {
         WinWaitClose % "ahk_PID" PID
         Gui +OwnDialogs
         OnMessage(0x44, "DA_OnMsgBox")
-        MsgBox 0x40044, % this.ClassName " > " A_ThisFunc "()", You modified the configuration for this class.`nReload?
+        MsgBox 0x40044, % this.ClassName " > " A_ThisFunc, You modified the configuration for this class.`nReload?
         OnMessage(0x44, "")
         IfMsgBox Yes, {
             reload
