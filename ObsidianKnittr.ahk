@@ -442,11 +442,10 @@ openFolder(Path) {
     }
     return
 }
-buildAHKScriptContent(Path,RScript_Path:="") {
+buildAHKScriptContent(Path,RSCRIPT_PATH:="") {
     SplitPath % Path,, OutDir
-    if script.config.config.bundleStarterScript && (RScript_Path!="") {
-        RSCRIPT_PATH:=RScript_Path
-            , BUILD_RPATH:=strreplace(OutDir "\build.R","\","\\")
+    if script.config.config.bundleStarterScript && (RSCRIPT_PATH!="") {
+        BUILD_RPATH:=strreplace(OutDir "\build.R","\","\\")
             , OUTDIR_PATH:=OutDir
         AHK_Build=
             (Join`s LTRIM
