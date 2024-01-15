@@ -116,27 +116,8 @@ main() {
             if !requireA_Args(CLIArgs) {
                 msgbox % "error: arguments could not be validated. Missings Args?`n`nExpand upon this error message."
                 ExitApp -1
-            }
-            if (!CLIArgs.HasKey("LastExecutionDirectory")) {
-                CLIArgs.LastExecutionDirectory:=script.config.LastRun.LastExecutionDirectory
-            }
-            if (!CLIArgs.HasKey("OHTMLLevel")) {
-                CLIArgs.OHTMLLevel:=script.config.config.defaultRelativeLevel
-            }
-            if (!CLIArgs.HasKey("--noMove")) {
-                CLIArgs.noMove:=0
             } else {
-                CLIArgs.noMove:=1
-            }
-            if (CLIArgs.HasKey("--noRender")) {
-                CLIArgs.RenderToOutputs:=0
-            } else {
-                CLIArgs.RenderToOutputs:=1
-            }
-            if (!CLIArgs.HasKey("--noIntermediates")) {
-                CLIArgs.noIntermediates:=0
-            } else {
-                CLIArgs.noIntermediates:=1
+                CLIArgs:=processCLIFlags(CLIArgs)
             }
             CLIArgs.path:=StrReplace(CLIArgs.path, "/","\")
                 , script.config.LastRun.manuscriptpath:=CLIArgs.path
@@ -193,7 +174,6 @@ main() {
         ExitApp -1
     }
     obsidianhtml_configfile:=script.config.config.obsidianhtml_configfile
-
 
     tmpconfig:=createTemporaryObsidianHTML_Config(guiOut.manuscriptpath, obsidianhtml_configfile,bConvertInsteadofRun)
         , EL.configtemplate_path:=obsidianhtml_configfile
