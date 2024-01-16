@@ -238,8 +238,8 @@ main() {
         , EL.ObsidianHTMLWorkDir:=obsidianhtml_ret["WorkDir"]
         , EL.ObsidianHTMLOutputpath:=obsidianhtml_ret["Outputpath"]
         , EL.ObsidianHTMLCopyDir:=obsidianhtml_ret["ObsidianHTMLCopyDir"]
-        , EL.CMD:=obsidianhtml_ret["CMD"]
-        , EL.data_out:=obsidianhtml_ret["stdOut"]
+        , EL.ObsidianHTMLCMD:=obsidianhtml_ret["CMD"]
+        , EL.ObsidianHTMLstdOut:=obsidianhtml_ret["stdOut"]
     vMDPath:=getObsidianHTML_MDPath(obsidianhtml_ret)
     ;; Intermediary
     EL.Intermediary_Start:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec

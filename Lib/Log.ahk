@@ -81,8 +81,8 @@ ObsidianHTMLWorking Dir   : `%ObsidianHTMLWorkDir`%
 ObsidianHTMLOutputPath    : `%ObsidianHTMLOutputPath`%
 ___________________________________________________
 OHTML - StdStreams:
-Issued Command            : `%CMD`%
-stdOut                    : `%data_out`%
+Issued Command            : `%ObsidianHTMLCMD`%
+stdOut                    : `%ObsidianHTMLstdOut`%
 ___________________________________________________
 R - StdStreams:
 Issued Command            : `%RCMD`%
