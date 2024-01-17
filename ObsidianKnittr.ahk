@@ -132,7 +132,7 @@ main() {
 
     ;; defined formats-string for EL, define bautosubmitgui, 
     ExecutionDirectory:=guiOut.Settings.ExecutionDirectory
-    EL.manuscriptname:=manuscriptname:=guiOut.manuscriptname
+    EL.manuscriptname:=guiOut.manuscriptname
     EL.formats:=concat_formats(guiOut.Outputformats)
         , EL.manuscriptpath:=manuscriptpath:=guiOut.manuscriptpath
         , EL.bVerboseCheckbox:=guiOut.Settings.bVerboseCheckbox
