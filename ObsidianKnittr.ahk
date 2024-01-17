@@ -193,7 +193,7 @@ main() {
     if (tmpObsidianHTML_Config[1] && guiOut.Settings.bConvertInsteadofRun) {
         obsidianhtml_ret:=ObsidianHtml(,tmpObsidianHTML_Config[1],,guiOut.Settings.bUseOwnOHTMLFork,guiOut.Settings.bVerboseCheckbox,OHTML_OutputDir,OHTML_WorkDir,OHTML_WorkDir_OwnFork,OHTMLScopeRestrictor_Object,guiOut.Settings.bAutoSubmitOTGUI)
     } else {
-        obsidianhtml_ret:=ObsidianHtml(manuscriptpath,tmpObsidianHTML_Config[1],,guiOut.Settings.bUseOwnOHTMLFork,guiOut.Settings.bVerboseCheckbox,OHTML_OutputDir,OHTML_WorkDir,OHTML_WorkDir_OwnFork,OHTMLScopeRestrictor_Object,guiOut.Settings.bAutoSubmitOTGUI)
+        obsidianhtml_ret:=ObsidianHtml(guiOut.manuscriptpath,tmpObsidianHTML_Config[1],,guiOut.Settings.bUseOwnOHTMLFork,guiOut.Settings.bVerboseCheckbox,OHTML_OutputDir,OHTML_WorkDir,OHTML_WorkDir_OwnFork,OHTMLScopeRestrictor_Object,guiOut.Settings.bAutoSubmitOTGUI)
     }
     ;; OBSIDIANHTML REMOVE VAULT LIMITER
     if (guiOut.Settings.bRestrictOHTMLScope) {
