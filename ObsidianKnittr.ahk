@@ -127,14 +127,10 @@ main() {
                 , script.config.LastRun.last_output_type:=CLIArgs.format
             global manuscriptpath:=CLIArgs.path
             guiOut:=guiShow(true,CLIArgs)
-            for each,output_type in CLIArgs.format {
-                script.config.LastRun.last_output_type.=output_type
-                if (each<sel.count()) {
-                    script.config.LastRun.last_output_type.=", "
-                }
-            }
         }
     }
+
+    ;; defined formats-string for EL, define bautosubmitgui, 
     formats:=""
         , bAutoSubmitOTGUI:=false
     for _,format in guiOut.Outputformats {
@@ -148,13 +144,7 @@ main() {
         formats.=_ ", "
     }
     formats:=SubStr(formats,1,StrLen(formats)-2)
-        , output_type:=guiOut.sel
-    if (HasVal(output_type,"First in YAML")) {
-        output_type:=""
-    }
     ExecutionDirectory:=guiOut.Settings.ExecutionDirectory
-        , Outputformats:=guiOut.Outputformats
-        , bBackupOutput:=guiOut.Settings.bBackupOutput
     EL.formats:=formats
     EL.manuscriptname:=manuscriptname:=guiOut.manuscriptname
         , EL.manuscriptpath:=manuscriptpath:=guiOut.manuscriptpath
