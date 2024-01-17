@@ -156,29 +156,29 @@ main() {
         , Outputformats:=guiOut.Outputformats
         , bBackupOutput:=guiOut.Settings.bBackupOutput
     EL.formats:=formats
-        , EL.manuscriptname:=manuscriptname:=guiOut.manuscriptname
+    EL.manuscriptname:=manuscriptname:=guiOut.manuscriptname
         , EL.manuscriptpath:=manuscriptpath:=guiOut.manuscriptpath
-        , EL.bVerboseCheckbox:=bVerboseCheckbox:=guiOut.Settings.bVerboseCheckbox
-        , EL.bSRCConverterVersion:=guiOut.Settings.bSRCConverterVersion
-        , EL.bKeepFilename:=bKeepFilename:=guiOut.Settings.bKeepFilename
-        , EL.bExecuteRScript:=bExecuteRScript:=guiOut.Settings.bExecuteRScript
-        , EL.bRemoveHashTagFromTags:=bRemoveHashTagFromTags:=guiOut.Settings.bRemoveHashTagFromTags
-        , EL.bForceFixPNGFiles:=bForceFixPNGFiles:=guiOut.Settings.bForceFixPNGFiles
-        , EL.bInsertSetupChunk:=bInsertSetupChunk:=guiOut.Settings.bInsertSetupChunk
-        , EL.bConvertInsteadofRun:=bConvertInsteadofRun:=guiOut.Settings.bConvertInsteadofRun
-        , EL.bRemoveObsidianHTMLErrors:=bRemoveObsidianHTMLErrors:=guiOut.Settings.bRemoveObsidianHTMLErrors
-        , EL.bStripLocalMarkdownLinks:=bStripLocalMarkdownLinks:=guiOut.Settings.bStripLocalMarkdownLinks
-        , EL.bUseOwnOHTMLFork:=bUseOwnOHTMLFork:=guiOut.Settings.bUseOwnOHTMLFork
-        , EL.bRestrictOHTMLScope:=bRestrictOHTMLScope:=guiOut.Settings.bRestrictOHTMLScope
-        , EL.bRemoveQuartoReferenceTypesFromCrossrefs:=bRemoveQuartoReferenceTypesFromCrossrefs:=guiOut.Settings.bRemoveQuartoReferenceTypesFromCrossrefs
-    if (output_type="") && (bVerboseCheckbox="") && (!CLIArgs.Count()) {
+        , EL.bVerboseCheckbox:=guiOut.Settings.bVerboseCheckbox
+    ; , EL.bSRCConverterVersion:=guiOut.Settings.bSRCConverterVersion
+        , EL.bKeepFilename:=guiOut.Settings.bKeepFilename
+        , EL.bExecuteRScript:=guiOut.Settings.bExecuteRScript
+        , EL.bRemoveHashTagFromTags:=guiOut.Settings.bRemoveHashTagFromTags
+        , EL.bForceFixPNGFiles:=guiOut.Settings.bForceFixPNGFiles
+        , EL.bInsertSetupChunk:=guiOut.Settings.bInsertSetupChunk
+        , EL.bConvertInsteadofRun:=guiOut.Settings.bConvertInsteadofRun
+        , EL.bRemoveObsidianHTMLErrors:=guiOut.Settings.bRemoveObsidianHTMLErrors
+        , EL.bStripLocalMarkdownLinks:=guiOut.Settings.bStripLocalMarkdownLinks
+        , EL.bUseOwnOHTMLFork:=guiOut.Settings.bUseOwnOHTMLFork
+        , EL.bRestrictOHTMLScope:=guiOut.Settings.bRestrictOHTMLScope
+        , EL.bRemoveQuartoReferenceTypesFromCrossrefs:=guiOut.Settings.bRemoveQuartoReferenceTypesFromCrossrefs
+    if (output_type="") && (guiOut.Settings.bVerboseCheckbox="") && (!CLIArgs.Count()) {
         ExitApp -1
     }
 
     ;; OBSIDIANHTML SETUP CONFIGFILE
     obsidianhtml_configfile:=script.config.config.obsidianhtml_configfile
 
-    tmpObsidianHTML_Config:=createTemporaryObsidianHTML_Config(guiOut.manuscriptpath, obsidianhtml_configfile,bConvertInsteadofRun)
+    tmpObsidianHTML_Config:=createTemporaryObsidianHTML_Config(guiOut.manuscriptpath, obsidianhtml_configfile,guiOut.Settings.bConvertInsteadofRun)
         , EL.configtemplate_path:=obsidianhtml_configfile
         , EL.configfile_contents:=tmpObsidianHTML_Config[2]
     notify("Running ObsidianHTML",CLIArgs)
@@ -193,7 +193,7 @@ main() {
     OHTML_OutputDir:=Deref(script.config.config.OHTML_OutputDir)
         , OHTML_WorkDir:=Deref(script.config.config.OHTML_WorkDir)
         , OHTML_WorkDir_OwnFork := script.config.Config.OHTML_WorkDir_OwnFork ; "D:\Dokumente neu\ObsidianPluginDev\obsidian-html"
-    if (bRestrictOHTMLScope) {
+    if (guiOut.Settings.bRestrictOHTMLScope) {
         if (CLIArgs!="") && (FileExist(CLIArgs.path)) {
             if (CLIArgs.OHTMLLevel!="") {
                 OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(guiOut.manuscriptpath,bAutoSubmitOTGUI,CLIArgs.OHTMLLevel,CLIArgs)
@@ -214,13 +214,14 @@ main() {
             }
         }
     }
-    if (tmpObsidianHTML_Config[1] && bConvertInsteadofRun) {
-        obsidianhtml_ret:=ObsidianHtml(,tmpObsidianHTML_Config[1],,bUseOwnOHTMLFork,bVerboseCheckbox,OHTML_OutputDir,OHTML_WorkDir,OHTML_WorkDir_OwnFork,OHTMLScopeRestrictor_Object)
+    ;; OBSIDIANHTML EXECUTE OBSIDIANHTML
+    if (tmpObsidianHTML_Config[1] && guiOut.Settings.bConvertInsteadofRun) {
+        obsidianhtml_ret:=ObsidianHtml(,tmpObsidianHTML_Config[1],,guiOut.Settings.bUseOwnOHTMLFork,guiOut.Settings.bVerboseCheckbox,OHTML_OutputDir,OHTML_WorkDir,OHTML_WorkDir_OwnFork,OHTMLScopeRestrictor_Object)
     } else {
-        obsidianhtml_ret:=ObsidianHtml(manuscriptpath,tmpObsidianHTML_Config[1],,bUseOwnOHTMLFork,bVerboseCheckbox,OHTML_OutputDir,OHTML_WorkDir,OHTML_WorkDir_OwnFork,OHTMLScopeRestrictor_Object)
+        obsidianhtml_ret:=ObsidianHtml(manuscriptpath,tmpObsidianHTML_Config[1],,guiOut.Settings.bUseOwnOHTMLFork,guiOut.Settings.bVerboseCheckbox,OHTML_OutputDir,OHTML_WorkDir,OHTML_WorkDir_OwnFork,OHTMLScopeRestrictor_Object)
     }
     ;; OBSIDIANHTML REMOVE VAULT LIMITER
-    if (bRestrictOHTMLScope) {
+    if (guiOut.Settings.bRestrictOHTMLScope) {
         tempOVaultRoot:=removeTemporaryObsidianVaultRoot(OHTMLScopeRestrictor_Object.Path,OHTMLScopeRestrictor_Object.Graph)
         if tempOVaultRoot.Removed {
             EL.temporaryVaultpath:=OHTMLScopeRestrictor_Object.Path 
@@ -240,7 +241,7 @@ main() {
         , EL.ObsidianHTML_End:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
         , EL.obsidianhtml_version:=strreplace(obsidianhtml_ret.obsidianhtml_version,"`n")
         , EL.obsidianhtml_path:=obsidianhtml_ret.obsidianhtml_path
-        , EL.UsedVerb:=(bConvertInsteadofRun?"Convert":"Run")
+        , EL.UsedVerb:=(guiOut.Settings.bConvertInsteadofRun?"Convert":"Run")
         , EL.ObsidianHTMLWorkDir:=obsidianhtml_ret["WorkDir"]
         , EL.ObsidianHTMLOutputpath:=obsidianhtml_ret["Outputpath"]
         , EL.ObsidianHTMLCopyDir:=obsidianhtml_ret["ObsidianHTMLCopyDir"]
@@ -304,7 +305,7 @@ main() {
     if (CLIArgs.HasKey("--noRender") && CLIArgs.HasKey("--noMove")) {
 
     } else {
-        if bKeepFilename {
+        if guiOut.Settings.bKeepFilename {
             tmp:=buildRScriptContent(rmd_Path,guiOut.manuscriptName,guiOut)
         } else {
             tmp:=buildRScriptContent(rmd_Path,,guiOut)
@@ -319,8 +320,8 @@ main() {
         if (CLIArgs.HasKey("--noRender")) {
 
         } else {
-            if (bExecuteRScript) {
-                if bBackupOutput && ((!CLIArgs.HasKey("--noMove"))) {
+            if (guiOut.Settings.bExecuteRScript) {
+                if guiOut.Settings.bBackupOutput && ((!CLIArgs.HasKey("--noMove"))) {
                     ttip(-1)
                     notify("Backing up Files",CLIArgs)
                     BackupDirectory:=backupOutput(rmd_Path,guiOut)
@@ -350,17 +351,17 @@ main() {
         }
     } else {
         script_contents:=tmp.1
-        if bExecuteRScript {
+        if guiOut.Settings.bExecuteRScript {
             ;ttip(" ",5,,,,,,,16)
             ttip(-1)
             notify("Executing R-BuildScript",CLIArgs)
-            if bBackupOutput {
+            if guiOut.Settings.bBackupOutput {
                 BackupDirectory:=backupOutput(rmd_Path,guiOut)
             }
             if script.config.config.backupCount {
                 limitBackups(BackupDirectory,script.config.config.backupCount)
             }
-            rscript_ret:=runRScript(rmd_Path,script_contents,Outputformats,script.config.config.RScriptPath)
+            rscript_ret:=runRScript(rmd_Path,script_contents,guiOut.Outputformats,script.config.config.RScriptPath)
             EL.Rdata_out:=rscript_ret[1]
                 , EL.RCMD:=rscript_ret[2]
                 , EL.RWD:=rscript_ret[3]
