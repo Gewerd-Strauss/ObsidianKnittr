@@ -65,6 +65,37 @@ requireA_Args(Args) {
         MsgBox % "FATAL: this shouldn't happen, error occured in '" A_ThisFunc "'. 'foundQ'>'reqQ'??"
     }
 }
+validateCLIArgs(Byref Args) {
+    ;; validate if non-implemented arguments are fed, and remove them
+    for arg,val in Args {
+        if (arg=="format") {
+            continue
+        } else if (arg=="cli") {
+            continue
+        }
+        if script.config.LastRun.HasKey(arg) {
+            if (DEBUG) {
+                ; msgbox ,,,% arg " = " val,% "0.3"
+            }
+        } else {
+            if InStr("path,runCLI,OHTMLLevel,noMove,nointermediates",arg) {
+                continue
+            }
+            if ((SubStr(arg,1,2)="--") && !InStr(arg,"=")) { ;; generalise don't filter out flags
+                continue
+            }
+            if (InStr(arg,"quarto::")) {
+                continue
+            }
+            if (DEBUG) {
+                msgbox % arg " = " val
+            }
+            Title:=": CLI-processing"
+            Message:="CLI-Parameter '" arg "' is not implemented as of yet.`nThe parameter will be ignored."
+            AppError(Title, Message,0x40030," > " A_ThisFunc)
+        }
+    }
+}
 CLI_help() {
     flags:={"--noMove":"`t`t-`tSet to '1' to convert the note locally and create the '.qmd'-file at the location of the root."
             , "--noIntermediates": "`t-`tSet to '1' to delete/not store intermediate files after finishing execution.`n`t`t`t`t`t`t`tDeletes the output directory itself(?)"

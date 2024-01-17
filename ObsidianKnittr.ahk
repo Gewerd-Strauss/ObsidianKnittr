@@ -122,6 +122,7 @@ main() {
             }
             CLIArgs.path:=StrReplace(CLIArgs.path, "/","\")
                 , script.config.LastRun.manuscriptpath:=CLIArgs.path
+            validateCLIArgs(CLIArgs)
                 , script.config.LastRun.manuscriptpath:=CLIArgs.path
                 , script.config.DDLHistory:=buildHistory(script.config.DDLHistory,script.config.Config.HistoryLimit,script.config.LastRun.manuscriptpath)
                 , script.config.LastRun.last_output_type:=CLIArgs.format
@@ -833,35 +834,6 @@ guiShow(runCLI:=FALSE,CLIArgs:="") {
             sel:=CLIArgs.format
         } else {
             sel:=[CLIArgs.format]
-        }
-        for arg,val in CLIArgs {
-            if (arg=="format") {
-                continue
-            } else if (arg=="cli") {
-                continue
-            }
-            if script.config.LastRun.HasKey(arg) {
-                if (DEBUG) {
-                    msgbox ,,,% arg " = " val,% "0.5"
-                }
-                script.config.LastRun[arg]:=val
-            } else {
-                if InStr("path,runCLI,OHTMLLevel,noMove,nointermediates",arg) {
-                    continue
-                }
-                if ((SubStr(arg,1,2)="--") && !InStr(arg,"=")) { ;; generalise don't filter out flags
-                    continue
-                }
-                if (InStr(arg,"quarto::")) {
-                    continue
-                }
-                if (DEBUG) {
-                    msgbox % arg " = " val
-                }
-                Title:=": CLI-processing"
-                Message:="CLI-Parameter '" arg "' is not implemented as of yet.`nThe parameter will be ignored."
-                AppError(Title, Message,0x40030," > " A_ThisFunc)
-            }
         }
         SplitPath % script.config.lastrun.manuscriptpath,, OutDir
         SplitPath % OutDir,, OutDir,
