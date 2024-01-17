@@ -131,22 +131,9 @@ main() {
     }
 
     ;; defined formats-string for EL, define bautosubmitgui, 
-    formats:=""
-        , bAutoSubmitOTGUI:=false
-    for _,format in guiOut.Outputformats {
-        if format.SkipGUI {
-            bAutoSubmitOTGUI:=format.SkipGUI
-        }
-        if format.HasKey("Error") && (format.Error.ID=0) {
-            Reload
-            ExitApp -1 ;; fucking weird bug. DO NOT remove this exitapp below the reload-command. for some reason, removing it results in the script just ignoring the reload and continuing on as normal under certain situations
-        }
-        formats.=_ ", "
-    }
-    formats:=SubStr(formats,1,StrLen(formats)-2)
     ExecutionDirectory:=guiOut.Settings.ExecutionDirectory
-    EL.formats:=formats
     EL.manuscriptname:=manuscriptname:=guiOut.manuscriptname
+    EL.formats:=concat_formats(guiOut.Outputformats)
         , EL.manuscriptpath:=manuscriptpath:=guiOut.manuscriptpath
         , EL.bVerboseCheckbox:=guiOut.Settings.bVerboseCheckbox
         , EL.bKeepFilename:=guiOut.Settings.bKeepFilename
@@ -776,6 +763,17 @@ populateLV(last_output,PotentialOutputs) {
         LV_Add(Options,potential_output_type)
     }
     return
+}
+concat_formats(formats) {
+    for _,format in formats {
+        if format.HasKey("Error") && (format.Error.ID=0) {
+            Reload
+            ExitApp -1 ;; fucking weird bug. DO NOT remove this exitapp below the reload-command. for some reason, removing it results in the script just ignoring the reload and continuing on as normal under certain situations
+        }
+        format_str.=_ ", "
+    }
+    format_str:=SubStr(format_str,1,StrLen(format_str)-2)
+    return format_str
 }
 GCAutoSubmit() {
     global bAutoSubmitOTGUI:=True
