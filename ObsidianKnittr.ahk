@@ -235,7 +235,7 @@ main() {
     Destination:=(InStr(Deref(ExecutionDirectory),A_Desktop)?0:ExecutionDirectory)
         , rmd_Path:=copyBack(rmd_Path,Destination,guiOut.manuscriptpath)
     SplitPath % rmd_Path,, OutDir
-    rawinputCopyLocation:=regexreplace(OutDir "\" guiOut.manuscriptName "_vault.md ","\\{2,}","\")
+    rawinputCopyLocation:=regexreplace(OutDir "\" guiOut.manuscriptName "_vault.md","\\{2,}","\")
         , EL.output_path
         , EL.rawInputcopyLocation:=rawinputCopyLocation
     ; 7
@@ -425,7 +425,7 @@ copyBack(Source,Destination,manuscript_path) {
     SplitPath % Source, OutFileName, Dir,
     SplitPath % manuscript_path,,,,manuscript_name,
     if Destination {
-        FileCopyDir % Dir, % Output_Path:=Destination "\" manuscript_name "\", true
+        FileCopyDir % Dir, % Output_Path:=regexreplace(Destination "\" manuscript_name "\","\\{2,}","\"), true
         writeFile(Output_Path "\index.md",manuscriptcontent,,,true)
         pd:=Trim(regexreplace(Output_Path "\" manuscript_name "_vault.md ","\\{2,}","\"))
         FileCopy % manuscript_path, % pd, 1
@@ -437,7 +437,8 @@ copyBack(Source,Destination,manuscript_path) {
         pd:=Trim(regexreplace(Output_Path "\" manuscript_name "_vault.md ","\\{2,}","\"))
         FileCopy % manuscript_path, % pd, 1
     }
-    return Output_Path OutFileName
+    path:=regexreplace(Output_Path OutFileName,"\\{2,}","\")
+    return path 
 }
 convertMDToRMD(md_Path,notename) {
     OldName:=md_Path "\" notename ".md"
