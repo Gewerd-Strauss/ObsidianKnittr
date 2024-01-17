@@ -171,29 +171,29 @@ main() {
     if (guiOut.Settings.bRestrictOHTMLScope) {
         if (CLIArgs!="") && (FileExist(CLIArgs.path)) {
             if (CLIArgs.OHTMLLevel!="") {
-                OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(guiOut.manuscriptpath,bAutoSubmitOTGUI,CLIArgs.OHTMLLevel,CLIArgs)
+                OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(guiOut.manuscriptpath,guiOut.Settings.bAutoSubmitOTGUI,CLIArgs.OHTMLLevel,CLIArgs)
             } else {
                 if (guiOut.manuscriptpath==script.config.LastRun.path_lastmanuscript) {
-                    OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(guiOut.manuscriptpath,bAutoSubmitOTGUI,script.config.LastRun.LastRelativeLevel,CLIArgs)
+                    OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(guiOut.manuscriptpath,guiOut.Settings.bAutoSubmitOTGUI,script.config.LastRun.LastRelativeLevel,CLIArgs)
                 } else {
                     script.config.LastRun.LastRelativeLevel:=-1
-                    OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(guiOut.manuscriptpath,bAutoSubmitOTGUI,,CLIArgs)
+                    OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(guiOut.manuscriptpath,guiOut.Settings.bAutoSubmitOTGUI,,CLIArgs)
                 }
             }
         } else {
             if (guiOut.manuscriptpath==script.config.LastRun.path_lastmanuscript) {
-                OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(guiOut.manuscriptpath,bAutoSubmitOTGUI,script.config.LastRun.LastRelativeLevel)
+                OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(guiOut.manuscriptpath,guiOut.Settings.bAutoSubmitOTGUI,script.config.LastRun.LastRelativeLevel)
             } else {
                 script.config.LastRun.LastRelativeLevel:=-1
-                OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(guiOut.manuscriptpath,bAutoSubmitOTGUI)
+                OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(guiOut.manuscriptpath,guiOut.Settings.bAutoSubmitOTGUI)
             }
         }
     }
     ;; OBSIDIANHTML EXECUTE OBSIDIANHTML
     if (tmpObsidianHTML_Config[1] && guiOut.Settings.bConvertInsteadofRun) {
-        obsidianhtml_ret:=ObsidianHtml(,tmpObsidianHTML_Config[1],,guiOut.Settings.bUseOwnOHTMLFork,guiOut.Settings.bVerboseCheckbox,OHTML_OutputDir,OHTML_WorkDir,OHTML_WorkDir_OwnFork,OHTMLScopeRestrictor_Object)
+        obsidianhtml_ret:=ObsidianHtml(,tmpObsidianHTML_Config[1],,guiOut.Settings.bUseOwnOHTMLFork,guiOut.Settings.bVerboseCheckbox,OHTML_OutputDir,OHTML_WorkDir,OHTML_WorkDir_OwnFork,OHTMLScopeRestrictor_Object,guiOut.Settings.bAutoSubmitOTGUI)
     } else {
-        obsidianhtml_ret:=ObsidianHtml(manuscriptpath,tmpObsidianHTML_Config[1],,guiOut.Settings.bUseOwnOHTMLFork,guiOut.Settings.bVerboseCheckbox,OHTML_OutputDir,OHTML_WorkDir,OHTML_WorkDir_OwnFork,OHTMLScopeRestrictor_Object)
+        obsidianhtml_ret:=ObsidianHtml(manuscriptpath,tmpObsidianHTML_Config[1],,guiOut.Settings.bUseOwnOHTMLFork,guiOut.Settings.bVerboseCheckbox,OHTML_OutputDir,OHTML_WorkDir,OHTML_WorkDir_OwnFork,OHTMLScopeRestrictor_Object,guiOut.Settings.bAutoSubmitOTGUI)
     }
     ;; OBSIDIANHTML REMOVE VAULT LIMITER
     if (guiOut.Settings.bRestrictOHTMLScope) {
@@ -906,6 +906,7 @@ guiShow(runCLI:=FALSE,CLIArgs:="") {
                     ,"bRestrictOHTMLScope":bRestrictOHTMLScope + 0
                     ,"bStripLocalMarkdownLinks":bStripLocalMarkdownLinks + 0
                     ,"ExecutionDirectory":ExecutionDirectory
+                    ,"bAutoSubmitOTGUI":bAutoSubmitOTGUI
                     ,"bUseOwnOHTMLFork":bUseOwnOHTMLFork + 0}
                 ,"Outputformats":Outputformats
                 ,"filesuffixes":filesuffixes}

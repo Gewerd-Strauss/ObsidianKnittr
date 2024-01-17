@@ -1,4 +1,4 @@
-﻿ObsidianHtml(manuscript_path:="",config_path:="",bUseConvert:=true,bUseOwnOHTMLFork:=false,bVerbose:=false,OutputDir="",WorkDir:="",WorkDir_OwnFork:="",ScopeRestrictorObject:="") {
+﻿ObsidianHtml(manuscript_path:="",config_path:="",bUseConvert:=true,bUseOwnOHTMLFork:=false,bVerbose:=false,OutputDir="",WorkDir:="",WorkDir_OwnFork:="",ScopeRestrictorObject:="",bAutoSubmitOTGUI:="") {
     if (WorkDir="") {
         WorkDir:= A_Desktop "\ObsidianHTMLOutput"
     }
