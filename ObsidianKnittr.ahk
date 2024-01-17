@@ -121,8 +121,6 @@ main() {
                 processCLIFlags(CLIArgs)
                 processCLIArgs(CLIArgs)
             }
-            CLIArgs.path:=StrReplace(CLIArgs.path, "/","\")
-                , script.config.LastRun.manuscriptpath:=CLIArgs.path
             validateCLIArgs(CLIArgs)
                 , script.config.LastRun.manuscriptpath:=CLIArgs.path
                 , script.config.DDLHistory:=buildHistory(script.config.DDLHistory,script.config.Config.HistoryLimit,script.config.LastRun.manuscriptpath)
