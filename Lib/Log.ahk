@@ -36,7 +36,6 @@ ObsidianKnittr:
 ObsidianKnittr - Version  : `%ObsidianKnittr_Version`%
 Output - Formats          : `%formats`%
 Keep Filename             : `%bKeepFilename`%
-SRC_Converter Version     : `%bSRCConverterVersion`% (deprecated, only for completeness)
 Stripped '#' from Tags    : `%bRemoveHashTagFromTags`%
 
 ObsidianHTML:

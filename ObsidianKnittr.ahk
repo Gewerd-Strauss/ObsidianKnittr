@@ -149,7 +149,6 @@ main() {
     EL.manuscriptname:=manuscriptname:=guiOut.manuscriptname
         , EL.manuscriptpath:=manuscriptpath:=guiOut.manuscriptpath
         , EL.bVerboseCheckbox:=guiOut.Settings.bVerboseCheckbox
-    ; , EL.bSRCConverterVersion:=guiOut.Settings.bSRCConverterVersion
         , EL.bKeepFilename:=guiOut.Settings.bKeepFilename
         , EL.bExecuteRScript:=guiOut.Settings.bExecuteRScript
         , EL.bRemoveHashTagFromTags:=guiOut.Settings.bRemoveHashTagFromTags
@@ -692,7 +691,6 @@ guiCreate(runCLI,CLIArgs) {
         SplitPath % OutDir, OutFileName, OutDir,
         guicontrol,, bVerboseCheckbox, % (script.config.LastRun.Verbose)
         guicontrol,, bRestrictOHTMLScope, % (script.config.LastRun.RestrictOHTMLScope)
-        guicontrol,, bSRCConverterVersion, % (script.config.LastRun.Conversion)
         guicontrol,, bKeepFilename, % (script.config.LastRun.KeepFileName)
         guicontrol,, bExecuteRScript, % (script.config.LastRun.RenderToOutputs)
         guicontrol,, bBackupOutput, % (script.config.LastRun.BackupOutput)
@@ -869,7 +867,6 @@ guiShow(runCLI:=FALSE,CLIArgs:="") {
         SplitPath % OutDir,, OutDir,
         bVerboseCheckbox := (script.config.LastRun.Verbose)
             , bRestrictOHTMLScope := (script.config.LastRun.RestrictOHTMLScope)
-            , bSRCConverterVersion := (script.config.LastRun.Conversion)
             , bKeepFilename := (script.config.LastRun.KeepFileName)
             , bExecuteRScript := (script.config.LastRun.RenderToOutputs)
             , bBackupOutput := (script.config.LastRun.BackupOutput)
@@ -928,7 +925,6 @@ guiShow(runCLI:=FALSE,CLIArgs:="") {
                 ,"manuscriptpath":manuscriptpath
                 ,"manuscriptname":manuscriptName
                 ,Settings:{"bVerboseCheckbox":bVerboseCheckbox + 0
-                    ,"bSRCConverterVersion":bSRCConverterVersion + 0
                     ,"bKeepFilename":bKeepFilename + 0
                     ,"bBackupOutput":bBackupOutput + 0
                     ,"bExecuteRScript":bExecuteRScript + 0
@@ -998,7 +994,6 @@ guiSubmit() {
         , script.config.LastRun.last_output_type:=""
         , script.config.LastRun.Verbose:=bVerboseCheckbox+0
         , script.config.LastRun.RestrictOHTMLScope:=bRestrictOHTMLScope+0
-        , script.config.LastRun.Conversion:=bSRCConverterVersion+0
         , script.config.LastRun.KeepFileName:=bKeepFilename+0
         , script.config.LastRun.RenderToOutputs:=bExecuteRScript+0
         , script.config.LastRun.BackupOutput:=bBackupOutput+0
