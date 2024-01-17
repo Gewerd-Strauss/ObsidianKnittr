@@ -178,9 +178,9 @@ main() {
     ;; OBSIDIANHTML SETUP CONFIGFILE
     obsidianhtml_configfile:=script.config.config.obsidianhtml_configfile
 
-    tmpconfig:=createTemporaryObsidianHTML_Config(guiOut.manuscriptpath, obsidianhtml_configfile,bConvertInsteadofRun)
+    tmpObsidianHTML_Config:=createTemporaryObsidianHTML_Config(guiOut.manuscriptpath, obsidianhtml_configfile,bConvertInsteadofRun)
         , EL.configtemplate_path:=obsidianhtml_configfile
-        , EL.configfile_contents:=tmpconfig[2]
+        , EL.configfile_contents:=tmpObsidianHTML_Config[2]
     notify("Running ObsidianHTML",CLIArgs)
     if (obsidianhtml_configfile="") {
         obsidianhtml_configfile:=script.config.config.obsidianhtml_configfile
@@ -214,10 +214,10 @@ main() {
             }
         }
     }
-    if (tmpconfig[1] && bConvertInsteadofRun) {
-        obsidianhtml_ret:=ObsidianHtml(,tmpconfig[1],,bUseOwnOHTMLFork,bVerboseCheckbox,OHTML_OutputDir,OHTML_WorkDir,OHTML_WorkDir_OwnFork,OHTMLScopeRestrictor_Object)
+    if (tmpObsidianHTML_Config[1] && bConvertInsteadofRun) {
+        obsidianhtml_ret:=ObsidianHtml(,tmpObsidianHTML_Config[1],,bUseOwnOHTMLFork,bVerboseCheckbox,OHTML_OutputDir,OHTML_WorkDir,OHTML_WorkDir_OwnFork,OHTMLScopeRestrictor_Object)
     } else {
-        obsidianhtml_ret:=ObsidianHtml(manuscriptpath,tmpconfig[1],,bUseOwnOHTMLFork,bVerboseCheckbox,OHTML_OutputDir,OHTML_WorkDir,OHTML_WorkDir_OwnFork,OHTMLScopeRestrictor_Object)
+        obsidianhtml_ret:=ObsidianHtml(manuscriptpath,tmpObsidianHTML_Config[1],,bUseOwnOHTMLFork,bVerboseCheckbox,OHTML_OutputDir,OHTML_WorkDir,OHTML_WorkDir_OwnFork,OHTMLScopeRestrictor_Object)
     }
     ;; OBSIDIANHTML REMOVE VAULT LIMITER
     if (bRestrictOHTMLScope) {
