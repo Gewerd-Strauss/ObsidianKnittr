@@ -171,7 +171,7 @@ main() {
         , EL.bUseOwnOHTMLFork:=bUseOwnOHTMLFork:=guiOut.Settings.bUseOwnOHTMLFork
         , EL.bRestrictOHTMLScope:=bRestrictOHTMLScope:=guiOut.Settings.bRestrictOHTMLScope
         , EL.bRemoveQuartoReferenceTypesFromCrossrefs:=bRemoveQuartoReferenceTypesFromCrossrefs:=guiOut.Settings.bRemoveQuartoReferenceTypesFromCrossrefs
-    if (output_type="") && (bVerboseCheckbox="") && (!A_Args.length()) {
+    if (output_type="") && (bVerboseCheckbox="") && (!CLIArgs.Count()) {
         ExitApp -1
     }
 
@@ -400,7 +400,7 @@ main() {
     } else if (FileExist(rscript_ret.Output_Path)) {
         removeTempDir(rscript_ret.OutputPath)
     }
-    if (!A_Args.length()) { ;; only change config when running in GUI mode
+    if (!CLIArgs.Count()) { ;; only change config when running in GUI mode
         script.config.LastRun.manuscriptpath:=StrReplace(script.config.LastRun.manuscriptpath, "/","\")
         script.save()
     }
@@ -607,7 +607,7 @@ processTags(Contents,bRemoveHashTagFromTags) {
     ;;  TODO: regexreplaceall for these patterns: "`{_obsidian_pattern_tag_XXXX}", as they are not found in the frontmatter and thus are not replaced
     return Contents
 }
-guiCreate(runCLI) {
+guiCreate(runCLI,CLIArgs) {
     global
     gui destroy
     if (!FileExist(A_ScriptDir "\INI-Files\DynamicArguments.ini")) {
@@ -672,7 +672,7 @@ guiCreate(runCLI) {
             }
         }
     }
-    if (!A_Args.length()) { ;; only change config when running in GUI mode
+    if (!CLIArgs.Count()) { ;; only change config when running in GUI mode
         script.config.LastRun.manuscriptpath:=StrReplace(script.config.LastRun.manuscriptpath, "/","\")
         script.save()
     }
@@ -791,7 +791,7 @@ GCAutoSubmit() {
 }
 guiShow(runCLI:=FALSE,CLIArgs:="") {
     global
-    filesuffixes:=guiCreate(runCLI)
+    filesuffixes:=guiCreate(runCLI,CLIArgs)
         , x:=(script.config.GuiPositioning.X!=""?script.config.GuiPositioning.X:200)
         , y:=(script.config.GuiPositioning.Y!=""?script.config.GuiPositioning.Y:200)
         , bAutoSubmitOTGUI:=false
@@ -830,7 +830,7 @@ guiShow(runCLI:=FALSE,CLIArgs:="") {
     } Else {
         x:=MouseX
     }
-    if (!A_Args.length()) {
+    if (!CLIArgs.count()) {
         gui 1: show,x%x% y%y% w%guiWidth% h%guiHeight%, % script.name " - Choose manuscript"
         enableGuiDrag(1)
         WinWaitClose % script.name " - Choose manuscript"
@@ -897,7 +897,7 @@ guiShow(runCLI:=FALSE,CLIArgs:="") {
             ot.SkipGUI:=bAutoSubmitOTGUI
         }
         ot.GenerateGUI(x,y,TRUE,"ParamsGUI:",1,1,674,1)
-        if (A_Args.length()) {
+        if (CLIArgs.count()) {
             for param,value in CLIArgs {
                 if !InStr(param,format) {
                     continue
@@ -911,7 +911,7 @@ guiShow(runCLI:=FALSE,CLIArgs:="") {
         ot.AssembleFormatString()
         Outputformats[format]:=ot
     }
-    if (!A_Args.length()) {
+    if (!CLIArgs.count()) {
         atmp:=getPotentialWorkDir(ChosenFile,ExecutionDirectory)
             , ExecutionDirectory:=(atmp.relativeToNote=1?script.config.config.OHTML_OutputDir:atmp.ExecutionDirectories)
             , ExecutionDirectory:=ExecutionDirectory . (SubStr(ExecutionDirectory,0)!="\"?"\":"")
@@ -1023,7 +1023,7 @@ guiSubmit() {
             script.config.LastRun.last_output_type.=", "
         }
     }
-    if (!A_Args.length()) { ;; only change config when running in GUI mode
+    if (!CLIArgs.Count()) { ;; only change config when running in GUI mode
         script.config.LastRun.manuscriptpath:=StrReplace(script.config.LastRun.manuscriptpath, "/","\")
             , script.save()
     }
