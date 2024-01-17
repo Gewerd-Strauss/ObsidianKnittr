@@ -1,9 +1,9 @@
-buildRScriptContent(Path,output_filename="",out="") {
+buildRScriptContent(Path,output_filename="",guiOut="") {
     SplitPath % Path,, Path2,, Name
     RScriptFilePath:=strreplace(Path2,"\","\\")
         , RScriptFolder:=strreplace(Path2,"\","/")
     OutputType_Print:=""
-    for _, output_type in out.sel {
+    for _, output_type in guiOut.sel {
         OutputType_Print.="sprintf('" output_type "')`n"
     }
     Str=
@@ -21,7 +21,7 @@ buildRScriptContent(Path,output_filename="",out="") {
             %OutputType_Print%
             version
         )
-    if out.settings.bForceFixPNGFiles {
+    if guiOut.settings.bForceFixPNGFiles {
         Str2=
             (LTrim
                 files <- list.files(pattern="*.PNG",recursive = TRUE)
@@ -44,11 +44,11 @@ buildRScriptContent(Path,output_filename="",out="") {
     }
     Name:=(output_filename!=""?output_filename:"index")
         , FormatOptions:=""
-    for _, Class in out.Outputformats { 
+    for _, Class in guiOut.Outputformats { 
         Class.FilenameMod:=" (" Class.package ")"
             , Class.Filename:=Name
     }
-    for _,Class in out.Outputformats {
+    for _,Class in guiOut.Outputformats {
         format:=Class.AssembledFormatString
         if Instr(format,"pdf") {
             continue
@@ -68,7 +68,7 @@ buildRScriptContent(Path,output_filename="",out="") {
             , FormatOptions.= A_Tab strreplace(format,"`n",A_Tab "`n") "`n`n"
     }
     ;; pdf handling
-    for _, Class in out.Outputformats { 
+    for _, Class in guiOut.Outputformats { 
         format:=Class.AssembledFormatString
         if !Instr(format,"pdf") {
 
