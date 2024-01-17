@@ -28,7 +28,6 @@ script := {base : script.base
         , aboutPath : A_ScriptDir "\res\About.html"
         , reqInternet: false
     ; , vfile_local : A_ScriptDir "\res\version.ini"
-        , EL : "359b3d07acd54175a1257e311b5dfaa8370467c95f869d80dba32f4afdcae19f4485d67815d9c1f4fe9a024586584b3a0e37489e7cfaad8ce4bbc657ed79bd74"
         , authorID : "Laptop-C"
         , Computername : A_ComputerName
         , license : A_ScriptDir "\res\LICENSE.txt" ;; do not edit the variables above if you don't know what you are doing.
