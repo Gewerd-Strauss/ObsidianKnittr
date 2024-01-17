@@ -11,13 +11,7 @@
     }
     return Object
 }
-processCLIFlags(Args) {
-    if (!Args.HasKey("LastExecutionDirectory")) {
-        Args.LastExecutionDirectory:=script.config.LastRun.LastExecutionDirectory
-    }
-    if (!Args.HasKey("OHTMLLevel")) {
-        Args.OHTMLLevel:=script.config.config.defaultRelativeLevel
-    }
+processCLIFlags(Byref Args) {
     if (!Args.HasKey("--noMove")) {
         Args.noMove:=0
     } else {
@@ -33,7 +27,19 @@ processCLIFlags(Args) {
     } else {
         Args.noIntermediates:=1
     }
-    return Args
+}
+processCLIArgs(ByRef Args) {
+    if (!Args.HasKey("LastExecutionDirectory")) {
+        Args.LastExecutionDirectory:=script.config.LastRun.LastExecutionDirectory
+    }
+    if (!Args.HasKey("OHTMLLevel")) {
+        Args.OHTMLLevel:=script.config.config.defaultRelativeLevel
+    }
+    if Args.HasKey("path") {
+        Args.path:=StrReplace(Args.path, "/","\")
+    } else {
+
+    }
 }
 requireA_Args(Args) {
     required:=["format","path"]

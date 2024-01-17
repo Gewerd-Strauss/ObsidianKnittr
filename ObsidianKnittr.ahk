@@ -118,7 +118,8 @@ main() {
                 msgbox % "error: arguments could not be validated. Missings Args?`n`nExpand upon this error message."
                 ExitApp -1
             } else {
-                CLIArgs:=processCLIFlags(CLIArgs)
+                processCLIFlags(CLIArgs)
+                processCLIArgs(CLIArgs)
             }
             CLIArgs.path:=StrReplace(CLIArgs.path, "/","\")
                 , script.config.LastRun.manuscriptpath:=CLIArgs.path
