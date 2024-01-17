@@ -171,7 +171,7 @@ main() {
         , EL.bUseOwnOHTMLFork:=guiOut.Settings.bUseOwnOHTMLFork
         , EL.bRestrictOHTMLScope:=guiOut.Settings.bRestrictOHTMLScope
         , EL.bRemoveQuartoReferenceTypesFromCrossrefs:=guiOut.Settings.bRemoveQuartoReferenceTypesFromCrossrefs
-    if (output_type="") && (guiOut.Settings.bVerboseCheckbox="") && (!CLIArgs.Count()) {
+    if (guiOut.sel="") && (guiOut.Settings.bVerboseCheckbox="") && (!CLIArgs.Count()) {
         ExitApp -1
     }
 
