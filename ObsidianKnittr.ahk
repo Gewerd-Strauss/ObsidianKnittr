@@ -641,22 +641,7 @@ guiCreate(runCLI,CLIArgs) {
     gui add, text, % "yp+20 xp+5", % "LM: " OutNameNoExt " (" OutDir ")"
     gui add, text, % "yp+20 xp", % "LL: " script.config.LastRun.LastRelativeLevel (script.config.LastRun.LastRelativeLevel=0?" (manuscript-folder)":"") " DL: " script.config.Config.defaultRelativeLevel
     gui add, text, % "ym xm" + WideControlWidth + 5,% " via Obsidian-HTML, RMarkdown and Quarto"
-    last_output:=script.config.LastRun.last_output_type
-    for _,output_type in PotentialOutputs {
-        Cond:=Instr(last_output,output_type)
-        if Cond {
-            Options:="Check"
-                , last_output:=strreplace(last_output,output_type)
-        } else {
-            Options:="-Check"
-        }
-        if (filesuffixes.HasKey(output_type)) {
-            Options.=" cGreen"
-        } else {
-            Options.=" cRed"
-        }
-        LV_Add(Options,output_type)
-    }
+    populateLV(script.config.LastRun.last_output_type,PotentialOutputs)
     HistoryString:=""
     for each, File in script.config.DDLHistory {
         if (!FileExist(File)) {
@@ -785,6 +770,24 @@ getDefinedOutputFormats(Path) {
         }
     }
     return [Arr,filesuffixes]
+}
+populateLV(last_output,PotentialOutputs) {
+    for _,potential_output_type in PotentialOutputs {
+        Cond:=Instr(last_output,potential_output_type)
+        if Cond {
+            Options:="Check"
+                , last_output:=strreplace(last_output,potential_output_type)
+        } else {
+            Options:="-Check"
+        }
+        if (filesuffixes.HasKey(potential_output_type)) {
+            Options.=" cGreen"
+        } else {
+            Options.=" cRed"
+        }
+        LV_Add(Options,potential_output_type)
+    }
+    return
 }
 GCAutoSubmit() {
     global bAutoSubmitOTGUI:=True
