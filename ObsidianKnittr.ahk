@@ -47,6 +47,7 @@ main() {
         , onError(erh)
         , exh:=Func("fonExit").Bind(DEBUG)
         , onExit(exh)
+    ;; LOAD/INIT SCRIPT-CONFIGS
     if !script.load() {
         RS_C:=rscript_check()
             , OHTML_C:=obsidianhtml_check()
@@ -173,6 +174,8 @@ main() {
     if (output_type="") && (bVerboseCheckbox="") && (!A_Args.length()) {
         ExitApp -1
     }
+
+    ;; OBSIDIANHTML SETUP CONFIGFILE
     obsidianhtml_configfile:=script.config.config.obsidianhtml_configfile
 
     tmpconfig:=createTemporaryObsidianHTML_Config(guiOut.manuscriptpath, obsidianhtml_configfile,bConvertInsteadofRun)
@@ -186,6 +189,7 @@ main() {
     ATC1:=A_TickCount
     Codetimer_Log()
 
+    ;; OBSIDIANHTML SETUP VAULT LIMITER
     OHTML_OutputDir:=Deref(script.config.config.OHTML_OutputDir)
         , OHTML_WorkDir:=Deref(script.config.config.OHTML_WorkDir)
         , OHTML_WorkDir_OwnFork := script.config.Config.OHTML_WorkDir_OwnFork ; "D:\Dokumente neu\ObsidianPluginDev\obsidian-html"
@@ -215,6 +219,7 @@ main() {
     } else {
         obsidianhtml_ret:=ObsidianHtml(manuscriptpath,tmpconfig[1],,bUseOwnOHTMLFork,bVerboseCheckbox,OHTML_OutputDir,OHTML_WorkDir,OHTML_WorkDir_OwnFork,OHTMLScopeRestrictor_Object)
     }
+    ;; OBSIDIANHTML REMOVE VAULT LIMITER
     if (bRestrictOHTMLScope) {
         tempOVaultRoot:=removeTemporaryObsidianVaultRoot(OHTMLScopeRestrictor_Object.Path,OHTMLScopeRestrictor_Object.Graph)
         if tempOVaultRoot.Removed {
@@ -230,6 +235,7 @@ main() {
             }
         }
     }
+    ;; OBSIDIANHTML POSTPROCESS RESULTS
     EL.ObsidianHTML_Duration:=Codetimer_Log()
         , EL.ObsidianHTML_End:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
         , EL.obsidianhtml_version:=strreplace(obsidianhtml_ret.obsidianhtml_version,"`n")
@@ -241,6 +247,8 @@ main() {
         , EL.ObsidianHTMLCMD:=obsidianhtml_ret["CMD"]
         , EL.ObsidianHTMLstdOut:=obsidianhtml_ret["stdOut"]
     vMDPath:=getObsidianHTML_MDPath(obsidianhtml_ret)
+
+    ;; INTERMEDIARY PROCESSING
     ;; Intermediary
     EL.Intermediary_Start:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
     Codetimer_Log()
@@ -274,6 +282,7 @@ main() {
         , EL.Intermediary_Duration:=Codetimer_Log()
         , EL.Intermediary_End:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
 
+    ;; COMPILE VIA RSCRIPT OR QUARTO_CLI
     ;; R
     EL.RScriptExecution_Start:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
         , Codetimer_Log()
