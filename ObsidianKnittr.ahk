@@ -765,8 +765,8 @@ getDefinedOutputFormats(Path) {
                 }
             }
         }
-        for _, output_type in PotentialOutputs {
-            Arr.push(output_type)
+        for _, potential_output_type in PotentialOutputs {
+            Arr.push(potential_output_type)
         }
     }
     return [Arr,filesuffixes]
@@ -1021,8 +1021,8 @@ guiSubmit() {
         , script.config.LastRun.UseOwnOHTMLFork:=bUseOwnOHTMLFork+0
         , script.config.LastRun.RemoveQuartoReferenceTypesFromCrossrefs:=bRemoveQuartoReferenceTypesFromCrossrefs+0
         , script.config.DDLHistory:=buildHistory(script.config.DDLHistory,script.config.Config.HistoryLimit,script.config.LastRun.manuscriptpath)
-    for each,output_type in sel {
-        script.config.LastRun.last_output_type.=output_type
+    for each,_output_type in sel {
+        script.config.LastRun.last_output_type.=_output_type
         if (each<sel.count()) {
             script.config.LastRun.last_output_type.=", "
         }
