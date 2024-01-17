@@ -44,8 +44,8 @@ requireA_Args(Args) {
             if (arg="path") {
                 val:=strreplace(val,"""")
                 if (!FileExist(val)) {
-                    message:="Fatal error: CLI run without providing required argument '" arg "'.`nThis program will exit now."
-                    AppError("Fatal argument-error occured", Message, Options := 0, TitlePrefix := A_ThisFunc "()")
+                    message:="Fatal error: CLI run without providing required argument '" arg "'.`nThis program will exit now." "`n" ttip_Obj2Str(Args)
+                    AppError("Fatal argument-error occured", Message, Options := 0, TitlePrefix := " > " A_ThisFunc ": ")
                     ExitApp -1
                 }
             }
@@ -66,31 +66,99 @@ requireA_Args(Args) {
     }
 }
 CLI_help() {
+    flags:={"--noMove":"`t`t-`tSet to '1' to convert the note locally and create the '.qmd'-file at the location of the root."
+            , "--noIntermediates": "`t-`tSet to '1' to delete/not store intermediate files after finishing execution.`n`t`t`t`t`t`t`tDeletes the output directory itself(?)"
+            , "--noOpen":"`t`t-`tSet to '1' to not open the output directory after execution finishes."
+            , "--noRender":"`t`t-`tSet to '1' to only create the '.qmd'-file, without rendering to outputs.`n`t`t`t`t`t`t`tOverwrites CL-Arg 'RenderToOutputs'"}
     Obj:={Path:"`t`t`t-`t(req): absolute path to the note being processed. The note must lie within an obsidian-Vault, as detected`n`t`t`t`t`t`tby the presence of an ``.obsidian``-folder somewhere above the note's location."
             , format:"`t`t`t-`t(req): key of the output-format used. Output format must be defined in 'DynamicArguments.ini'."
-            , FullLog:"`t`t`t-`tNOT TESTED"
+            , FullLog:"`t`t`t-`tNOT IMPLEMENTED"
             , OHTMLLevel:"`t`t-`tInteger, set to number of levels above the manuscript-LOCATION to implement an OHTML-restrictor."
-            , Log:"`t`t`t-`tDD"
+            , Log:"`t`t`t-`tNOT IMPLEMENTED"
             , "quarto::XXXX.YY":"`t`t-`tPass along parameter modifications for parameter 'YY' of quarto-format 'XXXX'. Use quarto's parameter naming-scheme`n`t`t`t`t`t`tExample: ``quarto::html.number-depth=1``"
-            , RenderToOutputs:"`t-`tSet to '1' to execute file-compilation via quarto-cli/`rscript`"
-            , noMove:"`t-SEt to '1' to convert the note locally and create the '.qmd'-file at the location of the root."
+            , RenderToOutputs:"`t`t-`tSet to '1' to execute file-compilation via quarto-cli/``rscript``"
             , LastExecutionDirectory:"`t-`tSet to '1' to process in OHTML-output directory, set to '2' to process in vault-subfolder."}
     name:=script.name
-    str=
+    version:=script.version
+    str1=
         (LTRIM
-            CLI-Overview for '%name%':
-            -h`tPaste this help
-            -v`tPaste Version
+            ---------------------------------------
+            CLI-Overview for '%name%' (v.%version%)
+            1/3 - CLI-Arguments
+            ---------------------------------------
+            -h`treturn this help
+            -v`treturn version
+
+            Arguments:
+
         )
     for Arg, Explanation in Obj {
-        str.="`t`t" Arg  Explanation "`n"
+        str1.="`t`t" Arg  Explanation "`n"
     }
-    str.="`n`nPress [Esc] to close the help."
-    ttip(str,5)
+    str2=
+        (LTrim
+            ---------------------------------------
+            CLI-Overview for '%name%' (v.%version%)
+            2/3 - Flags
+            ---------------------------------------
+
+            Flags:
+
+        )
+    for Arg, Explanation in flags {
+        str2.="`t`t" Arg  Explanation "`n"
+    }
+    str3=
+        (LTrim
+            ---------------------------------------
+            CLI-Overview for '%name%' (v.%version%)
+            3/3 - to-be-decided
+            ---------------------------------------
+
+        )
+    ;for Arg, Explanation in flags {
+    ;    str3.="`t`t" Arg  Explanation "`n"
+    ;}
+    str1_2=
+        (LTRIM
+            ---------------------------------------
+            < {X} | {2} | {3} > 
+            ---------------------------------------
+            Press [Esc] to close the help.
+            Press [1-9] for further details.
+        )
+
+    str2_2=
+        (LTRIM
+            ---------------------------------------
+            < {1} | {X} | {3} > 
+            ---------------------------------------
+            Press [Esc] to close the help.
+            Press [1-9] for further details.
+        )
+    str3_2=
+        (LTRIM
+            ---------------------------------------
+            < {1} | {2} | {X} > 
+            ---------------------------------------
+            Press [Esc] to close the help.
+            Press [1-9] for further details.
+        )
+    curr_help:=str1 str1_2
     while (1) {
         if GetKeyState("Escape") {
             break
         }
+        if (GetKeyState(1)) {
+            curr_help:=str1 str1_2
+        } else if (GetKeyState(2)) {
+            curr_help:=str2 str2_2
+        } else if (GetKeyState(3)) {
+            curr_help:=str3 str3_2
+        } else if (GetKeyState("LCtrl") && GetKeyState("C")) {
+            Clipboard:=curr_help
+        }
+        ttip(curr_help,5)
     }
     return
 }
