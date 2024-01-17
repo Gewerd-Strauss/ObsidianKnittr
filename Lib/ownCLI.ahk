@@ -11,6 +11,30 @@
     }
     return Object
 }
+processCLIFlags(Args) {
+    if (!Args.HasKey("LastExecutionDirectory")) {
+        Args.LastExecutionDirectory:=script.config.LastRun.LastExecutionDirectory
+    }
+    if (!Args.HasKey("OHTMLLevel")) {
+        Args.OHTMLLevel:=script.config.config.defaultRelativeLevel
+    }
+    if (!Args.HasKey("--noMove")) {
+        Args.noMove:=0
+    } else {
+        Args.noMove:=1
+    }
+    if (Args.HasKey("--noRender")) {
+        Args.RenderToOutputs:=0
+    } else {
+        Args.RenderToOutputs:=1
+    }
+    if (!Args.HasKey("--noIntermediates")) {
+        Args.noIntermediates:=0
+    } else {
+        Args.noIntermediates:=1
+    }
+    return Args
+}
 requireA_Args(Args) {
     required:=["format","path"]
     found:=[]

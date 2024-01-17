@@ -1,5 +1,5 @@
 buildRScriptContent(Path,output_filename="",out="") {
-    SplitPath % Path, , Path2, , Name
+    SplitPath % Path,, Path2,, Name
     RScriptFilePath:=strreplace(Path2,"\","\\")
         , RScriptFolder:=strreplace(Path2,"\","/")
     OutputType_Print:=""
@@ -140,20 +140,24 @@ runRScript(Path,script_contents,Outputformats,RScript_Path:="") {
     if !FileExist(RScript_Path) {
         RScript_Path:=rscript_check().2
         if !FileExist(RScript_Path) {
-            MsgBox 0x10,% script.name " - " A_ThisFunc "()", % "Error encountered`; the Path provided for the RScript-Utility ('" RScript_Path "') does not point to a valid file.`nAdditionally, Rscript is not part of the PATH variable, thus 'where rscript' fails as well. The manuscript cannot be compiled to output formats.`nLocate RScript or manually execute the rscript to proceeed."
+            Title:=""
+            Message:="Error encountered`; the Path provided for the RScript-Utility ('" RScript_Path "') does not point to a valid file.`nAdditionally, Rscript is not part of the PATH variable, thus 'where rscript' fails as well. The manuscript cannot be compiled to output formats.`nLocate RScript or manually execute the rscript to proceeed."
+            AppError(Title, Message,0x10," > " A_ThisFunc)
             return ["FILENOTFOUND:" RScript_Path,"where rscript",""]
         }
     }
     CMD:=Quote_ObsidianHTML(RScript_Path) A_Space Quote_ObsidianHTML(strreplace(OutDir "\build.R","\","\")) ;; works with valid codefile (manually ensured no utf-corruption) from cmd, all three work for paths not containing umlaute with FileAppend
     if DEBUG {
-        CLipboard:=CMD "`n" OutDir "`n`n`n`n" Quote_ObsidianHTML(InOut)
+        Clipboard:=CMD "`n" OutDir "`n`n`n`n" Quote_ObsidianHTML(InOut)
     }
     GetStdStreams_WithInput(CMD, OutDir, InOut:="`n")
     if DEBUG {
         Clipboard:=InOut
     }
     if !validateRExecution(InOut,Outputformats) {
-        MsgBox 0x10,% script.name " - " A_ThisFunc "()", % "Error encountered`; the 'build.R'-script did not run to succession.`n`nFor more information, see the generated 'Executionlog.txt'-file, and execute the 'build.R'-script via console or RStudio.`n`nThe script will continue to cleanup its working directories now.",4
+        Title:="Execution of 'build.R' failed."
+        Message:="Error encountered`; the 'build.R'-script did not run to succession.`n`nFor more information, see the generated 'Executionlog.txt'-file, and execute the 'build.R'-script via console or RStudio.`n`nThe script will continue to cleanup its working directories now."
+        AppError(Title, Message,0x40010," > " A_ThisFunc,4)
     }
     return [InOut,CMD,OutDir]
 }
