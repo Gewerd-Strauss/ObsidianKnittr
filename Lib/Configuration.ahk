@@ -28,9 +28,6 @@
             bStripLocalMarkdownLinks=0
             Conversion=
             ConvertInsteadofRun=1
-            ForceFixPNGFiles=0
-            FullLog=0
-            InsertSetupChunk=0
             KeepFileName=1
             last_output_type=
             LastRelativeLevel=1

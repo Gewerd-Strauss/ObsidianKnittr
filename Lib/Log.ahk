@@ -49,8 +49,6 @@ Vault Limited             : `%bRestrictOHTMLScope`%
 
 RMD:
 Execute R-Script          : `%bRendertoOutputs`%
-Fixed PNG Files           : `%bForceFixPNGFiles`%
-Inserted Setup Chunk      : `%bInsertSetupChunk`%
 
 QMD: 
 Quarto - Version          : `%Quarto_Version`%

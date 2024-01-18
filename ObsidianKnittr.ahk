@@ -138,8 +138,6 @@ main() {
         , EL.bKeepFilename:=guiOut.Settings.bKeepFilename
         , EL.bRendertoOutputs:=guiOut.Settings.bRendertoOutputs
         , EL.bRemoveHashTagFromTags:=guiOut.Settings.bRemoveHashTagFromTags
-        , EL.bForceFixPNGFiles:=guiOut.Settings.bForceFixPNGFiles
-        , EL.bInsertSetupChunk:=guiOut.Settings.bInsertSetupChunk
         , EL.bConvertInsteadofRun:=guiOut.Settings.bConvertInsteadofRun
         , EL.bRemoveObsidianHTMLErrors:=guiOut.Settings.bRemoveObsidianHTMLErrors
         , EL.bStripLocalMarkdownLinks:=guiOut.Settings.bStripLocalMarkdownLinks
@@ -240,7 +238,7 @@ main() {
         , EL.rawInputcopyLocation:=rawinputCopyLocation
     ; 7
     notify("Converting Image SRC's",CLIArgs)
-    NewContents:=ConvertSRC_SYNTAX_V4(rmd_Path,guiOut.Settings.bInsertSetupChunk,guiOut.Settings.bRemoveObsidianHTMLErrors,guiOut.Settings.bStripLocalMarkdownLinks)
+    NewContents:=ConvertSRC_SYNTAX_V4(rmd_Path,guiOut.Settings.bRemoveObsidianHTMLErrors,guiOut.Settings.bStripLocalMarkdownLinks)
     notify("Processing Tags",CLIArgs)
     NewContents:=processTags(NewContents,guiOut.Settings.bRemoveHashTagFromTags)
     notify("Processing Abstract",CLIArgs)
@@ -653,8 +651,6 @@ guiCreate(runCLI,CLIArgs) {
     gui add, Groupbox, % "xm" +WideControlWidth + 5 " yp" + 55 " w" WideControlWidth " h170", General configuration
     gui add, checkbox, % "xp+10 yp+20" " vbRemoveHashTagFromTags", % "Remove '#' from tags?"
     gui add, checkbox, % "xp yp+20" " vbStripLocalMarkdownLinks", % "Strip local markdown links?"
-    gui add, checkbox, % "xp yp+20" " vbInsertSetupChunk", % "!Insert Setup-Chunk?"
-    gui add, checkbox, % "xp yp+20" " vbForceFixPNGFiles", % "Double-convert png-files pre-rendering?"
     gui add, checkbox, % "xp yp+20" " vbKeepFilename", % "Keep Filename?"
     gui add, checkbox, % "xp yp+20" " vbRendertoOutputs", % "Render manuscripts to chosen outputs?"
     gui add, checkbox, % "xp yp+20" " vbBackupOutput", % "Backup Output files before rendering?"
@@ -682,8 +678,6 @@ guiCreate(runCLI,CLIArgs) {
         guicontrol,, bRendertoOutputs, % (script.config.LastRun.RenderToOutputs)
         guicontrol,, bBackupOutput, % (script.config.LastRun.BackupOutput)
         guicontrol,, bRemoveHashTagFromTags, % (script.config.LastRun.RemoveHashTagFromTags)
-        guicontrol,, bForceFixPNGFiles, % (script.config.LastRun.ForceFixPNGFiles)
-        guicontrol,, bInsertSetupChunk, % (script.config.LastRun.InsertSetupChunk)
         guicontrol,, bConvertInsteadofRun, % (script.config.LastRun.ConvertInsteadofRun)
         guicontrol,, bRemoveObsidianHTMLErrors, % (script.config.LastRun.RemoveObsidianHTMLErrors)
         guicontrol,, bStripLocalMarkdownLinks, % (script.config.LastRun.bStripLocalMarkdownLinks)
@@ -834,18 +828,16 @@ guiShow(runCLI:=FALSE,CLIArgs:="") {
         }
         SplitPath % script.config.lastrun.manuscriptpath,, OutDir
         SplitPath % OutDir,, OutDir,
-        bVerboseCheckbox := (script.config.LastRun.Verbose)
-            , bRestrictOHTMLScope := (script.config.LastRun.RestrictOHTMLScope)
-            , bKeepFilename := (script.config.LastRun.KeepFileName)
-            , bBackupOutput := (script.config.LastRun.BackupOutput)
-            , bRemoveHashTagFromTags := (script.config.LastRun.RemoveHashTagFromTags)
-            , bForceFixPNGFiles := (script.config.LastRun.ForceFixPNGFiles)
-            , bInsertSetupChunk := (script.config.LastRun.InsertSetupChunk)
-            , bConvertInsteadofRun := (script.config.LastRun.ConvertInsteadofRun)
-            , bRemoveObsidianHTMLErrors := (script.config.LastRun.RemoveObsidianHTMLErrors)
-            , bStripLocalMarkdownLinks := (script.config.LastRun.bStripLocalMarkdownLinks)
-            , bUseOwnOHTMLFork := (script.config.LastRun.UseOwnOHTMLFork)
-            , bRemoveQuartoReferenceTypesFromCrossrefs := (script.config.LastRun.RemoveQuartoReferenceTypesFromCrossrefs)
+        bVerboseCheckbox := (CLIArgs.Verbose?1:0)
+        ;, bRestrictOHTMLScope := (script.config.LastRun.RestrictOHTMLScope)                                               ;; handled
+            , bKeepFilename := (script.config.LastRun.KeepFileName)                                                             ;; TODO: implement cli toggle                                
+            , bBackupOutput := (script.config.LastRun.BackupOutput)                                                             ;; TODO: implement cli toggle
+            , bRemoveHashTagFromTags := (script.config.LastRun.RemoveHashTagFromTags)                                           ;; TODO: implement cli toggle
+            , bConvertInsteadofRun := (script.config.LastRun.ConvertInsteadofRun)                                               ;; TODO: implement cli toggle
+            , bRemoveObsidianHTMLErrors := (script.config.LastRun.RemoveObsidianHTMLErrors)                                     ;; TODO: implement cli toggle
+            , bStripLocalMarkdownLinks := (script.config.LastRun.bStripLocalMarkdownLinks)                                      ;; TODO: implement cli toggle
+            , bUseOwnOHTMLFork := (script.config.LastRun.UseOwnOHTMLFork)                                                       ;; TODO: implement cli toggle
+            , bRemoveQuartoReferenceTypesFromCrossrefs := (script.config.LastRun.RemoveQuartoReferenceTypesFromCrossrefs)       ;; TODO: implement cli toggle
             , bRendertoOutputs := (CLIArgs.RenderToOutputs)                                                        ;; TODO: implement cli toggle                                
         ; , Button2 := (script.config.LastRun.LastExecutionDirectory=1?1:0)
         ; , Button3 := (script.config.LastRun.LastExecutionDirectory=1?0:1)
@@ -899,8 +891,6 @@ guiShow(runCLI:=FALSE,CLIArgs:="") {
                     ,"bRendertoOutputs":bRendertoOutputs + 0
                     ,"bRemoveHashTagFromTags":bRemoveHashTagFromTags + 0
                     ,"bRemoveQuartoReferenceTypesFromCrossrefs":bRemoveQuartoReferenceTypesFromCrossrefs + 0
-                    ,"bForceFixPNGFiles":bForceFixPNGFiles + 0
-                    ,"bInsertSetupChunk":bInsertSetupChunk + 0
                     ,"bConvertInsteadofRun":bConvertInsteadofRun + 0
                     ,"bRemoveObsidianHTMLErrors":bRemoveObsidianHTMLErrors + 0
                     ,"bRestrictOHTMLScope":bRestrictOHTMLScope + 0
@@ -968,8 +958,6 @@ guiSubmit() {
         , script.config.LastRun.RenderToOutputs:=bRendertoOutputs+0
         , script.config.LastRun.BackupOutput:=bBackupOutput+0
         , script.config.LastRun.RemoveHashTagFromTags:=bRemoveHashTagFromTags+0
-        , script.config.LastRun.ForceFixPNGFiles:=bForceFixPNGFiles+0
-        , script.config.LastRun.InsertSetupChunk:=bInsertSetupChunk+0
         , script.config.LastRun.ConvertInsteadofRun:=bConvertInsteadofRun+0
         , script.config.LastRun.RemoveObsidianHTMLErrors:=bRemoveObsidianHTMLErrors+0
         , script.config.LastRun.bStripLocalMarkdownLinks:=bStripLocalMarkdownLinks+0

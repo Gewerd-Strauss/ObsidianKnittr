@@ -21,27 +21,6 @@ buildRScriptContent(Path,output_filename="",guiOut="") {
             %OutputType_Print%
             version
         )
-    if guiOut.settings.bForceFixPNGFiles {
-        Str2=
-            (LTrim
-                files <- list.files(pattern="*.PNG",recursive = TRUE)
-                files2 <- list.files(pattern="*.png",recursive = TRUE)
-                filesF <- c(files,files2)
-                lapply(filesF,ImgFix  <- function(Path="")
-                {
-                png_image  <- magick::image_read(Path)
-                jpeg_image <- magick::image_convert(png_image,"JPEG")
-                png_image  <- magick::image_convert(jpeg_image,"PNG")
-                magick::image_write(png_image,Path)
-                sprintf( "Fixed Path '`%s'", Path)
-                })
-            )
-        Str.="`n" Str2
-        bFixPNGs:=true
-    }
-    else {
-        bFixPNGs:=false
-    }
     Name:=(output_filename!=""?output_filename:"index")
         , FormatOptions:=""
     for _, Class in guiOut.Outputformats { 
@@ -85,28 +64,6 @@ buildRScriptContent(Path,output_filename="",guiOut="") {
             Str3:=format
         }
         Str3:=Strreplace(Str3,"%Name%",Name Class.FilenameMod)
-        Str2=
-            (LTrim
-                files <- list.files(pattern="*.PNG",recursive = TRUE)
-                files2 <- list.files(pattern="*.png",recursive = TRUE)
-                filesF <- c(files,files2)
-                lapply(filesF,ImgFix  <- function(Path="")
-                {
-                png_image  <- magick::image_read(Path)
-                jpeg_image <- magick::image_convert(png_image,"JPEG")
-                png_image  <- magick::image_convert(jpeg_image,"PNG")
-                magick::image_write(png_image,Path)
-                sprintf( "Fixed Path '`%s'", Path)
-                })
-
-
-
-
-                rmarkdown::render(`"index.rmd`",%format%,`"%Name%"`)`n
-            )
-        if bFixPNGs {
-            ;Str2:="`n" Str3 "`n"
-        }
         Str.="`n`n" Str3
             , FormatOptions.= A_Tab strreplace(format,"`n",A_Tab "`n") "`n`n"
     }
