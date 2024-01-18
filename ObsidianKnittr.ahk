@@ -590,6 +590,9 @@ guiCreate(runCLI,CLIArgs) {
     ret:=getDefinedOutputFormats(A_ScriptDir "\INI-Files\DynamicArguments.ini")
         , PotentialOutputs:=ret[1]
         , filesuffixes:=ret[2]
+    if (CLIArgs.count()) {
+        return filesuffixes
+    }
     Gui Margin, 16, 16
     Gui +AlwaysOnTop -SysMenu -ToolWindow -caption +Border +LabelGC +hwndOKGui
     Gui Color, 1d1f21, 373b41,
