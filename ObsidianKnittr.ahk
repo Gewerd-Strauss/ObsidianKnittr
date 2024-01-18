@@ -128,12 +128,11 @@ main() {
             guiOut:=guiShow(true,CLIArgs)
         }
     }
-
-    ;; defined formats-string for EL, define bautosubmitgui, 
+    ;; POPULATE EL WITH VALUES
     ExecutionDirectory:=guiOut.Settings.ExecutionDirectory
     EL.manuscriptname:=guiOut.manuscriptname
-    EL.formats:=concat_formats(guiOut.Outputformats)
-        , EL.manuscriptpath:=manuscriptpath:=guiOut.manuscriptpath
+        , EL.formats:=concat_formats(guiOut.Outputformats)
+        , EL.manuscriptpath:=guiOut.manuscriptpath
         , EL.bVerboseCheckbox:=guiOut.Settings.bVerboseCheckbox
         , EL.bKeepFilename:=guiOut.Settings.bKeepFilename
         , EL.bRendertoOutputs:=guiOut.Settings.bRendertoOutputs
@@ -949,30 +948,29 @@ guiSubmit() {
     if !FileExist(manuscriptpath) {
         manuscriptpath:=chooseFile()
     }
-    script.config.LastRun.path_lastmanuscript:=script.config.LastRun.manuscriptpath
-        , script.config.LastRun.manuscriptpath:=manuscriptpath
-        , script.config.LastRun.last_output_type:=""
-        , script.config.LastRun.Verbose:=bVerboseCheckbox+0
-        , script.config.LastRun.RestrictOHTMLScope:=bRestrictOHTMLScope+0
-        , script.config.LastRun.KeepFileName:=bKeepFilename+0
-        , script.config.LastRun.RenderToOutputs:=bRendertoOutputs+0
-        , script.config.LastRun.BackupOutput:=bBackupOutput+0
-        , script.config.LastRun.RemoveHashTagFromTags:=bRemoveHashTagFromTags+0
-        , script.config.LastRun.ConvertInsteadofRun:=bConvertInsteadofRun+0
-        , script.config.LastRun.RemoveObsidianHTMLErrors:=bRemoveObsidianHTMLErrors+0
-        , script.config.LastRun.bStripLocalMarkdownLinks:=bStripLocalMarkdownLinks+0
-        , script.config.LastRun.UseOwnOHTMLFork:=bUseOwnOHTMLFork+0
-        , script.config.LastRun.RemoveQuartoReferenceTypesFromCrossrefs:=bRemoveQuartoReferenceTypesFromCrossrefs+0
-        , script.config.DDLHistory:=buildHistory(script.config.DDLHistory,script.config.Config.HistoryLimit,script.config.LastRun.manuscriptpath)
-    for each,_output_type in sel {
-        script.config.LastRun.last_output_type.=_output_type
-        if (each<sel.count()) {
-            script.config.LastRun.last_output_type.=", "
-        }
-    }
     if (!CLIArgs.Count()) { ;; only change config when running in GUI mode
-        script.config.LastRun.manuscriptpath:=StrReplace(script.config.LastRun.manuscriptpath, "/","\")
-            , script.save()
+        script.config.LastRun.path_lastmanuscript:=StrReplace(script.config.LastRun.manuscriptpath, "/","\")
+            , script.config.LastRun.manuscriptpath:=StrReplace(manuscriptpath, "/","\")
+            , script.config.LastRun.last_output_type:=""
+            , script.config.LastRun.Verbose:=bVerboseCheckbox+0
+            , script.config.LastRun.RestrictOHTMLScope:=bRestrictOHTMLScope+0
+            , script.config.LastRun.KeepFileName:=bKeepFilename+0
+            , script.config.LastRun.RenderToOutputs:=bRendertoOutputs+0
+            , script.config.LastRun.BackupOutput:=bBackupOutput+0
+            , script.config.LastRun.RemoveHashTagFromTags:=bRemoveHashTagFromTags+0
+            , script.config.LastRun.ConvertInsteadofRun:=bConvertInsteadofRun+0
+            , script.config.LastRun.RemoveObsidianHTMLErrors:=bRemoveObsidianHTMLErrors+0
+            , script.config.LastRun.bStripLocalMarkdownLinks:=bStripLocalMarkdownLinks+0
+            , script.config.LastRun.UseOwnOHTMLFork:=bUseOwnOHTMLFork+0
+            , script.config.LastRun.RemoveQuartoReferenceTypesFromCrossrefs:=bRemoveQuartoReferenceTypesFromCrossrefs+0
+            , script.config.DDLHistory:=buildHistory(script.config.DDLHistory,script.config.Config.HistoryLimit,script.config.LastRun.manuscriptpath)
+        for each,_output_type in sel {
+            script.config.LastRun.last_output_type.=_output_type
+            if (each<sel.count()) {
+                script.config.LastRun.last_output_type.=", "
+            }
+        }
+        script.save()
     }
     return [DDLval,manuscriptpath,sel]
 }
