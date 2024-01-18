@@ -136,7 +136,7 @@ main() {
         , EL.manuscriptpath:=manuscriptpath:=guiOut.manuscriptpath
         , EL.bVerboseCheckbox:=guiOut.Settings.bVerboseCheckbox
         , EL.bKeepFilename:=guiOut.Settings.bKeepFilename
-        , EL.bExecuteRScript:=guiOut.Settings.bExecuteRScript
+        , EL.bRendertoOutputs:=guiOut.Settings.bRendertoOutputs
         , EL.bRemoveHashTagFromTags:=guiOut.Settings.bRemoveHashTagFromTags
         , EL.bForceFixPNGFiles:=guiOut.Settings.bForceFixPNGFiles
         , EL.bInsertSetupChunk:=guiOut.Settings.bInsertSetupChunk
@@ -295,7 +295,7 @@ main() {
         if (CLIArgs.HasKey("--noRender")) {
 
         } else {
-            if (guiOut.Settings.bExecuteRScript) {
+            if (guiOut.Settings.bRendertoOutputs) {
                 if guiOut.Settings.bBackupOutput && ((!CLIArgs.HasKey("--noMove"))) {
                     ttip(-1)
                     notify("Backing up Files",CLIArgs)
@@ -326,7 +326,7 @@ main() {
         }
     } else {
         script_contents:=tmp.1
-        if guiOut.Settings.bExecuteRScript {
+        if guiOut.Settings.bRendertoOutputs {
             ;ttip(" ",5,,,,,,,16)
             ttip(-1)
             notify("Executing R-BuildScript",CLIArgs)
@@ -656,7 +656,7 @@ guiCreate(runCLI,CLIArgs) {
     gui add, checkbox, % "xp yp+20" " vbInsertSetupChunk", % "!Insert Setup-Chunk?"
     gui add, checkbox, % "xp yp+20" " vbForceFixPNGFiles", % "Double-convert png-files pre-rendering?"
     gui add, checkbox, % "xp yp+20" " vbKeepFilename", % "Keep Filename?"
-    gui add, checkbox, % "xp yp+20" " vbExecuteRScript", % "Render manuscripts to chosen outputs?"
+    gui add, checkbox, % "xp yp+20" " vbRendertoOutputs", % "Render manuscripts to chosen outputs?"
     gui add, checkbox, % "xp yp+20" " vbBackupOutput", % "Backup Output files before rendering?"
 
     gui add, Groupbox, % "xm" +WideControlWidth + 5 " yp" + 35 " w" WideControlWidth " h70", Engine-Specific Stuff
@@ -679,7 +679,7 @@ guiCreate(runCLI,CLIArgs) {
         guicontrol,, bVerboseCheckbox, % (script.config.LastRun.Verbose)
         guicontrol,, bRestrictOHTMLScope, % (script.config.LastRun.RestrictOHTMLScope)
         guicontrol,, bKeepFilename, % (script.config.LastRun.KeepFileName)
-        guicontrol,, bExecuteRScript, % (script.config.LastRun.RenderToOutputs)
+        guicontrol,, bRendertoOutputs, % (script.config.LastRun.RenderToOutputs)
         guicontrol,, bBackupOutput, % (script.config.LastRun.BackupOutput)
         guicontrol,, bRemoveHashTagFromTags, % (script.config.LastRun.RemoveHashTagFromTags)
         guicontrol,, bForceFixPNGFiles, % (script.config.LastRun.ForceFixPNGFiles)
@@ -837,7 +837,6 @@ guiShow(runCLI:=FALSE,CLIArgs:="") {
         bVerboseCheckbox := (script.config.LastRun.Verbose)
             , bRestrictOHTMLScope := (script.config.LastRun.RestrictOHTMLScope)
             , bKeepFilename := (script.config.LastRun.KeepFileName)
-            , bExecuteRScript := (script.config.LastRun.RenderToOutputs)
             , bBackupOutput := (script.config.LastRun.BackupOutput)
             , bRemoveHashTagFromTags := (script.config.LastRun.RemoveHashTagFromTags)
             , bForceFixPNGFiles := (script.config.LastRun.ForceFixPNGFiles)
@@ -847,6 +846,7 @@ guiShow(runCLI:=FALSE,CLIArgs:="") {
             , bStripLocalMarkdownLinks := (script.config.LastRun.bStripLocalMarkdownLinks)
             , bUseOwnOHTMLFork := (script.config.LastRun.UseOwnOHTMLFork)
             , bRemoveQuartoReferenceTypesFromCrossrefs := (script.config.LastRun.RemoveQuartoReferenceTypesFromCrossrefs)
+            , bRendertoOutputs := (CLIArgs.RenderToOutputs)                                                        ;; TODO: implement cli toggle                                
         ; , Button2 := (script.config.LastRun.LastExecutionDirectory=1?1:0)
         ; , Button3 := (script.config.LastRun.LastExecutionDirectory=1?0:1)
     }
@@ -896,7 +896,7 @@ guiShow(runCLI:=FALSE,CLIArgs:="") {
                 ,Settings:{"bVerboseCheckbox":bVerboseCheckbox + 0
                     ,"bKeepFilename":bKeepFilename + 0
                     ,"bBackupOutput":bBackupOutput + 0
-                    ,"bExecuteRScript":bExecuteRScript + 0
+                    ,"bRendertoOutputs":bRendertoOutputs + 0
                     ,"bRemoveHashTagFromTags":bRemoveHashTagFromTags + 0
                     ,"bRemoveQuartoReferenceTypesFromCrossrefs":bRemoveQuartoReferenceTypesFromCrossrefs + 0
                     ,"bForceFixPNGFiles":bForceFixPNGFiles + 0
@@ -906,7 +906,7 @@ guiShow(runCLI:=FALSE,CLIArgs:="") {
                     ,"bRestrictOHTMLScope":bRestrictOHTMLScope + 0
                     ,"bStripLocalMarkdownLinks":bStripLocalMarkdownLinks + 0
                     ,"ExecutionDirectory":ExecutionDirectory
-                    ,"bAutoSubmitOTGUI":bAutoSubmitOTGUI
+                    ,"bAutoSubmitOTGUI":bAutoSubmitOTGUI + 0
                     ,"bUseOwnOHTMLFork":bUseOwnOHTMLFork + 0}
                 ,"Outputformats":Outputformats
                 ,"filesuffixes":filesuffixes}
@@ -965,7 +965,7 @@ guiSubmit() {
         , script.config.LastRun.Verbose:=bVerboseCheckbox+0
         , script.config.LastRun.RestrictOHTMLScope:=bRestrictOHTMLScope+0
         , script.config.LastRun.KeepFileName:=bKeepFilename+0
-        , script.config.LastRun.RenderToOutputs:=bExecuteRScript+0
+        , script.config.LastRun.RenderToOutputs:=bRendertoOutputs+0
         , script.config.LastRun.BackupOutput:=bBackupOutput+0
         , script.config.LastRun.RemoveHashTagFromTags:=bRemoveHashTagFromTags+0
         , script.config.LastRun.ForceFixPNGFiles:=bForceFixPNGFiles+0

@@ -48,7 +48,7 @@ Stripped Local MD-Links   : `%bStripLocalMarkdownLinks`%
 Vault Limited             : `%bRestrictOHTMLScope`%
 
 RMD:
-Execute R-Script          : `%bExecuteRScript`%
+Execute R-Script          : `%bRendertoOutputs`%
 Fixed PNG Files           : `%bForceFixPNGFiles`%
 Inserted Setup Chunk      : `%bInsertSetupChunk`%
 
