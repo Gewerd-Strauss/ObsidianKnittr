@@ -595,8 +595,9 @@ guiCreate(runCLI,CLIArgs) {
     ret:=getDefinedOutputFormats(A_ScriptDir "\INI-Files\DynamicArguments.ini")
         , PotentialOutputs:=ret[1]
         , filesuffixes:=ret[2]
+        , inputsuffixes:=ret[3]
     if (CLIArgs.count()) {
-        return filesuffixes
+        return [filesuffixes,inputsuffixes]
     }
     Gui Margin, 16, 16
     Gui +AlwaysOnTop -SysMenu -ToolWindow -caption +Border +LabelGC +hwndOKGui
@@ -675,7 +676,6 @@ guiCreate(runCLI,CLIArgs) {
     Gui Add, Text,x15 yp,% script.name " v." regexreplace(script.config.version.ObsidianKnittr_Version,"\s*","") " | Obsidian-HTML v." strreplace(script.config.version.ObsidianHTML_Version,"commit:")
     Gui Add, Text,x15 yp+15,% "Quarto-cli" " v." regexreplace(quartogetVersion(),"\s*","") " | Using " (script.config.config.useQuartoCLI?"quarto-cli":"quarto's R-package")
     script.version:=script.config.version.ObsidianKnittr_Version
-
     if (script.config.LastRun.manuscriptpath!="") && (script.config.LastRun.last_output_type!="") {
         SplitPath % script.config.lastrun.manuscriptpath,, OutDir
         SplitPath % OutDir, OutFileName, OutDir,
@@ -693,7 +693,7 @@ guiCreate(runCLI,CLIArgs) {
         guicontrol,, Button2, % (script.config.LastRun.LastExecutionDirectory=1?1:0)
         guicontrol,, Button3, % (script.config.LastRun.LastExecutionDirectory=1?0:1)
     }
-    return filesuffixes
+    return [filesuffixes,inputsuffixes]
 }
 getPotentialWorkDir(File,ExecutionDirectory) {
     gui submit, nohide
@@ -706,6 +706,7 @@ getDefinedOutputFormats(Path) {
     PotentialOutputs:=["bookdown::word_document2", "html_document", "bookdown::html_document2", "bookdown::pdf_document2", "odt_document", "rtf_document", "md_document", "tufte::tufte_html", "github_document"]
         , Arr:=[]
         , filesuffixes:=[]
+        , inputsuffixes:=[]
     if !FileExist(Path) {
         Gui +OwnDialogs
         Title:="File not found"
@@ -739,13 +740,16 @@ getDefinedOutputFormats(Path) {
                 if InStr(Line, "filesuffix:Meta") {
                     filesuffixes[Arr[Arr.MaxIndex()]]:=strsplit(Line,"Value:").2
                 }
+                if InStr(Line, "inputsuffix:Meta") {
+                    inputsuffixes[Arr[Arr.MaxIndex()]]:=strsplit(Line,"Value:").2
+                }
             }
         }
         for _, potential_output_type in PotentialOutputs {
             Arr.push(potential_output_type)
         }
     }
-    return [Arr,filesuffixes]
+    return [Arr,filesuffixes,inputsuffixes]
 }
 populateLV(last_output,PotentialOutputs) {
     for _,potential_output_type in PotentialOutputs {
@@ -782,7 +786,9 @@ GCAutoSubmit() {
 }
 guiShow(runCLI:=FALSE,CLIArgs:="") {
     global
-    filesuffixes:=guiCreate(runCLI,CLIArgs)
+    ret:=guiCreate(runCLI,CLIArgs)
+        , filesuffixes:=ret[1]
+        , inputsuffixes:=ret[2]
         , x:=(script.config.GuiPositioning.X!=""?script.config.GuiPositioning.X:200)
         , y:=(script.config.GuiPositioning.Y!=""?script.config.GuiPositioning.Y:200)
         , bAutoSubmitOTGUI:=false
@@ -905,6 +911,7 @@ guiShow(runCLI:=FALSE,CLIArgs:="") {
                     ,"bAutoSubmitOTGUI":bAutoSubmitOTGUI + 0
                     ,"bUseOwnOHTMLFork":bUseOwnOHTMLFork + 0}
                 ,"Outputformats":Outputformats
+                ,"inputsuffixes":inputsuffixes
                 ,"filesuffixes":filesuffixes}
     } Else {
         ttip("Exiting",5)
