@@ -423,11 +423,11 @@ buildAHKScriptContent(Path,RSCRIPT_PATH:="") {
     }
     return
 }
-copyBack(Source,Destination,manuscript_path) {
+copyBack(Source,noDesktopDestination,manuscript_path) {
     SplitPath % Source, OutFileName, Dir,
     SplitPath % manuscript_path,,,,manuscript_name,
-    if Destination {
-        FileCopyDir % Dir, % Output_Path:=regexreplace(Destination "\" manuscript_name "\","\\{2,}","\"), true
+    if noDesktopDestination {
+        FileCopyDir % Dir, % Output_Path:=regexreplace(noDesktopDestination "\" manuscript_name "\","\\{2,}","\"), true
         writeFile(Output_Path "\index.md",manuscriptcontent,,,true)
         pd:=Trim(regexreplace(Output_Path "\" manuscript_name "_vault.md ","\\{2,}","\"))
         FileCopy % manuscript_path, % pd, 1
