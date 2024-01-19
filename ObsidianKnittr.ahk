@@ -134,7 +134,6 @@ main() {
         }
     }
     ;; POPULATE EL WITH VALUES
-    ExecutionDirectory:=guiOut.Settings.ExecutionDirectory
     EL.manuscriptname:=guiOut.manuscriptname
         , EL.formats:=concat_formats(guiOut.Outputformats)
         , EL.manuscriptpath:=guiOut.manuscriptpath
@@ -234,7 +233,7 @@ main() {
     rmd_Path:=convertMDToRMD(vMDPath,"index")
     ; 5, 6
     notify("Moving to output folder",CLIArgs)
-    Destination:=(InStr(Deref(ExecutionDirectory),A_Desktop)?0:ExecutionDirectory)
+    Destination:=(InStr(Deref(guiOut.Settings.ExecutionDirectory),A_Desktop)?0:guiOut.Settings.ExecutionDirectory)
         , rmd_Path:=copyBack(rmd_Path,Destination,guiOut.manuscriptpath)
     SplitPath % rmd_Path,, OutDir
     rawinputCopyLocation:=regexreplace(OutDir "\" guiOut.manuscriptName "_vault.md","\\{2,}","\")
@@ -873,16 +872,15 @@ guiShow(runCLI:=FALSE,CLIArgs:="") {
     if (!CLIArgs.count()) {
         atmp:=getPotentialWorkDir(ChosenFile,ExecutionDirectory)
             , ExecutionDirectory:=(atmp.relativeToNote=1?script.config.config.OHTML_OutputDir:atmp.ExecutionDirectories)
-            , ExecutionDirectory:=ExecutionDirectory . (SubStr(ExecutionDirectory,0)!="\"?"\":"")
+            , script.config.LastRun.LastExecutionDirectory:=atmp.relativeToNote
+            , ExecutionDirectory:=ExecutionDirectory . (SubStr(ExecutionDirectory,0)!="\"?"\":"") 
     } else {
         if (CLIArgs.noMove) {
-            atmp:=getPotentialWorkDir(CLIArgs.Path,CLIArgs.LastExecutionDirectory)
-            script.config.LastRun.LastExecutionDirectory:=atmp.relativeToNote
             SplitPath % CLIArgs.path,, OutDir
-            ExecutionDirectory:=OutDir . (SubStr(OutDir,0)!="\"?"\":"")
+            atmp:=getPotentialWorkDir(CLIArgs.Path,CLIArgs.LastExecutionDirectory)
+                , ExecutionDirectory:=OutDir . (SubStr(OutDir,0)!="\"?"\":"")
         } else {
             atmp:=getPotentialWorkDir(CLIArgs.Path,CLIArgs.LastExecutionDirectory)
-                , script.config.LastRun.LastExecutionDirectory:=atmp.relativeToNote
                 , ExecutionDirectory:=(atmp.relativeToNote=1?script.config.config.OHTML_OutputDir:atmp.ExecutionDirectories)
                 , ExecutionDirectory:=ExecutionDirectory . (SubStr(ExecutionDirectory,0)!="\"?"\":"")
         }
