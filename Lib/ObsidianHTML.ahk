@@ -245,6 +245,7 @@ createTemporaryObsidianHTML_Config(manuscript_path, obsidianhtml_configfile,Conv
                 # and read in that scales with the size of the site.
                 %A_Space%%A_Space%graph:
                 %A_Space%%A_Space%%A_Space%%A_Space%enabled: False
+                %A_Space%%A_Space%%A_Space%%A_Space%show_inclusions_in_graph: False
                 %A_Space%%A_Space%search:
                 %A_Space%%A_Space%%A_Space%%A_Space%enabled: False
 
