@@ -84,27 +84,39 @@ validateCLIArgs(Byref Args) {
         } else if (arg=="cli") {
             continue
         }
-        if script.config.LastRun.HasKey(arg) {
-            if (DEBUG) {
-                ; msgbox ,,,% arg " = " val,% "0.3"
-            }
-        } else {
-            if InStr("path,runCLI,OHTMLLevel,noMove,nointermediates",arg) {
-                continue
-            }
-            if ((SubStr(arg,1,2)="--") && !InStr(arg,"=")) { ;; generalise don't filter out flags
-                continue
-            }
-            if (InStr(arg,"quarto::")) {
-                continue
-            }
-            if (DEBUG) {
-                msgbox % arg " = " val
-            }
-            Title:=": CLI-processing"
-            Message:="CLI-Parameter '" arg "' is not implemented as of yet.`nThe parameter will be ignored."
-            AppError(Title, Message,0x40030," > " A_ThisFunc)
+        valid_inputs=
+            (LTrim
+                //obsidian html//
+                convert ohtmllevel removeobsidianhtmlerrors usecustomfork verbose
+
+                //quarto r//
+                rendertooutputs lastexecutiondirectory
+
+                //flags//
+                nointermediates nomove noopen notify
+
+                //flags-extensions//
+                IntermediatesRemovalLevel
+
+                //base//
+                path runcli nooklog
+
+            )
+        if InStr(valid_inputs,arg) {
+            continue
         }
+        if ((SubStr(arg,1,2)="--") && !InStr(arg,"=")) { ;; generalise don't filter out flags
+            continue
+        }
+        if (InStr(arg,"quarto::")) {
+            continue
+        }
+        if (DEBUG) {
+            msgbox % arg " = " val
+        }
+        Title:=": CLI-processing"
+        Message:="CLI-Parameter '" arg "' (value:'" val "') is not implemented as of yet.`nThe parameter will be ignored."
+        AppError(Title, Message,0x40030," > " A_ThisFunc)
     }
 }
 CLI_help() {
