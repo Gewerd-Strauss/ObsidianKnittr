@@ -87,6 +87,7 @@ setupDefaultDA(Path) {
             `tlink-external-newwindow:Checkbox|Type:boolean|Default:1|String:"Open external links in a new browser window/tab (don't navigate the current tab)"|Tab3Parent:4. Links|Link:"https://quarto.org/docs/reference/formats/html.html#links"|Linktext:?
             `tauthor:combobox|Type:String|Default:"Gewerd Strauss"|String:"Set Author for this output format"|ctrlOptions:Author1,Gewerd Strauss,redacted|Tab3Parent:3. Misc
             `tfilesuffix:Meta|Value:html
+            `tinputsuffix:Meta|Value:qmd
             `trenderingpackage_start:Meta|Value:quarto::quarto_render("index.qmd",execute_params = list(
             `trenderingpackage_end:Meta|Value:),output_format = "html","`%name`%.html")
             `tdateformat:Meta|Value:{A_DD}.{A_MM}.{A_YYYY}
@@ -116,6 +117,7 @@ setupDefaultDA(Path) {
             `trenderingpackage_start:Meta|Value:quarto::quarto_render("index.qmd",execute_params = list(
             `trenderingpackage_end:Meta|Value:),output_format = "docx","`%name`%.docx")
             `tfilesuffix:Meta|Value:docx
+            `tinputsuffix:Meta|Value:qmd
             `tdateformat:Meta|Value:{A_DD}.{A_MM}.{A_YYYY}
             `tpackage:Meta|Value:quarto
         )
@@ -287,6 +289,7 @@ setupDefaultDA(Path) {
             `trenderingpackage_start:Meta|Value:quarto::quarto_render("index.qmd",execute_params = list(
             `trenderingpackage_end:Meta|Value:),output_format = "pdf","`%name`%.pdf")
             `tfilesuffix:Meta|Value:pdf
+            `tinputsuffix:Meta|Value:qmd
             `tdateformat:Meta|Value:{A_DD}.{A_MM}.{A_YYYY}
             `tpackage:Meta|Value:quarto
             `t;|Link:"https://quarto.org/docs/reference/formats/pdf.html#format-options"|Tab3Parent:Format options|LinkText:?
@@ -327,6 +330,7 @@ setupDefaultDA(Path) {
             `tpandoc_args:Edit|Type:String|Default:NULL|String:"Set Pandoc arguments"|ctrlOptions:w300, h60|Tab3Parent:3. Misc
             `trenderingpackage:Meta|Value:rmarkdown::render("index.rmd",`%format`%,"`%name`%")
             `tfilesuffix:Meta|Value:html
+            `tinputsuffix:Meta|Value:rmd
             `tdateformat:Meta|Value:{A_DD}.{A_MM}.{A_YYYY}
             `tpackage:Meta|Value:bookdown
         )
@@ -347,6 +351,7 @@ setupDefaultDA(Path) {
             `tglobal_numbering:Checkbox|Type:boolean|Default:1|String:"Do you want to number tables and figures globally throughout the document?"|Tab3Parent:1. General
             `trenderingpackage:Meta|Value:rmarkdown::render("index.rmd",`%format`%,"`%name`%")
             `tfilesuffix:Meta|Value:docx
+            `tinputsuffix:Meta|Value:rmd
             `tdateformat:Meta|Value:{A_DD}.{A_MM}.{A_YYYY}
             `tpackage:Meta|Value:bookdown
             `t;md_extensions
@@ -378,6 +383,7 @@ setupDefaultDA(Path) {
             `tglobal_numbering:Checkbox|Type:boolean|Default:1|String:"Do you want to number tables and figures globally throughout the document?"|Tab3Parent:1. General
             `trenderingpackage:Meta|Value:rmarkdown::render("index.rmd",`%format`%,"`%name`%")
             `tfilesuffix:Meta|Value:pdf
+            `tinputsuffix:Meta|Value:rmd
             `tdateformat:Meta|Value:{A_DD}.{A_MM}.{A_YYYY}
             `tpackage:Meta|Value:bookdown
         )
@@ -415,6 +421,7 @@ setupDefaultDA(Path) {
             `tpandoc_args:Edit|Type:String|Default:NULL|String:"Set Pandoc arguments"|ctrlOptions:w300, h60|Tab3Parent:3. Misc
             `trenderingpackage:Meta|Value:rmarkdown::render("index.rmd",`%format`%,"`%name`%")
             `tfilesuffix:Meta|Value:html
+            `tinputsuffix:Meta|Value:rmd
             `tdateformat:Meta|Value:{A_DD}.{A_MM}.{A_YYYY}
             `tpackage:Meta|Value:rmarkdown
         )
@@ -436,6 +443,7 @@ setupDefaultDA(Path) {
             `t;md_extensions
             `trenderingpackage:Meta|Value:rmarkdown::render("index.rmd",`%format`%,"`%name`%")
             `tfilesuffix:Meta|Value:docx
+            `tinputsuffix:Meta|Value:rmd
             `tdateformat:Meta|Value:{A_DD}.{A_MM}.{A_YYYY}
             `tpackage:Meta|Value:rmarkdown
         )
@@ -465,6 +473,7 @@ setupDefaultDA(Path) {
             `t;extra_dependencies
             `trenderingpackage:Meta|Value:rmarkdown::render("index.rmd",`%format`%,"`%name`%")
             `tfilesuffix:Meta|Value:pdf
+            `tinputsuffix:Meta|Value:rmd
             `tdateformat:Meta|Value:{A_DD}.{A_MM}.{A_YYYY}
             `tpackage:Meta|Value:rmarkdown
 
