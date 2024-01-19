@@ -95,7 +95,7 @@ main() {
             , writeFile(A_ScriptDir "\INI-Files\ObsidianKnittr_Version.ini",script.config.Version.ObsidianKnittr_Version,"UTF-16")
     }
     FileRead ObsidianKnittr_Version, % A_ScriptDir "\INI-Files\ObsidianKnittr_Version.ini"
-    EL.ObsidianKnittr_Version:=script.version:=script.config.version.ObsidianKnittr_Version:=Regexreplace(ObsidianKnittr_Version,"\s*")
+    script.version:=script.config.version.ObsidianKnittr_Version:=Regexreplace(ObsidianKnittr_Version,"\s*")
     clArgs:=A_Args
     if (!clArgs.length()) {
         guiOut:=guiShow()
@@ -147,6 +147,7 @@ main() {
         , EL.bUseOwnOHTMLFork:=guiOut.Settings.bUseOwnOHTMLFork
         , EL.bRestrictOHTMLScope:=guiOut.Settings.bRestrictOHTMLScope
         , EL.bRemoveQuartoReferenceTypesFromCrossrefs:=guiOut.Settings.bRemoveQuartoReferenceTypesFromCrossrefs
+        , EL.ObsidianKnittr_Version:=Regexreplace(ObsidianKnittr_Version,"\s*")
     if (guiOut.sel="") && (guiOut.Settings.bVerboseCheckbox="") && (!CLIArgs.Count()) {
         ExitApp -1
     }
