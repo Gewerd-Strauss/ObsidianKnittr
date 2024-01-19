@@ -42,9 +42,9 @@ main() {
         , fTraySetup()
         , script.loadCredits(script.resfolder "\credits.txt")
         , script.loadMetadata(script.resfolder "\meta.txt")
-        , erh:=Func("fonError").Bind(DEBUG)
+        , erh:=Func("fonError").Bind(DEBUG,EL)
         , onError(erh)
-        , exh:=Func("fonExit").Bind(DEBUG)
+        , exh:=Func("fonExit").Bind(DEBUG,EL)
         , onExit(exh)
     ;; LOAD/INIT SCRIPT-CONFIGS
     if !script.load() {
@@ -124,6 +124,11 @@ main() {
                 , script.config.LastRun.manuscriptpath:=CLIArgs.path
                 , script.config.DDLHistory:=buildHistory(script.config.DDLHistory,script.config.Config.HistoryLimit,script.config.LastRun.manuscriptpath)
                 , script.config.LastRun.last_output_type:=CLIArgs.format
+            if (CLIArgs.noOKLog) { ;; disable logging by immediately returning out of the 'class.__Set()'-call
+                EL.toggleAutoWrite(0) ;; don't write every new change to file directly ;; works for both error and exit
+            } else {
+                EL.toggleAutoWrite(1) ;; write every new change to file directly ;; works for both error and exit
+            }
             global manuscriptpath:=CLIArgs.path
             guiOut:=guiShow(true,CLIArgs)
         }

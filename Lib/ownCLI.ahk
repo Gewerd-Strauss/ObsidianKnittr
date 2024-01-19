@@ -12,10 +12,15 @@
     return Object
 }
 processCLIFlags(Byref Args) {
-    if (!Args.HasKey("--noMove")) {
-        Args.noMove:=0
-    } else {
+    if (Args.HasKey("--noMove")) {
         Args.noMove:=1
+    } else {
+        Args.noMove:=0
+    }
+    if (Args.HasKey("--noOKLog")) { ;; TODO: implement disabling the executionlogging via assignment to members of class EL (e.g. `EL.XX:=YYY`)
+        Args.noOKLog:=1
+    } else {
+        Args.noOKLog:=0
     }
     if (Args.HasKey("--noRender")) {
         Args.RenderToOutputs:=0
