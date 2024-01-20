@@ -265,15 +265,9 @@ main() {
         , Codetimer_Log()
         , writeFile(rmd_Path,NewContents,"UTF-8",,true)
     if (qmd_Path!="") {
-            qmd_Path:=Regexreplace(guiOut.manuscriptpath,".md$",".qmd")
         if (CLIArgs.noMove) {
+            qmd_Path:=regexreplace(guiOut.manuscriptdir "\" guiOut.manuscriptname ".qmd","\\{2,}","\")
                 , qmdContents:=quartopurgeTags(qmdContents)
-            if (CLIArgs.HasKey("--noIntermediates")) {
-                d:=strreplace(guiOut.manuscriptpath,"/","\")
-                    , d:=strreplace(d,".md")
-                    , d:=strreplace(d,".qmd")
-                FileRemoveDir % d, % true
-            }
         }
         writeFile(qmd_Path,qmdContents,"UTF-8-RAW",,true)
     }
@@ -318,7 +312,9 @@ main() {
                         , quarto_ret[1].="`nFormat " output_type ":`n" InOut
                         , quarto_ret[2].=CMD
                         , Clipboard:=InOut
-                        , writeFile(OutDir "\build_" guiOut.Outputformats[output_type].filesuffix ".cmd",CMD,"UTF-8-RAW",,true)
+                    if (!CLIArgs.noIntermediates) {
+                        writeFile(OutDir "\build_" guiOut.Outputformats[output_type].filesuffix ".cmd",CMD,"UTF-8-RAW",,true)
+                    }
                 }
                 EL.Rdata_out:=quarto_ret[1]
                     , EL.RCMD:=quarto_ret[2]
@@ -375,6 +371,9 @@ main() {
         removeTempDir(quarto_ret.OutputPath)
     } else if (FileExist(rscript_ret.Output_Path)) {
         removeTempDir(rscript_ret.OutputPath)
+    if (CLIArgs.noIntermediates) {
+        guiOut.removableintermediates:=collectQuartoIntermediates(guiOut,CLIArgs)
+        failedRemovals:=cleanupIntermediatequartoFiles(guiOut)
     }
     if (!CLIArgs.Count()) { ;; only change config when running in GUI mode
         script.config.LastRun.manuscriptpath:=StrReplace(script.config.LastRun.manuscriptpath, "/","\")
@@ -891,9 +890,10 @@ guiShow(runCLI:=FALSE,CLIArgs:="") {
         }
     }
     if (manuscriptpath!="") && !ot.bClosedNoSubmit {
-        SplitPath % manuscriptpath,,,, manuscriptName
+        SplitPath % manuscriptpath,,manuscriptdir,, manuscriptName
         return {"sel":sel
                 ,"manuscriptpath":manuscriptpath
+                ,"manuscriptdir":manuscriptdir
                 ,"manuscriptname":manuscriptName
                 ,Settings:{"bVerboseCheckbox":bVerboseCheckbox + 0
                     ,"bKeepFilename":bKeepFilename + 0
