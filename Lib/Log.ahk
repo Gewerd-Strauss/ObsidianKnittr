@@ -17,17 +17,17 @@ Quarto - Version          : `%Quarto_Version`%
 ___________________________________________________
 Timings:
 
-ObsidianHTML            > `%ObsidianHTML_Start`%
-ObsidianHTML            < `%ObsidianHTML_End`%
-                                       `%ObsidianHTML_Duration`%
-intermediary Processing > `%Intermediary_Start`%
-intermediary Processing < `%Intermediary_End`%
-                                       `%Intermediary_Duration`%
-R                       > `%RScriptExecution_Start`%
-R                       < `%RScriptExecution_End`%
-                                       `%RScriptExecution_Duration`%
+ObsidianHTML              > `%ObsidianHTML_Start`%
+ObsidianHTML              < `%ObsidianHTML_End`%
+                                           `%ObsidianHTML_Duration`%
+intermediary Processing   > `%Intermediary_Start`%
+intermediary Processing   < `%Intermediary_End`%
+                                           `%Intermediary_Duration`%
+Compilation               > `%Compilation_Start`%
+Compilation               < `%Compilation_End`%
+                                         `%Compilation_Duration`%
 
-Total (not ms-precise)                 `%TotalExecution_Duration`%
+Total (not ms-precise)                   `%TotalExecution_Duration`%
 
 ___________________________________________________
 Script Execution Settings:

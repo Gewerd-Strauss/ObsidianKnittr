@@ -261,8 +261,7 @@ main() {
         , EL.Intermediary_End:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
 
     ;; COMPILE VIA RSCRIPT OR QUARTO_CLI
-    ;; R
-    EL.RScriptExecution_Start:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
+    EL.Compilation_Start:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
         , Codetimer_Log()
         , writeFile(rmd_Path,NewContents,"UTF-8",,true)
     if (qmd_Path!="") {
@@ -352,8 +351,8 @@ main() {
         }
     }
     EL.DocumentSettings:=tmp[2]
-        , EL.RScriptExecution_Duration:=Codetimer_Log()
-        , EL.RScriptExecution_End:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
+        , EL.Compilation_Duration:=Codetimer_Log()
+        , EL.Compilation_End:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
         , EL.getTotalDuration(ATC1,A_TickCount)
     ;; final touches - ahk starter, moving shit to output folder
     if (!script.config.config.useQuartoCLI) {
