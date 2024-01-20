@@ -300,14 +300,14 @@ main() {
                 if (guiOut.Settings.bBackupOutput && !CLIArgs.noMove) {
                     ttip(-1)
                     notify("Backing up Files",CLIArgs)
-                    BackupDirectory:=backupOutput(rmd_Path,guiOut)
+                    BackupDirectory:=backupOutput(qmd_Path,guiOut)
                 }
                 if script.config.config.backupCount {
                     limitBackups(BackupDirectory,script.config.config.backupCount)
                 }
                 ttip(-1)
                 notify("Executing quarto-CLI",CLIArgs)
-                SplitPath % rmd_Path,, OutDir
+                SplitPath % qmd_Path,, OutDir
                 quarto_ret:=["","",OutDir]
                 for _, output_type in guiOut.sel {
                     write_quarto_yaml(guiOut.Outputformats[output_type],OutDir,"qCLI_yaml_" guiOut.Outputformats[output_type].filesuffix ".yaml")
