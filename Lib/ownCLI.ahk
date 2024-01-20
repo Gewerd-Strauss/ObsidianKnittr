@@ -27,6 +27,11 @@ processCLIFlags(Byref Args) {
     } else {
         Args.RenderToOutputs:=1
     }
+    if (Args.HasKey("--OHTML.Verbose")) {
+        Args.Verbose:=1
+    } else {
+        Args.Verbose:=0
+    }
     if (!Args.HasKey("--noIntermediates")) {
         Args.noIntermediates:=0
     } else {
