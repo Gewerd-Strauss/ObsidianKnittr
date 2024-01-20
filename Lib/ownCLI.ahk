@@ -24,8 +24,13 @@ processCLIFlags(Byref Args) {
     }
     if (Args.HasKey("--noRender")) {
         Args.RenderToOutputs:=0
+    } else { ;; default
+        if (!Args.HasKey("RenderToOutputs")) {
+            Args.RenderToOutputs:=1
+        }
+    }
+    if (false) {
     } else {
-        Args.RenderToOutputs:=1
     }
     if (Args.HasKey("--OHTML.Verbose")) {
         Args.Verbose:=1
