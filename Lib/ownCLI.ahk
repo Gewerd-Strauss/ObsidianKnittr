@@ -45,6 +45,13 @@ processCLIArgs(ByRef Args) {
     } else {
 
     }
+    if (!Args.HasKey("--noIntermediates")) {
+        Args.IntermediatesRemovalLevel:=0
+    } else {
+        if (!Args.HasKey("IntermediatesRemovalLevel")) {
+            Args.IntermediatesRemovalLevel:=1
+        }
+    }
 }
 requireA_Args(Args) {
     required:=["format","path"]
