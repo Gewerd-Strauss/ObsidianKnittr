@@ -265,8 +265,8 @@ main() {
         , Codetimer_Log()
         , writeFile(rmd_Path,NewContents,"UTF-8",,true)
     if (qmd_Path!="") {
-        if (CLIArgs.HasKey("--noMove")) {
             qmd_Path:=Regexreplace(guiOut.manuscriptpath,".md$",".qmd")
+        if (CLIArgs.noMove) {
                 , qmdContents:=quartopurgeTags(qmdContents)
             if (CLIArgs.HasKey("--noIntermediates")) {
                 d:=strreplace(guiOut.manuscriptpath,"/","\")
@@ -297,7 +297,7 @@ main() {
 
         } else {
             if (guiOut.Settings.bRendertoOutputs) {
-                if guiOut.Settings.bBackupOutput && ((!CLIArgs.HasKey("--noMove"))) {
+                if (guiOut.Settings.bBackupOutput && !CLIArgs.noMove) {
                     ttip(-1)
                     notify("Backing up Files",CLIArgs)
                     BackupDirectory:=backupOutput(rmd_Path,guiOut)
@@ -327,8 +327,7 @@ main() {
         }
     } else {
         script_contents:=tmp.1
-        if guiOut.Settings.bRendertoOutputs {
-            ;ttip(" ",5,,,,,,,16)
+        if (guiOut.Settings.bRendertoOutputs) {
             ttip(-1)
             notify("Executing R-BuildScript",CLIArgs)
             if guiOut.Settings.bBackupOutput {
