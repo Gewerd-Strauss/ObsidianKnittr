@@ -94,7 +94,14 @@ main() {
             , script.load()
             , writeFile(A_ScriptDir "\INI-Files\ObsidianKnittr_Version.ini",script.config.Version.ObsidianKnittr_Version,"UTF-16")
     }
-    FileRead ObsidianKnittr_Version, % A_ScriptDir "\INI-Files\ObsidianKnittr_Version.ini"
+    if (FileExist(OK_V:=A_ScriptDir "\INI-Files\ObsidianKnittr_Version.ini")) {
+        FileRead ObsidianKnittr_Version, % OK_V
+    } else {
+        if (script.config.HasKey("Version")) {
+            ObsidianKnittr_Version:=script.config.Version.ObsidianKnittr_Version
+                , writeFile(A_ScriptDir "\INI-Files\ObsidianKnittr_Version.ini",script.config.Version.ObsidianKnittr_Version,"UTF-16")
+        }
+    }
     script.version:=script.config.version.ObsidianKnittr_Version:=Regexreplace(ObsidianKnittr_Version,"\s*")
     clArgs:=A_Args
     if (!clArgs.length()) {
