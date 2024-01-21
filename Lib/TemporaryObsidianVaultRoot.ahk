@@ -3,7 +3,6 @@ createTemporaryObsidianVaultRoot(manuscript_location,bAutoSubmitOTGUI,LastRelati
         if (script.config.Config.defaultRelativeLevel!="") && (script.config.Config.defaultRelativeLevel >0) {
             Level:=script.config.Config.defaultRelativeLevel + 0
         }
-
     } else {
         Level:=script.config.Config.defaultRelativeLevel + 0
     }
@@ -13,6 +12,9 @@ createTemporaryObsidianVaultRoot(manuscript_location,bAutoSubmitOTGUI,LastRelati
         } else {
             Level:=LastRelativeLevel
         }
+    }
+    if (CLIArgs.HasKey("OHTMLLevel")) {
+        Level:=CLIArgs.OHTMLLevel
     }
     Graph:=findObsidianVaultRootFromNote(manuscript_location,true)
     if (Graph="0") {
