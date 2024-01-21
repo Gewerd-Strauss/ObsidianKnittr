@@ -289,10 +289,10 @@ main() {
         }
         if (qmd_Path!="") {
             tmp.1:=modifyQuartobuildscript(tmp.1,tmp.3,guiOut)
-                , EL.Quarto_Version:=quartogetVersion()
         }
     }
     format:=tmp.2
+    EL.Quarto_Version:=quartogetVersion()
     if (script.config.config.useQuartoCLI) {
         if (CLIArgs.HasKey("--noRender")) {
 
