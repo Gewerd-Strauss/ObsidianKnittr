@@ -46,6 +46,13 @@ processCLIFlags(Byref Args) {
     } else {
         Args.UseCustomFork:=0
     }
+    if (Args.HasKey("--OHTML.Convert")) {
+        Args.Convert:=1
+    } else if (Args.HasKey("--OHTML.Run")) {
+        Args.Convert:=0
+    } else { ;; if verb is not specified, default to convert.
+        Args.Convert:=1
+    }
     if (!Args.HasKey("--noIntermediates")) {
         Args.noIntermediates:=0
     } else {
