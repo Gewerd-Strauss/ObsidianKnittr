@@ -29,8 +29,12 @@ processCLIFlags(Byref Args) {
             Args.RenderToOutputs:=1
         }
     }
-    if (false) {
+
+    ;; OHTML
+    if (Args.HasKey("--OHTML.TrimErrors")) {
+        Args.RemoveObsidianHTMLErrors:=1
     } else {
+        Args.RemoveObsidianHTMLErrors:=0
     }
     if (Args.HasKey("--OHTML.Verbose")) {
         Args.Verbose:=1
