@@ -68,8 +68,22 @@ processCLIArgs(ByRef Args) {
     if (!Args.HasKey("LastExecutionDirectory")) {
         Args.LastExecutionDirectory:=script.config.LastRun.LastExecutionDirectory
     }
-    if (!Args.HasKey("OHTMLLevel")) {
-        Args.OHTMLLevel:=script.config.config.defaultRelativeLevel
+    if (Args.HasKey("OHTMLLevel")) {
+        Args.OHTMLLevel+=0
+        Args.RestrictOHTMLScope:=true
+    } else {
+        if (script.config.config.HasKey("defaultRelativeLevel")) {
+            if ((script.config.config.defaultRelativeLevel + 0)>0) { ;; if defaultlevel is a number and larger than 0, so use it
+                Args.OHTMLLevel:=script.config.config.defaultRelativeLevel + 0
+                Args.RestrictOHTMLScope:=true
+            } else { ;; default level is not a number, or not larger than 0, so don't use it and default to entire vault (by setting -1)
+                Args.OHTMLLevel:=-1
+                Args.RestrictOHTMLScope:=true
+            }
+        } else { ;; if the default-level is not a number/not set
+            Args.OHTMLLevel:=-1
+            Args.RestrictOHTMLScope:=true
+        }
     }
     if Args.HasKey("path") {
         Args.path:=StrReplace(Args.path, "/","\")
