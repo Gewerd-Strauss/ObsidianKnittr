@@ -8,7 +8,6 @@
             useQuartoCLI=1
             defaultRelativeLevel=2
             Destination=0
-            FullLogOnSuccess=0
             HistoryLimit=25
             obsidianhtml_configfile=
             obsidianTagEndChars=():'
