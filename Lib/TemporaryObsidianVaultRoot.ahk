@@ -1,3 +1,37 @@
+/*
+LOGIC BEHIND THE NUMERIC ASSIGNMENT FOR THE OHTML-RESTRICTOR:
+By specifying a an integer level between -1 → +inf, a directory above the manuscript_path can be configured to temporarily contain  an `.obsidian`-directory.
+
+A couple notes:
+1.levels marked `(x)` signify the actual vault-root of the obsidian-vault, which is not removed after OHTML-execution has concluded.
+2..levels marked `(y)` signify the directory in which the manuscript lies _directly, e.g. the following structure holds true:
+.   - obsidian_vaultroot/path/to/folder/manuscript.md
+.   - obsidian_vaultroot/path/to/folder/.obsidian/
+3. If there are N folders between the true vault-root & the manuscriptpath, setting `OHTMLLevel>=N` will behave the same as setting `OHTMLLevel=N`: the true vault-root will be used.
+There are two special cases:
+
+1. OHTMLLevel = -1
+.  In this case, the true vault-root is used (see `(x)` in examples below). As this is the "valid" vault-root of the Obsidian.md-vault, this folder will not be removed after execution of ObsidianHTML() returns
+2. OHTMLLevel = 0
+.  In this case, the folder immediately containing the manuscript_path will be turned into a temporary vault-root.
+
+EXAMPLES:
+path: D:\Dokumente neu\Obsidian NoteTaking\The Universe\019-Bugtesting-Subvault\nesting\nesting2\nesting3\019-ObsHTML_EmbeddedTitleStripping_Main.md
+;; ohtmllevel = 0 → (y) "D:\Dokumente neu\Obsidian NoteTaking\The Universe\019-Bugtesting-Subvault\nesting\nesting2\nesting3\.obsidian"
+;; ohtmllevel = 1 →     "D:\Dokumente neu\Obsidian NoteTaking\The Universe\019-Bugtesting-Subvault\nesting\nesting2\.obsidian"
+;; ohtmllevel = 2 →     "D:\Dokumente neu\Obsidian NoteTaking\The Universe\019-Bugtesting-Subvault\nesting\.obsidian"
+;; ohtmllevel = 3 → (x) "D:\Dokumente neu\Obsidian NoteTaking\The Universe\019-Bugtesting-Subvault\.obsidian"
+;; ohtmllevel =-1 → (x) "D:\Dokumente neu\Obsidian NoteTaking\The Universe\019-Bugtesting-Subvault\.obsidian"
+
+path: D:\Dokumente neu\Obsidian NoteTaking\The Universe\200 University\06 Interns and Unis\BE28 Internship Report\Submission\BE28 Internship Report.md
+;; ohtmllevel = 0 → (y) "D:\Dokumente neu\Obsidian NoteTaking\The Universe\200 University\06 Interns and Unis\BE28 Internship Report\Submission\.obsidian"
+;; ohtmllevel = 1 →     "D:\Dokumente neu\Obsidian NoteTaking\The Universe\200 University\06 Interns and Unis\BE28 Internship Report\.obsidian"
+;; ohtmllevel = 2 →     "D:\Dokumente neu\Obsidian NoteTaking\The Universe\200 University\06 Interns and Unis\.obsidian"
+;; ohtmllevel = 3 →     "D:\Dokumente neu\Obsidian NoteTaking\The Universe\200 University\.obsidian"
+;; ohtmllevel = 4 → (x) "D:\Dokumente neu\Obsidian NoteTaking\The Universe\.obsidian"
+;; ohtmllevel = 5 → (x) "D:\Dokumente neu\Obsidian NoteTaking\The Universe\.obsidian"
+;; ohtmllevel =-1 → (x) "D:\Dokumente neu\Obsidian NoteTaking\The Universe\.obsidian"
+*/
 createTemporaryObsidianVaultRoot(manuscript_location,bAutoSubmitOTGUI,LastRelativeLevel:=-1,CLIArgs:="") {
     if (bAutoSubmitOTGUI) {
         if (script.config.Config.defaultRelativeLevel!="") && (script.config.Config.defaultRelativeLevel >0) {
