@@ -311,8 +311,14 @@ main() {
                 SplitPath % qmd_Path,, OutDir
                 quarto_ret:=["","",OutDir]
                 for _, output_type in guiOut.sel {
+                    ;; use "index.qmd" if we explicitly use the flag to do so, or if we are not running in CLI-mode.
+                    if (CLIArgs.SourceNameIndex || CLIArgs="") { 
+                        SourceFileName:="index"
+                    } else {
+                        SourceFileName:=guiOut.manuscriptname
+                    }
                     write_quarto_yaml(guiOut.Outputformats[output_type],OutDir,"qCLI_yaml_" guiOut.Outputformats[output_type].filesuffix ".yaml")
-                        , CMD:="quarto render index.qmd --to " guiOut.Outputformats[output_type].filesuffix 
+                        , CMD:="quarto render " SourceFileName ".qmd --to " guiOut.Outputformats[output_type].filesuffix 
                         , CMD.=" --metadata-file=""qCLI_yaml_" guiOut.Outputformats[output_type].filesuffix ".yaml"""
                         , CMD.=" --output """ guiOut.Outputformats[output_type].Filename guiOut.Outputformats[output_type].FilenameMod "."  guiOut.Outputformats[output_type].filesuffix """"
                         , GetStdStreams_WithInput(CMD, OutDir, InOut:="`n")
