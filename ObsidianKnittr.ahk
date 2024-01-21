@@ -318,7 +318,9 @@ main() {
                         , GetStdStreams_WithInput(CMD, OutDir, InOut:="`n")
                         , quarto_ret[1].="`nFormat " output_type ":`n" InOut
                         , quarto_ret[2].=CMD
-                        , Clipboard:=InOut
+                    if (DEBUG) {
+                        Clipboard:=(IsObject(InOut)?ttip_Obj2Str(InOut):InOut)
+                    }
                     if (!CLIArgs.noIntermediates) {
                         writeFile(OutDir "\build_" guiOut.Outputformats[output_type].filesuffix ".cmd",CMD,"UTF-8-RAW",,true)
                     }
