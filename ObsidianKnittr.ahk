@@ -619,7 +619,7 @@ guiCreate(runCLI,CLIArgs) {
         }
     }
     DDLRows:=(script.config.Config.HistoryLimit>25?25:script.config.Config.HistoryLimit)
-    gui add, text, % "yp+25 xp+10 w" WideControlWidth -  3*5, % "Choose execution directory for OHTML"
+    gui add, text, % "yp+25 xp+10 w" WideControlWidth -  3*5, % "Choose execution directory for Quarto/R"
     gui add, Radio,% "vExecutionDirectory Checked",% "&1. OHTML-Output-Dir"
     gui add, Radio,,% "&2. subfolder of note-location in vault"
     ;gui add, DDL,% "yp+20 xp w" WideControlWidth -  4*5 " vExecutionDirectory hwndExeDir r" DDLRows, % ExecutionDirectories
@@ -669,7 +669,7 @@ guiCreate(runCLI,CLIArgs) {
     gui add, checkbox, % "xp yp+20" " vbRendertoOutputs", % "Render manuscripts to chosen outputs?"
     gui add, checkbox, % "xp yp+20" " vbBackupOutput", % "Backup Output files before rendering?"
 
-    gui add, Groupbox, % "xm" +WideControlWidth + 5 " yp" + 35 " w" WideControlWidth " h70", Engine-Specific Stuff
+    gui add, Groupbox, % "xm" +WideControlWidth + 5 " yp" + 75 " w" WideControlWidth " h70", Engine-Specific Stuff
     gui add, checkbox, % "xp+10 yp+20" " vbRemoveQuartoReferenceTypesFromCrossrefs", % "Remove ""figure""/""table""/""equation"" from`ninline references in quarto-documents?"
     gui add, text,xp yp+20 w0
     Gui Font, s7 cWhite, Verdana
