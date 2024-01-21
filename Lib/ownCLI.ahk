@@ -41,6 +41,11 @@ processCLIFlags(Byref Args) {
     } else {
         Args.Verbose:=0
     }
+    if (Args.HasKey("--OHTML.UseCustomFork")) {
+        Args.UseCustomFork:=1
+    } else {
+        Args.UseCustomFork:=0
+    }
     if (!Args.HasKey("--noIntermediates")) {
         Args.noIntermediates:=0
     } else {
