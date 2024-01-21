@@ -139,7 +139,7 @@ validateCLIArgs(Byref Args) {
         valid_inputs=
             (LTrim
                 //obsidian html//
-                convert ohtmllevel removeobsidianhtmlerrors usecustomfork verbose
+                convert ohtmllevel RestrictOHTMLScope removeobsidianhtmlerrors usecustomfork verbose
 
                 //quarto r//
                 rendertooutputs lastexecutiondirectory
