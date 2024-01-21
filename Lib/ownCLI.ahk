@@ -53,6 +53,11 @@ processCLIFlags(Byref Args) {
     } else { ;; if verb is not specified, default to convert.
         Args.Convert:=1
     }
+    if (Args.HasKey("--SourceNameIndex")) { ;; control if the resulting md/rmd/qmd-file should have name %manuscriptname% or "index". Default: "index"
+        Args.SourceNameIndex:=0
+    } else {
+        Args.SourceNameIndex:=1
+    }
     if (!Args.HasKey("--noIntermediates")) {
         Args.noIntermediates:=0
     } else {
@@ -132,7 +137,7 @@ validateCLIArgs(Byref Args) {
                 IntermediatesRemovalLevel
 
                 //base//
-                path runcli nooklog
+                path runcli nooklog SourceNameIndex
 
             )
         if InStr(valid_inputs,arg) {
