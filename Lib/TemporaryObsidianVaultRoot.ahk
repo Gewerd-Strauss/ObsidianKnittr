@@ -217,7 +217,12 @@ chooseTV_Element(TV_String,Graph,Level,bAutoSubmitOTGUI,CLIArgs) {
     if !ret.isVaultRoot {
         FileCreateDir % temporary_obsidianconfig_path "\"
         if !FileExist(temporary_obsidianconfig_path) {
-            ;; throw error
+            Title:="temp. config could not be created."
+                , Message:="The temporary '.obsidian'-folder could not be written to path '" temporary_obsidianconfig_path "\'"
+                . "`nYou may either continue execution while using the vault's root itself, or exit the program to investigate the issue."
+                . "`nWhen you continue "
+                . "`n`nDo you want to continue execution while using the vault's root folder now?"
+            AppError(Title, Message,0x40034," > " A_ThisFunc ": ")
         }
     } else {
         return false
