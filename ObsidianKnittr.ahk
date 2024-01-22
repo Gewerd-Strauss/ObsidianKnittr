@@ -197,6 +197,10 @@ main() {
                 OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(guiOut.manuscriptpath,guiOut.Settings.bAutoSubmitOTGUI)
             }
         }
+        if (!OHTMLScopeRestrictor_Object.IsVaultRoot) { ;; ensure that the Restrictor-`.obsidian`-path gets removed in case of an error.
+            OnExit(Func("removeTempDir").bind(OHTMLScopeRestrictor_Object.Path,false))
+            OnError(Func("removeTempDir").bind(OHTMLScopeRestrictor_Object.Path,false))
+        }
     }
     ;; OBSIDIANHTML EXECUTE OBSIDIANHTML
     if (tmpObsidianHTML_Config[1] && guiOut.Settings.bConvertInsteadofRun) {
@@ -210,6 +214,8 @@ main() {
         if tempOVaultRoot.Removed {
             EL.temporaryVaultpath:=OHTMLScopeRestrictor_Object.Path 
                 , EL.temporaryVaultpathRemoved:="Yes"
+            OnExit(Func("removeTempDir"),0)  ;; as the folder has been removed successfully, we can now remove this callback.  #FIXME: This does not seem to work at all. Why?
+            OnError(Func("removeTempDir"),0)
         } else {
             if tempOVaultRoot.IsVaultRoot {
                 EL.temporaryVaultpath:=OHTMLScopeRestrictor_Object.Path
