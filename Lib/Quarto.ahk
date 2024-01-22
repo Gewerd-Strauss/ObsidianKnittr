@@ -184,6 +184,8 @@ quartogetVersion() {
     if quarto_check().1 {
         GetStdStreams_WithInput("quarto -V",,out)
         out:=RegexReplace(out,"\s+")
+    } else {
+        out:="<not found. Is Quarto Installed?>"
     }
     return out
 }
@@ -268,7 +270,7 @@ collectQuartoIntermediates(guiOut,CLIArgs) {
     purgeable_names:=["%root%\index.md"
             ,"%root%\not_created.md"]
         , removable_inputsuffixes:={}
-    for _, suffix in guiOut.inputsuffixes {
+    for _, suffix in guiOut.inputsuffixes { ;; check which filetypes of `index\.(<fileending>?\w*)` are required by the formats given, then remove all types that aren't.
         removable_inputsuffixes[suffix]:=true
     }
     for __,inputsuffix in guiOut.inputsuffixes {
@@ -292,11 +294,12 @@ collectQuartoIntermediates(guiOut,CLIArgs) {
     }
 
     /*
+    ;;??:
     index_files | required for r-execution, so... no
     index_cache | required for r-execution, so... no
     build.+\.cmd
 
-    ;;--noIntermediates
+    ;;intermediates:
     index.rmd   | only if rmd is not required
     index.md
     %filename%_vault.md
