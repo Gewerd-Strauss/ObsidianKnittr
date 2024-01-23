@@ -59,7 +59,10 @@ processCLIFlags(Byref Args) {
     if (Args.HasKey("--OHTML.Convert")) {
         Args.Convert:=1
     } else if (Args.HasKey("--OHTML.Run")) {
-        Args.Convert:=0
+        Title:=": OHTML-related deprecation-warning"
+            , Message:="Starting with release of ObsidianHTML v4.X, the ObsidianHTML-Verb 'Run' will be deprecated in favour of a combination of 'convert' and 'serve'. Currently, this is not yet fully implemented, so this is just a warning. The 'Run'-Option will be removed at some point."
+            , AppError(Title, Message,0x40030," > " A_ThisFunc)
+        Args.Convert:=0 ;; FIXME: starting with OHTML v4.0.1., "obsidianhtml run" is deprecated. However, the documentation on how to invoke similar results via ohtml convert & ohtml serve is not given yet. 
     } else { ;; if verb is not specified, default to convert.
         Args.Convert:=1
     }
