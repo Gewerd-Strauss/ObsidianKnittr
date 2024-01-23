@@ -29,6 +29,16 @@ processCLIFlags(Byref Args) {
             Args.RenderToOutputs:=1
         }
     }
+    if (Args.HasKey("--SourceNameIndex")) { ;; control if the resulting md/rmd/qmd-file should have name %manuscriptname% or "index". Default: "index"
+        Args.SourceNameIndex:=0
+    } else {
+        Args.SourceNameIndex:=1
+    }
+    if (!Args.HasKey("--noIntermediates")) {
+        Args.noIntermediates:=0
+    } else {
+        Args.noIntermediates:=1
+    }
 
     ;; OHTML
     if (Args.HasKey("--OHTML.TrimErrors")) {
@@ -52,16 +62,6 @@ processCLIFlags(Byref Args) {
         Args.Convert:=0
     } else { ;; if verb is not specified, default to convert.
         Args.Convert:=1
-    }
-    if (Args.HasKey("--SourceNameIndex")) { ;; control if the resulting md/rmd/qmd-file should have name %manuscriptname% or "index". Default: "index"
-        Args.SourceNameIndex:=0
-    } else {
-        Args.SourceNameIndex:=1
-    }
-    if (!Args.HasKey("--noIntermediates")) {
-        Args.noIntermediates:=0
-    } else {
-        Args.noIntermediates:=1
     }
 }
 processCLIArgs(ByRef Args) {
