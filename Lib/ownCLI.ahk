@@ -66,6 +66,13 @@ processCLIFlags(Byref Args) {
     } else { ;; if verb is not specified, default to convert.
         Args.Convert:=1
     }
+
+    ;; Quarto
+    if (Args.HasKey("--Quarto.TrimRefTypes")) {
+        Args.RemoveQuartoReferenceTypesFromCrossrefs:=1
+    } else {
+        Args.RemoveQuartoReferenceTypesFromCrossrefs:=0
+    }
 }
 processCLIArgs(ByRef Args) {
     if (!Args.HasKey("LastExecutionDirectory")) {
@@ -145,7 +152,7 @@ validateCLIArgs(Byref Args) {
                 convert ohtmllevel RestrictOHTMLScope removeobsidianhtmlerrors usecustomfork verbose
 
                 //quarto r//
-                rendertooutputs lastexecutiondirectory
+                rendertooutputs lastexecutiondirectory removequartoreferencetypesfromcrossrefs
 
                 //flags//
                 nointermediates nomove noopen notify
