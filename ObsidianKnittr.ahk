@@ -601,7 +601,6 @@ processTags(Contents,bRemoveHashTagFromTags) {
                 , Contents:=strreplace(Contents,"``" _match "``",(bRemoveHashTagFromTags?"":"#") match[2])
         }
     }
-    ;;  TODO: regexreplaceall for these patterns: "`{_obsidian_pattern_tag_XXXX}", as they are not found in the frontmatter and thus are not replaced
     return Contents
 }
 guiCreate(runCLI,CLIArgs) {
@@ -906,7 +905,7 @@ guiShow(runCLI:=FALSE,CLIArgs:="") {
                 , ExecutionDirectory:=OutDir . (SubStr(OutDir,0)!="\"?"\":"")
         } else {
             atmp:=getPotentialWorkDir(CLIArgs.Path,CLIArgs.LastExecutionDirectory)
-                , ExecutionDirectory:=(atmp.relativeToNote=1?script.config.config.OHTML_OutputDir:atmp.ExecutionDirectories)
+            ExecutionDirectory:=(atmp.relativeToNote=1?script.config.config.OHTML_OutputDir:atmp.ExecutionDirectories)
                 , ExecutionDirectory:=ExecutionDirectory . (SubStr(ExecutionDirectory,0)!="\"?"\":"")
         }
     }
