@@ -76,7 +76,11 @@ processCLIFlags(Byref Args) {
 }
 processCLIArgs(ByRef Args) {
     if (!Args.HasKey("LastExecutionDirectory")) {
-        Args.LastExecutionDirectory:=script.config.LastRun.LastExecutionDirectory
+        Args.LastExecutionDirectory:=1
+    } else {
+        if (Args.LastExecutionDirectory>2 || Args.LastExecutionDirectory<1) {
+            Args.LastExecutionDirectory:=1
+        }
     }
     if (Args.HasKey("OHTMLLevel")) {
         Args.OHTMLLevel+=0
