@@ -112,7 +112,12 @@ requireA_Args(Args) {
             if (arg="path") {
                 val:=strreplace(val,"""")
                 if (!FileExist(val)) {
-                    message:="Fatal error: CLI run without providing required argument '" arg "'.`nThis program will exit now." "`n" ttip_Obj2Str(Args)
+                    args_str:=ttip_Obj2Str(Args)
+                    args_str:=strreplace(args_str,"`n.--","`n--")
+                    args_str:=strreplace(args_str," = `n","`n")
+                    args_str:=strreplace(args_str,".--","--",,1)
+                    args_str:=strreplace(args_str,"`n.","`n")
+                    message:="Fatal error: CLI run without providing valid input for the required argument '" arg "'.`nThe path '" val "' does not exist.`nThis program will exit now." "`n--------`nprovided Aguments:`n--------`n" args_str
                     AppError("Fatal argument-error occured", Message, Options := 0, TitlePrefix := " > " A_ThisFunc ": ")
                     ExitApp -1
                 }
