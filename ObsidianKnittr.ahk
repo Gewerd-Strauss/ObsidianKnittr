@@ -178,18 +178,9 @@ main() {
         , OHTML_WorkDir:=Deref(script.config.config.OHTML_WorkDir)
         , OHTML_WorkDir_OwnFork := script.config.Config.OHTML_WorkDir_OwnFork ; "D:\Dokumente neu\ObsidianPluginDev\obsidian-html"
     if (guiOut.Settings.bRestrictOHTMLScope) {
-        if (CLIArgs!="") && (FileExist(CLIArgs.path)) {
-            if (CLIArgs.OHTMLLevel!="") {
+        if (CLIArgs!="") && (FileExist(CLIArgs.path)) { ;; CLI-path
                 OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(guiOut.manuscriptpath,guiOut.Settings.bAutoSubmitOTGUI,CLIArgs.OHTMLLevel,CLIArgs)
-            } else {
-                if (guiOut.manuscriptpath==script.config.LastRun.path_lastmanuscript) {
-                    OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(guiOut.manuscriptpath,guiOut.Settings.bAutoSubmitOTGUI,script.config.LastRun.LastRelativeLevel,CLIArgs)
-                } else {
-                    script.config.LastRun.LastRelativeLevel:=-1
-                    OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(guiOut.manuscriptpath,guiOut.Settings.bAutoSubmitOTGUI,,CLIArgs)
-                }
-            }
-        } else {
+        } else { ;; GUI-path
             if (guiOut.manuscriptpath==script.config.LastRun.path_lastmanuscript) {
                 OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(guiOut.manuscriptpath,guiOut.Settings.bAutoSubmitOTGUI,script.config.LastRun.LastRelativeLevel)
             } else {
@@ -211,7 +202,7 @@ main() {
     ;; OBSIDIANHTML REMOVE VAULT LIMITER
     if (guiOut.Settings.bRestrictOHTMLScope) {
         tempOVaultRoot:=removeTemporaryObsidianVaultRoot(OHTMLScopeRestrictor_Object.Path,OHTMLScopeRestrictor_Object.Graph)
-        if tempOVaultRoot.Removed {
+        if (tempOVaultRoot.Removed) {
             EL.temporaryVaultpath:=OHTMLScopeRestrictor_Object.Path 
                 , EL.temporaryVaultpathRemoved:="Yes"
             OnExit(Func("removeTempDir"),0)  ;; as the folder has been removed successfully, we can now remove this callback.  #FIXME: This does not seem to work at all. Why?
