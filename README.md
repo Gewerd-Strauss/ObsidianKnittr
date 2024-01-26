@@ -1,3 +1,6 @@
+Note: I am currently working on a major refactoring and expansion rewrite, but this will take time for various private reasons. Once that rewrite is completed, an attempt at a proper documentation is going to be (finally) written, as I expect the project to reach proper feature-completeness at that point. 
+
+
 # ObsidianScripts
  A variety of Obsidian.md helpers, in varying states of completion.
 
