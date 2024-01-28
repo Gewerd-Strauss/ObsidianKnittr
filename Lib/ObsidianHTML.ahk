@@ -349,8 +349,8 @@ updateObsidianHTMLToMaster() {
 }
 obsidianhtml_check() {
     static obsidianhtml_on_path:=false
-    static out:=""
-    if !obsidianhtml_on_path {
+        , out:=""
+    if (out="") {
         GetStdStreams_WithInput("where obsidianhtml",,out)
         out:=strreplace(out,"`n")
         if !FileExist(out) {
@@ -363,8 +363,8 @@ obsidianhtml_check() {
 }
 python_check() {
     static python_on_path:=false
-    static out:=""
-    if !python_on_path {
+        , out:=""
+    if (out="") {
         GetStdStreams_WithInput("where python.exe",,out)
         out:=strsplit(out,"`n")
         for _, path in out {

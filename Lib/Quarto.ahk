@@ -191,14 +191,14 @@ quartogetVersion() {
 }
 quarto_check() {
     static quarto_on_path:=false
-    static out:=""
-    if !quarto_on_path {
+        , out:=""
+    if (out="") {
         GetStdStreams_WithInput("where quarto.exe",,out)
-            , GetStdStreams_WithInput("where quarto.cmd",,out2)
-            , GetStdStreams_WithInput("where quarto.js",,out3)
             , out:=strreplace(out,"`n")
-            , out2:=strreplace(out2,"`n")
-        if (!FileExist(out) || !FileExist(out2)) {
+        ; , GetStdStreams_WithInput("where quarto.cmd",,out2)
+        ; , GetStdStreams_WithInput("where quarto.js",,out3)
+        ; , out2:=strreplace(out2,"`n")
+        if (!FileExist(out)) {
             quarto_on_path:=false
         } else {
             quarto_on_path:=true
