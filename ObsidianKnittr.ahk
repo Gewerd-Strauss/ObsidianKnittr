@@ -869,18 +869,16 @@ guiShow(runCLI:=FALSE,CLIArgs:="") {
             sel:=[CLIArgs.format]
         }
         bVerboseCheckbox := (CLIArgs.Verbose?1:0)
-        ;, bRestrictOHTMLScope := (script.config.LastRun.RestrictOHTMLScope)                                               ;; handled
-            , bKeepFilename := (script.config.LastRun.KeepFileName)                                                             ;; TODO: implement cli toggle                                
-            , bBackupOutput := (script.config.LastRun.BackupOutput)                                                             ;; TODO: implement cli toggle
-            , bRemoveHashTagFromTags := (script.config.LastRun.RemoveHashTagFromTags)                                           ;; TODO: implement cli toggle
-            , bConvertInsteadofRun := (script.config.LastRun.ConvertInsteadofRun)                                               ;; TODO: implement cli toggle
-            , bRemoveObsidianHTMLErrors := (script.config.LastRun.RemoveObsidianHTMLErrors)                                     ;; TODO: implement cli toggle
-            , bStripLocalMarkdownLinks := (script.config.LastRun.bStripLocalMarkdownLinks)                                      ;; TODO: implement cli toggle
-            , bUseOwnOHTMLFork := (script.config.LastRun.UseOwnOHTMLFork)                                                       ;; TODO: implement cli toggle
-            , bRemoveQuartoReferenceTypesFromCrossrefs := (script.config.LastRun.RemoveQuartoReferenceTypesFromCrossrefs)       ;; TODO: implement cli toggle
-            , bRendertoOutputs := (CLIArgs.RenderToOutputs)                                                        ;; TODO: implement cli toggle                                
-        ; , Button2 := (script.config.LastRun.LastExecutionDirectory=1?1:0)
-        ; , Button3 := (script.config.LastRun.LastExecutionDirectory=1?0:1)
+            , bRestrictOHTMLScope := (CLIArgs.RestrictOHTMLScope?1:0)
+            , bKeepFilename := (CLIArgs.KeepFileName?1:0)
+            , bBackupOutput := (CLIArgs.BackupOutput?1:0)
+            , bRemoveHashTagFromTags := (CLIArgs.StripHashesfromTags?1:0)
+            , bConvertInsteadofRun := (CLIArgs.Convert?1:0)
+            , bRemoveObsidianHTMLErrors := (CLIArgs.RemoveObsidianHTMLErrors?1:0)
+            , bStripLocalMarkdownLinks := (CLIArgs.StriplocalMDLinks?1:0)
+            , bUseOwnOHTMLFork := (CLIArgs.UseCustomFork?1:0)
+            , bRemoveQuartoReferenceTypesFromCrossrefs := (CLIArgs.RemoveQuartoReferenceTypesFromCrossrefs?1:0)
+            , bRendertoOutputs := (CLIArgs.RenderToOutputs?1:0)
     }
     Outputformats:={}
     for _, format in sel {
