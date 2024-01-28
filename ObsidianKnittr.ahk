@@ -398,6 +398,15 @@ main() {
     if (CLIArgs.noIntermediates) {
         guiOut.removableintermediates:=collectQuartoIntermediates(guiOut,CLIArgs)
         failedRemovals:=cleanupIntermediatequartoFiles(guiOut)
+        if (failedRemovals.Count()) {
+            Title:=": clean-up of intermediates unsuccessful"
+            Message:="The following intermediate-files resulting from executing quarto could not be removed:"
+            for _, path in failedRemovals {
+                Message.="`n '" path "'"
+            }
+            Message.="`n`nYou may either ignore this warning, or remove them yourself"
+            AppError(Title, Message,0x40010," > " A_ThisFunc)
+        }
     }
     if (!CLIArgs.Count()) { ;; only change config when running in GUI mode
         script.config.LastRun.manuscriptpath:=StrReplace(script.config.LastRun.manuscriptpath, "/","\")
