@@ -179,7 +179,7 @@ main() {
         , OHTML_WorkDir_OwnFork := script.config.Config.OHTML_WorkDir_OwnFork ; "D:\Dokumente neu\ObsidianPluginDev\obsidian-html"
     if (guiOut.Settings.bRestrictOHTMLScope) {
         if (CLIArgs!="") && (FileExist(CLIArgs.path)) { ;; CLI-path
-                OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(guiOut.manuscriptpath,guiOut.Settings.bAutoSubmitOTGUI,CLIArgs.OHTMLLevel,CLIArgs)
+            OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(guiOut.manuscriptpath,guiOut.Settings.bAutoSubmitOTGUI,CLIArgs.OHTMLLevel,CLIArgs)
         } else { ;; GUI-path
             if (guiOut.manuscriptpath==script.config.LastRun.path_lastmanuscript) {
                 OHTMLScopeRestrictor_Object:=createTemporaryObsidianVaultRoot(guiOut.manuscriptpath,guiOut.Settings.bAutoSubmitOTGUI,script.config.LastRun.LastRelativeLevel)
@@ -1049,7 +1049,7 @@ editMainConfig(configfile) {
     OnMessage(0x44, "DA_OnMsgBox")
     Title:=this.ClassName " > " A_ThisFunc
     Message:="You modified the configuration for this class.`nReload?"
-    AppError(Title, Message, 0x40044,"",Timeout:=0)
+    AppError(Title, Message, 0x40044,"")
     OnMessage(0x44, "")
     IfMsgBox Yes, {
         reload
