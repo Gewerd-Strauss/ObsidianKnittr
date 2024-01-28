@@ -326,7 +326,7 @@ main() {
                 } else {
                     SourceFileName:=guiOut.manuscriptname
                 }
-                if (CLIArgs.keepFilename) {
+                if (guiOut.Settings.bkeepFilename) {
                     guiOut.Outputformats[output_type].filename:=guiOut.manuscriptname
                     guiOut.Outputformats[output_type].filenameMod:=" (" guiOut.Outputformats[output_type].package ")"
                 }
