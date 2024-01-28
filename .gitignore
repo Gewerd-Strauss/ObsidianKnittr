@@ -9,3 +9,4 @@ Tests/*
 **/dist/**
 INI-Files/**.ini
 ObsidianKnittr.exe
+ObsidianKnittr**.exe
