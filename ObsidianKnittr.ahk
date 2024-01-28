@@ -912,6 +912,15 @@ guiShow(runCLI:=FALSE,CLIArgs:="") {
             atmp:=getPotentialWorkDir(CLIArgs.Path,CLIArgs.LastExecutionDirectory)
                 , ExecutionDirectory:=OutDir . (SubStr(OutDir,0)!="\"?"\":"")
         } else {
+            /*
+            path:="D:\Dokumente neu\Obsidian NoteTaking\The Universe\200 University\06 Interns and Unis\BE28 Internship Report\Submission\BE28 Internship Report.md"
+            if !CliArgs.NoMove
+            LastExecutionDirectory = NA  → forced to 1 → "C:\Users\Claudius Main\Desktop\TempTemporal\"
+            LastExecutionDirectory = 0   → forced to 1 → "C:\Users\Claudius Main\Desktop\TempTemporal\"
+            LastExecutionDirectory = 1   → forced to 1 → "C:\Users\Claudius Main\Desktop\TempTemporal\"
+            LastExecutionDirectory = 2   → remains   2 → "D:\Dokumente neu\Obsidian NoteTaking\The Universe\200 University\06 Interns and Unis\BE28 Internship Report\Submission\ObsidianKnittr_output\"
+            LastExecutionDirectory = 3 + → forced to 1 → "C:\Users\Claudius Main\Desktop\TempTemporal\"
+            */
             atmp:=getPotentialWorkDir(CLIArgs.Path,CLIArgs.LastExecutionDirectory)
             ExecutionDirectory:=(atmp.relativeToNote=1?script.config.config.OHTML_OutputDir:atmp.ExecutionDirectories)
                 , ExecutionDirectory:=ExecutionDirectory . (SubStr(ExecutionDirectory,0)!="\"?"\":"")
