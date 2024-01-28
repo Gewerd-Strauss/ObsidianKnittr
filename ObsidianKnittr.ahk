@@ -275,10 +275,54 @@ main() {
         }
         writeFile(qmd_Path,qmdContents,"UTF-8-RAW",,true)
     }
-    notify("Creating R-BuildScript",CLIArgs)
-    if (CLIArgs.HasKey("--noRender") && CLIArgs.HasKey("--noMove")) {
-
+    if (script.config.config.useQuartoCLI) {
+        EL.Quarto_Version:=quartogetVersion()
+        if (guiOut.Settings.bRendertoOutputs) {
+            if (guiOut.Settings.bBackupOutput && !CLIArgs.noMove) {
+                ttip(-1)
+                notify("Backing up Files",CLIArgs)
+                BackupDirectory:=backupOutput(qmd_Path,guiOut)
+            }
+            if script.config.config.backupCount {
+                limitBackups(BackupDirectory,script.config.config.backupCount)
+            }
+            ttip(-1)
+            notify("Executing quarto-CLI",CLIArgs)
+            SplitPath % qmd_Path,, OutDir
+            quarto_ret:=["","",OutDir]
+            tmp:=""
+            for _, output_type in guiOut.sel {
+                ;; use "index.qmd" if we explicitly use the flag to do so, or if we are not running in CLI-mode.
+                if (CLIArgs.SourceNameIndex || CLIArgs="") { 
+                    SourceFileName:="index"
+                } else {
+                    SourceFileName:=guiOut.manuscriptname
+                }
+                if (CLIArgs.keepFilename) {
+                    guiOut.Outputformats[output_type].filename:=guiOut.manuscriptname
+                    guiOut.Outputformats[output_type].filenameMod:=" (" guiOut.Outputformats[output_type].package ")"
+                }
+                tmp.=output_type ":`n" write_quarto_yaml(guiOut.Outputformats[output_type],OutDir,"qCLI_yaml_" guiOut.Outputformats[output_type].filesuffix ".yaml")
+                    , CMD:="quarto render " SourceFileName ".qmd --to " guiOut.Outputformats[output_type].filesuffix 
+                    , CMD.=" --metadata-file=""qCLI_yaml_" guiOut.Outputformats[output_type].filesuffix ".yaml"""
+                    , CMD.=" --output """ guiOut.Outputformats[output_type].Filename guiOut.Outputformats[output_type].FilenameMod "."  guiOut.Outputformats[output_type].filesuffix """"
+                    , GetStdStreams_WithInput(CMD, OutDir, InOut:="`n")
+                    , quarto_ret[1].="`nFormat " output_type ":`n" InOut
+                    , quarto_ret[2].=CMD
+                if (DEBUG) {
+                    Clipboard:=(IsObject(InOut)?ttip_Obj2Str(InOut):InOut)
+                }
+                if (!CLIArgs.noIntermediates) {
+                    writeFile(OutDir "\build_" guiOut.Outputformats[output_type].filesuffix ".cmd",CMD,"UTF-8-RAW",,true)
+                }
+            }
+            EL.Rdata_out:=quarto_ret[1]
+                , EL.RCMD:=quarto_ret[2]
+                , EL.RWD:=quarto_ret[3]
+            EL.DocumentSettings:=tmp
+        }
     } else {
+        notify("Creating R-BuildScript",CLIArgs)
         if guiOut.Settings.bKeepFilename {
             tmp:=buildRScriptContent(rmd_Path,guiOut.manuscriptName,guiOut)
         } else {
@@ -287,53 +331,7 @@ main() {
         if (qmd_Path!="") {
             tmp.1:=modifyQuartobuildscript(tmp.1,tmp.3,guiOut)
         }
-    }
-    format:=tmp.2
-    EL.Quarto_Version:=quartogetVersion()
-    if (script.config.config.useQuartoCLI) {
-        if (CLIArgs.HasKey("--noRender")) {
-
-        } else {
-            if (guiOut.Settings.bRendertoOutputs) {
-                if (guiOut.Settings.bBackupOutput && !CLIArgs.noMove) {
-                    ttip(-1)
-                    notify("Backing up Files",CLIArgs)
-                    BackupDirectory:=backupOutput(qmd_Path,guiOut)
-                }
-                if script.config.config.backupCount {
-                    limitBackups(BackupDirectory,script.config.config.backupCount)
-                }
-                ttip(-1)
-                notify("Executing quarto-CLI",CLIArgs)
-                SplitPath % qmd_Path,, OutDir
-                quarto_ret:=["","",OutDir]
-                for _, output_type in guiOut.sel {
-                    ;; use "index.qmd" if we explicitly use the flag to do so, or if we are not running in CLI-mode.
-                    if (CLIArgs.SourceNameIndex || CLIArgs="") { 
-                        SourceFileName:="index"
-                    } else {
-                        SourceFileName:=guiOut.manuscriptname
-                    }
-                    write_quarto_yaml(guiOut.Outputformats[output_type],OutDir,"qCLI_yaml_" guiOut.Outputformats[output_type].filesuffix ".yaml")
-                        , CMD:="quarto render " SourceFileName ".qmd --to " guiOut.Outputformats[output_type].filesuffix 
-                        , CMD.=" --metadata-file=""qCLI_yaml_" guiOut.Outputformats[output_type].filesuffix ".yaml"""
-                        , CMD.=" --output """ guiOut.Outputformats[output_type].Filename guiOut.Outputformats[output_type].FilenameMod "."  guiOut.Outputformats[output_type].filesuffix """"
-                        , GetStdStreams_WithInput(CMD, OutDir, InOut:="`n")
-                        , quarto_ret[1].="`nFormat " output_type ":`n" InOut
-                        , quarto_ret[2].=CMD
-                    if (DEBUG) {
-                        Clipboard:=(IsObject(InOut)?ttip_Obj2Str(InOut):InOut)
-                    }
-                    if (!CLIArgs.noIntermediates) {
-                        writeFile(OutDir "\build_" guiOut.Outputformats[output_type].filesuffix ".cmd",CMD,"UTF-8-RAW",,true)
-                    }
-                }
-                EL.Rdata_out:=quarto_ret[1]
-                    , EL.RCMD:=quarto_ret[2]
-                    , EL.RWD:=quarto_ret[3]
-            }
-        }
-    } else {
+        format:=tmp.2 
         script_contents:=tmp.1
         if (guiOut.Settings.bRendertoOutputs) {
             ttip(-1)
@@ -356,9 +354,10 @@ main() {
                 run % rmd_Path
             }
         }
+        EL.DocumentSettings:=tmp[2]
     }
-    EL.DocumentSettings:=tmp[2]
-        , EL.Compilation_Duration:=Codetimer_Log()
+
+    EL.Compilation_Duration:=Codetimer_Log()
         , EL.Compilation_End:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
         , EL.getTotalDuration(ATC1,A_TickCount)
     ;; final touches - ahk starter, moving shit to output folder

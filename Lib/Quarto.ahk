@@ -224,9 +224,8 @@ write_quarto_yaml(output_type,OutDir,yaml_file) {
         , String:=Strreplace(String,"date: FALSEw","date: now")
         , String:=Strreplace(String,": true`n",": TRUE`n")
         , String:=Strreplace(String,": false`n",": FALSE`n")
-    ;Clipboard:=String
     writeFile(yaml_path,String,Encoding:="utf-8",Flags:=0x2,bSafeOverwrite:=true)
-    return
+    return String
 }
 cleanupIntermediatequartoFiles(guiOut) {
     FilesArr:=guiOut.removableintermediates
