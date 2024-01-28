@@ -383,6 +383,19 @@ main() {
             ; removeTempDir(rscript_ret.OutputPath,false)
         }
     }
+    ;; CLEANUP
+    if (CLIArgs.count()) {
+        if (FileExist(EL.__path)) {
+            if (CLIArgs.noOKLog) {
+                FileDelete % EL.__path
+            } else {  ;; only copy back the log if it is required
+                SplitPath % rmd_Path,, OutDir
+                FileMove % EL.__path, % OutDir "\Executionlog.txt",true
+            }
+        }
+    } else {
+        FileMove % EL.__path, % OutDir "\Executionlog.txt",true
+    }
     if (CLIArgs.noIntermediates) {
         guiOut.removableintermediates:=collectQuartoIntermediates(guiOut,CLIArgs)
         failedRemovals:=cleanupIntermediatequartoFiles(guiOut)
