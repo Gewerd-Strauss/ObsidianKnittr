@@ -104,6 +104,33 @@ main() {
     }
     script.version:=script.config.version.ObsidianKnittr_Version:=Regexreplace(ObsidianKnittr_Version,"\s*")
         , clArgs:=A_Args
+    /*
+    clArgs:=["-h"]
+    clArgs:=["path=D:\Dokumente neu\Obsidian NoteTaking\The Universe\200 University\06 Interns and Unis\BE28 Internship Report\Submission\BE28 Internship Report.md","format=quarto::html","format=quarto::docx","LastExecutionDirectory=0","OHTMLLevel=2"]
+    clArgs:=["path=D:\Dokumente neu\Obsidian NoteTaking\BE31-Thesis\100 Thesis\Submission\BE31 Thesis Report.md","format=quarto::html","Verbose=0","UseOwnOHTMLFork=1","LastExecutionDirectory=1","OHTMLLevel=2","quarto::html.number-depth=2","quarto::html.author=Manfred von Karma","quarto::html.toc=1","quarto::html.toc-location=left"]
+    clArgs:=["path=C:\Users\Claudius Main\Desktop\TempTemporal\BE31-Thesis-quarto\Report\___manuscript.md","format=quarto::html","Verbose=0","UseOwnOHTMLFork=1","LastExecutionDirectory=1","OHTMLLevel=-1","RenderToOutputs=0","--noMove","--noRender","--noOpen","--noIntermediates"]
+    clArgs:=["path=C:/Users/Claudius Main/Desktop/TempTemporal/BE31-Thesis-quarto/documentation/methods/___grain-success.md","format=quarto::html","Verbose=0","UseOwnOHTMLFork=1","LastExecutionDirectory=1","OHTMLLevel=-1","RenderToOutputs=0","--noMove","--noRender","--noOpen","--noIntermediates"]
+    clArgs:=["path=D:\Dokumente neu\Obsidian NoteTaking\BE31-Thesis-quarto\documentation\methods\___grain-success.md","format=quarto::html","Verbose=0","UseOwnOHTMLFork=1","LastExecutionDirectory=1","OHTMLLevel=1","RenderToOutputs=0","--noMove","--noRender","--noOpen","--notify"]
+    clArgs:=["format=quarto::html","Verbose=1","UseOwnOHTMLFork=1","LastExecutionDirectory=1","OHTMLLevel=-1","RenderToOutputs=0","--noMove","--noRender","--noOpen","--noIntermediates","path=D:\Dokumente neu\Obsidian NoteTaking\BE31-Thesis-quarto/documentation/methods/___grain-success.md"]
+    clArgs:=["OHTMLLevel=0","format=quarto::docx","format=quarto::html","Verbose=3","UseOwnOHTMLFork=1","LastExecutionDirectory=1","RenderToOutputs=0","--noRender","--notify","--noIntermediates","--noOpen","path=D:\Dokumente neu\Obsidian NoteTaking\The Universe\019-Bugtesting-Subvault\nesting\nesting2\nesting3\019-ObsHTML_EmbeddedTitleStripping_Main.md"]
+    clArgs:=["format=quarto::docx","format=quarto::html","OHTMLLevel=2","Verbose=0","UseOwnOHTMLFork=1","LastExecutionDirectory=1","RenderToOutputs=0","--notify","--noIntermediates","--noMove","--noOpen","path=D:\Dokumente neu\Obsidian NoteTaking\The Universe\019-Bugtesting-Subvault\nesting\nesting2\nesting3\019-ObsHTML_EmbeddedTitleStripping_Main.md"]
+
+    clArgs:=["format=quarto::html","quarto::html.author=Professor E. Gadd","OHTMLLevel=2","--OHTML.UseCustomFork","--OHTML.Convert","LastExecutionDirectory=1","--notify","--noIntermediates","--noMove","--noOpen","--noOKLOG","path=D:\Dokumente neu\Obsidian NoteTaking\The Universe\019-Bugtesting-Subvault\nesting\nesting2\nesting3\019-ObsHTML_EmbeddedTitleStripping_Main.md"]
+    clArgs:=["format=quarto::html","quarto::html.author=Professor E. Gadd","OHTMLLevel=2","--OHTML.UseCustomFork","--OHTML.Convert","LastExecutionDirectory=1","--notify","--noIntermediates","--noMove","--noOpen","path=D:\Dokumente neu\Obsidian NoteTaking\The Universe\019-Bugtesting-Subvault\nesting\nesting2\nesting3\019-ObsHTML_EmbeddedTitleStripping_Main.md"]
+    clArgs:=["format=quarto::html","quarto::html.author=Professor E. Gadd","OHTMLLevel=2","--OHTML.UseCustomFork","--OHTML.Convert","LastExecutionDirectory=1","--notify","--noIntermediates","IntermediatesRemovalLevel=4","--noMove","--noOpen","path=D:\Dokumente neu\Obsidian NoteTaking\The Universe\200 University\06 Interns and Unis\BE28 Internship Report\Submission\BE28 Internship Report.md"]
+    clArgs:=["format=quarto::html","quarto::html.author=Professor E. Gadd","OHTMLLevel=2","--OHTML.UseCustomFork","--OHTML.Convert","LastExecutionDirectory=1","--notify","--noIntermediates","IntermediatesRemovalLevel=4","--noOpen","path=D:\Dokumente neu\Obsidian NoteTaking\The Universe\200 University\06 Interns and Unis\BE28 Internship Report\Submission\BE28 Internship Report.md"]
+    if (DEBUG && GetKeyState("LShift","P")) {
+    clArgs:=["path=D:\Dokumente neu\Obsidian NoteTaking\BE31-Thesis-quarto\Report\___manuscript.md","format=quarto::html","LastExecutionDirectory=1","OHTMLLevel=-1","Verbose=1","--OHTML.Convert","--OHTML.UseCustomFork","--OHTML.TrimErrors","--noMove","--noRender","--noOpen","--notify","--noIntermediates","--SourceNameIndex"]
+    }
+    clArgs:=["format=quarto::html","quarto::html.author=Professor E. Gadd","OHTMLLevel=2","--OHTML.UseCustomFork","--OHTML.Convert","--OHTML.TrimErrors","--notify","--noIntermediates","IntermediatesRemovalLevel=4","--noOpen","--Quarto.TrimRefTypes","path=D:\Dokumente neu\Obsidian NoteTaking\The Universe\200 University\06 Interns and Unis\BE28 Internship Report\Submission\BE28 Internship Report.md"]
+    clArgs:=["format=quarto::html","quarto::html.author=Professor E. Gadd","OHTMLLevel=2","--OHTML.UseCustomFork","--OHTML.Convert","--OHTML.TrimErrors","LastExecutionDirectory=0","--notify","--noIntermediates","IntermediatesRemovalLevel=4","--noOpen","--Quarto.TrimRefTypes","path=D:\Dokumente neu\Obsidian NoteTaking\The Universe\200 University\06 Interns and Unis\BE28 Internship Report\Submission\BE28 Internship Report.md"]
+    clArgs:=["format=quarto::html","quarto::html.author=Professor E. Gadd","OHTMLLevel=2","--OHTML.UseCustomFork","--OHTML.Convert","--OHTML.TrimErrors","LastExecutionDirectory=1","--notify","--noIntermediates","IntermediatesRemovalLevel=4","--noOpen","--Quarto.TrimRefTypes","path=D:\Dokumente neu\Obsidian NoteTaking\The Universe\200 University\06 Interns and Unis\BE28 Internship Report\Submission\BE28 Internship Report.md"]
+    clArgs:=["format=quarto::html","quarto::html.author=Professor E. Gadd","OHTMLLevel=2","--OHTML.UseCustomFork","--OHTML.Convert","--OHTML.TrimErrors","LastExecutionDirectory=2","--notify","--noIntermediates","IntermediatesRemovalLevel=4","--noOpen","--Quarto.TrimRefTypes","path=D:\Dokumente neu\Obsidian NoteTaking\The Universe\200 University\06 Interns and Unis\BE28 Internship Report\Submission\BE28 Internship Report.md"]
+    clArgs:=["format=quarto::html","quarto::html.author=Professor E. Gadd","OHTMLLevel=2","--OHTML.UseCustomFork","--OHTML.Convert","--OHTML.TrimErrors","LastExecutionDirectory=3","--notify","--noIntermediates","IntermediatesRemovalLevel=4","--noOpen","--Quarto.TrimRefTypes","path=D:\Dokumente neu\Obsidian NoteTaking\The Universe\200 University\06 Interns and Unis\BE28 Internship Report\Submission\BE28 Internship Report.md"]
+    clArgs:=["format=quarto::html","quarto::html.author=Professor E. Gadd","OHTMLLevel=2","--OHTML.UseCustomFork","--OHTML.Convert","--OHTML.TrimErrors","LastExecutionDirectory=4","--notify","--noIntermediates","IntermediatesRemovalLevel=4","--noOpen","--Quarto.TrimRefTypes","path=D:\Dokumente neu\Obsidian NoteTaking\The Universe\200 University\06 Interns and Unis\BE28 Internship Report\Submission\BE28 Internship Report.md"]
+    clArgs:=["format=quarto::html","quarto::html.author=Professor E. Gadd","--OHTML.UseCustomFork","--OHTML.Convert","--OHTML.TrimErrors","LastExecutionDirectory=5","--notify","--noIntermediates","IntermediatesRemovalLevel=4","--noOpen","--Quarto.TrimRefTypes","--keepFilename","path=D:\Dokumente neu\Obsidian NoteTaking\The Universe\200 University\06 Interns and Unis\BE28 Internship Report\Submission\BE28 Internship Report.md"]
+    clArgs:=["format=quarto::html","quarto::html.author=Professor E. Gadd","OHTMLLevel=2","RestrictOHTMLScope=0","--OHTML.UseCustomFork","--OHTML.Convert","--OHTML.TrimErrors","LastExecutionDirectory=5","--notify","--noIntermediates","IntermediatesRemovalLevel=4","--noOpen","--Quarto.TrimRefTypes","--keepFilename","path=D:\Dokumente neu\Obsidian NoteTaking\The Universe\200 University\06 Interns and Unis\BE28 Internship Report\Submission\BE28 Internship Report.md"]
+    */
     if (!clArgs.length()) {
         guiOut:=guiShow()
     } else {
@@ -259,6 +286,7 @@ main() {
             break                                               ;; if a format is of quarto, run the quarto-conversion once, then continue on.
         }
     }
+    ;; postprocess rmd-filecontent (some of the steps below are already done to qmd-content during `convertToQMD()`)
     NewContents:=cleanLatexEnvironmentsforRMarkdown(NewContents)
         , NewContents:=fixNullFields(NewContents)
         , EL.Intermediary_Duration:=Codetimer_Log()
@@ -868,6 +896,20 @@ guiShow(runCLI:=FALSE,CLIArgs:="") {
         } else {
             sel:=[CLIArgs.format]
         }
+        /*
+        CLI-FLAGS OVERVIEW
+        RestrictOHTMLScope                          always true, only the level is set to -1 if - default: true (setting 'false' will do nothing, in that case it is internally set to 'true' and the actual vault-root is selected)
+        KeepFileName                                --keepFilename                              - default: true (output formats are generated with the name of the note, instead of e.g. 'index.html'.)
+        BackupOutput                                --noBackup                                  - default: true (by default, do backup,e.g. by absence of flag)
+        RemoveHashTagFromTags                       --INTER.stripHashesfromTags                 - default: false (in markdown-text, `#tag` & `#tag/nested` will be transformed to `tag` and  tag/nested` respectively)
+        ConvertInsteadofRun                         --OHTML.Convert / --OHTML.Run               - default: convert (true) (ObsidianHTML will deprecate the verb `run` in upcoming  v4.0.1.++. At that point, the option will be deprecated out of this program. However, it is already strongly advised not to use `run`, and this program is not extensively checked to work reliably when using `run` instead of `convert`)
+        RemoveObsidianHTMLErrors                    --OHTML.TrimErrors                          - default: false
+        StripLocalMarkdownLinks                     --INTER.stripLocalMDLinks                   - default: false
+        UseOwnOHTMLFork                             --OHTML.UseCustomFork                       - default: false
+        RemoveQuartoReferenceTypesFromCrossrefs     --Quarto.TrimRefTypes                       - default: false
+        RenderToOutputs                             --noRender                                  - default: false
+        SourceNameIndex                             --sourcenameIndex                           - default: true
+        */
         bVerboseCheckbox := (CLIArgs.Verbose?1:0)
             , bRestrictOHTMLScope := (CLIArgs.RestrictOHTMLScope?1:0)
             , bKeepFilename := (CLIArgs.KeepFileName?1:0)
@@ -901,6 +943,17 @@ guiShow(runCLI:=FALSE,CLIArgs:="") {
         ot.AssembleFormatString()
         Outputformats[format]:=ot
     }
+    /*
+
+    overview::
+
+    lastexecutiondirectories= 1 → subfolder of vault
+    "                       = 2 → ohtml-output dir (desktop) (defaUlt)
+
+
+    executiondirectory      = 1 → ohtml-output desktop
+    "                       = 2 → subfolder of vault
+    */
     if (!CLIArgs.count()) {
         atmp:=getPotentialWorkDir(ChosenFile,ExecutionDirectory)
             , ExecutionDirectory:=(atmp.relativeToNote=1?script.config.config.OHTML_OutputDir:atmp.ExecutionDirectories)

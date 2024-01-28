@@ -321,7 +321,14 @@ collectQuartoIntermediates(guiOut,CLIArgs) {
     %manuscriptdir%\*.yaml
     */
 
-    directory:=(CLIArgs.noMove?guiOut.manuscriptdir:guiOut.manuscriptdir) ;; HACK: I have no idea why this assignment to `directory` is a conditional, so it currently just does the same either way. I ym typing this in the hope that I review this when I find out that something's wrong
+    /*
+    HACK: I have no idea why this assignment to `directory` is a conditional, so it currently just does the same either way. 
+    I am typing this in the hope that I review this when I find out that something's wrong
+
+
+    Follow-up question: Why am I not cleaning guiOut.Settings.ExecutionDirectory? Especially in case of !cliargs.noMove, this should be more accurate than guiOut.manuscriptdir
+    */
+    directory:=(CLIArgs.noMove?guiOut.manuscriptdir:guiOut.manuscriptdir) 
     purgeable_names.push(directory "\*.cmd")
     purgeable_names.push(directory "\*.ahk")
     purgeable_names.push(directory "\build.r")
