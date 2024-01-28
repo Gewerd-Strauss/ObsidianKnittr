@@ -35,10 +35,30 @@ processCLIFlags(Byref Args) {
     } else {
         Args.SourceNameIndex:=1
     }
+    if (Args.HasKey("--keepFilename")) { ;; control if the rendered output-file should have name %manuscriptname% or "index". Default: "index"
+        Args.KeepFilename:=1
+    } else {
+        Args.KeepFilename:=0
+    }
     if (!Args.HasKey("--noIntermediates")) {
         Args.noIntermediates:=0
     } else {
         Args.noIntermediates:=1
+    }
+    if (!Args.HasKey("--noBackup")) {
+        Args.BackupOutput:=1
+    } else {
+        Args.BackupOutput:=0
+    }
+    if (!Args.HasKey("--INTER.striplocalMDLinks")) {
+        Args.StriplocalMDLinks:=0
+    } else {
+        Args.StriplocalMDLinks:=1
+    }
+    if (!Args.HasKey("--INTER.stripHashesfromTags")) {
+        Args.StripHashesfromTags:=0
+    } else {
+        Args.StripHashesfromTags:=1
     }
 
     ;; OHTML
@@ -149,10 +169,13 @@ validateCLIArgs(Byref Args) {
         valid_inputs=
             (LTrim
                 //obsidian html//
-                convert ohtmllevel RestrictOHTMLScope removeobsidianhtmlerrors usecustomfork verbose
+                run convert ohtmllevel RestrictOHTMLScope removeobsidianhtmlerrors usecustomfork verbose
 
                 //quarto r//
                 rendertooutputs lastexecutiondirectory removequartoreferencetypesfromcrossrefs
+
+                //intermediates//
+                striplocalMDLinks stripHashesfromTags
 
                 //flags//
                 nointermediates nomove noopen notify
@@ -161,7 +184,7 @@ validateCLIArgs(Byref Args) {
                 IntermediatesRemovalLevel
 
                 //base//
-                path runcli nooklog SourceNameIndex
+                path runcli nooklog SourceNameIndex keepFilename backupOutput
 
             )
         if InStr(valid_inputs,arg) {
