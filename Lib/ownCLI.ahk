@@ -187,6 +187,20 @@ validateCLIArgs(Byref Args) {
                 path runcli nooklog SourceNameIndex keepFilename backupOutput
 
             )
+
+        /*
+        filter out section-descriptor strings from `valid_inputs` before checking for argument-validity via `InStr(valid_inputs,arg)`.
+        This ensures that descriptors can't be used to smuggle invalid inputs through the validation.
+        Technically they shouldn't be able to do anything because after leaving CLI-processing, all CLI-Args are referenced directly. 
+
+        The exception are childs of `quarto::format` (e.g. quarto::html.toc=0), but those are not validated by OK's validator 
+        (because this is way too complicated and is done by quarto's CLI anyways).
+        */
+        needle:="`/`/.*`/`/" 
+            , Matches:=RegexMatchAll(valid_inputs, "imU)" needle)
+        for _, match in Matches {
+            valid_inputs:=strreplace(valid_inputs, match[0])
+        }
         if InStr(valid_inputs,arg) {
             continue
         }
