@@ -25,7 +25,6 @@
             [LastRun]
             BackupOutput=1
             bStripLocalMarkdownLinks=0
-            Conversion=
             ConvertInsteadofRun=1
             KeepFileName=1
             last_output_type=
