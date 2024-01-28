@@ -354,17 +354,16 @@ main() {
                 run % rmd_Path
             }
         }
+        ;; create ahk starter if running via rscript
+        notify("Building AHK-Starterscript",CLIArgs)
+        buildAHKScriptContent(rmd_Path,script.config.config.RScriptPath)
         EL.DocumentSettings:=tmp[2]
     }
 
     EL.Compilation_Duration:=Codetimer_Log()
         , EL.Compilation_End:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
         , EL.getTotalDuration(ATC1,A_TickCount)
-    ;; final touches - ahk starter, moving shit to output folder
-    if (!script.config.config.useQuartoCLI) {
-        notify("Building AHK-Starterscript",CLIArgs)
-        buildAHKScriptContent(rmd_Path,script.config.config.RScriptPath)
-    }
+    ;; moving shit to output folder
     SplitPath % Path,, OutDir
     SplitPath % OutDir,, OutDir2
     if script.config.config.OpenParentfolderInstead {
