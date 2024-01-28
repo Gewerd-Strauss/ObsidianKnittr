@@ -376,12 +376,13 @@ main() {
         openFolder(rmd_Path)
     }
     SplitPath % rmd_Path,, OutDir
-    FileMove % EL.__path, % OutDir "\Executionlog.txt",true
-    removeTempDir(md_Path)
-    if (FileExist(quarto_ret.Output_Path)) {
-        removeTempDir(quarto_ret.OutputPath)
-    } else if (FileExist(rscript_ret.Output_Path)) {
-        removeTempDir(rscript_ret.OutputPath)
+    if (!CLIArgs.noMove) {
+        if (FileExist(quarto_ret[3])) {
+            ; removeTempDir(quarto_ret[3],false) ;; FIXME: Which directory should get remvoed here? Under which conditions? 
+        } else if (FileExist(rscript_ret.Output_Path)) {
+            ; removeTempDir(rscript_ret.OutputPath,false)
+        }
+    }
     if (CLIArgs.noIntermediates) {
         guiOut.removableintermediates:=collectQuartoIntermediates(guiOut,CLIArgs)
         failedRemovals:=cleanupIntermediatequartoFiles(guiOut)
