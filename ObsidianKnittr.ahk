@@ -103,7 +103,7 @@ main() {
         }
     }
     script.version:=script.config.version.ObsidianKnittr_Version:=Regexreplace(ObsidianKnittr_Version,"\s*")
-    clArgs:=A_Args
+        , clArgs:=A_Args
     if (!clArgs.length()) {
         guiOut:=guiShow()
     } else {
@@ -868,8 +868,6 @@ guiShow(runCLI:=FALSE,CLIArgs:="") {
         } else {
             sel:=[CLIArgs.format]
         }
-        SplitPath % script.config.lastrun.manuscriptpath,, OutDir
-        SplitPath % OutDir,, OutDir,
         bVerboseCheckbox := (CLIArgs.Verbose?1:0)
         ;, bRestrictOHTMLScope := (script.config.LastRun.RestrictOHTMLScope)                                               ;; handled
             , bKeepFilename := (script.config.LastRun.KeepFileName)                                                             ;; TODO: implement cli toggle                                
