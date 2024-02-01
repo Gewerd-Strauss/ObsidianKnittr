@@ -233,6 +233,11 @@ chooseTV_Element(TV_String,Graph,Level,bAutoSubmitOTGUI,CLIArgs) {
     }
     return {Path:temporary_obsidianconfig_path,IsVaultRoot:false} 
 }
+TOVRClose() {
+    ttip("The GUI was closed without selection, using the vault-root...")
+    gui TOVR: destroy
+    return
+}
 TOVREscape() {
     gui TOVR: destroy
     return
