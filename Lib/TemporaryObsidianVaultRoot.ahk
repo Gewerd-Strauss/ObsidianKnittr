@@ -188,15 +188,18 @@ chooseTV_Element(TV_String,Graph,Level,bAutoSubmitOTGUI,CLIArgs) {
             gui show, w600 Autosize, % script.name  " - Set limiting '.obsidian'-folder"
         }
         objTOVRHK_Handler:=Func("TOVRHK_Handler").Bind(TVIDs)
+        sinkTOVRHK_Handler:=Func("sink").Bind(false)
+        sinkTOVRHK_Handler2:=Func("sink").Bind(true)
         Hotkey ifWinActive, % "ahk_id " TOVRGUI
         loop, % TVIDs.Count() {
             HKey:="!" A_Index
             Hotkey % HKey, % objTOVRHK_Handler
         }
+        Hotkey *LButton, % sinkTOVRHK_Handler
+        Hotkey *Space, % sinkTOVRHK_Handler2
         Hotkey IfWinActive
         Hotkey !a, % objTOVRHK_Handler
         Hotkey !f, % objTOVRHK_Handler
-
         Hotkey IfWinActive
     }
     if (1) && (bAutoSubmitOTGUI) {
@@ -380,4 +383,25 @@ CreateTreeView(TreeViewDefinitionString) {	; by Learning one
     return IDs
 }	; https://www.autohotkey.com/board/topic/92863-function-createtreeview/
 
-
+sink(FullSink:=false) {
+    if (FullSink) {
+        if (DEBUG) {
+            ttip(["The input '" A_ThisHotkey "' is not valid in the ListView-Element of this GUI to prevent potential faulty input.`nPlease use the Numrow-Keys to select a level.",id,ctrl,text,A_ThisHotkey,A_PriorHotkey])
+        } else {
+            ttip("The input '" A_ThisHotkey "' is not valid in the ListView-Element of this GUI to prevent potential faulty input.`nPlease use the Numrow-Keys to select a level.")
+        }
+        return
+    }
+    MouseGetPos,,, id,ctrl
+    ControlGetText Text, % ctrl ,A
+    if (!InStr(ctrl,"SysTreeView321")) { ;; do not allow clicking within the treeview element, but everywhere else
+        SendInput % "{LButton}"
+    } else {
+        if (DEBUG) {
+            ttip(["The input '" A_ThisHotkey "' is not valid in the ListView-Element of this GUI to prevent potential faulty input.`nPlease use the Numrow-Keys to select a level.",id,ctrl,text,A_ThisHotkey,A_PriorHotkey])
+        } else {
+            ttip("The input '" A_ThisHotkey "' is not valid in the ListView-Element of this GUI to prevent potential faulty input.`nPlease use the Numrow-Keys to select a level.")
+        }
+    }
+    return
+}
