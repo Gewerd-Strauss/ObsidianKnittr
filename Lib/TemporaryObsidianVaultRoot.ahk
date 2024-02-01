@@ -239,6 +239,7 @@ TOVRClose() {
     return
 }
 TOVREscape() {
+    ttip("The GUI was escaped out-of without selection, using the vault-root...")
     gui TOVR: destroy
     return
 }
