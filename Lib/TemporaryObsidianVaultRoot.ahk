@@ -50,7 +50,7 @@ createTemporaryObsidianVaultRoot(manuscript_location,bAutoSubmitOTGUI,LastRelati
     if (CLIArgs.HasKey("OHTMLLevel")) {
         Level:=CLIArgs.OHTMLLevel
     }
-    Graph:=findObsidianVaultRootFromNote(manuscript_location,true)
+    global Graph:=findObsidianVaultRootFromNote(manuscript_location,true)
     if (Graph="0") {
         AppError(A_ThisFunc " - Graph-object not found", "The program could not find an obsidian root folder`n(``.obsidian\``) above or at the location of """ manuscript_location """.",,"")
     }
@@ -196,6 +196,7 @@ chooseTV_Element(TV_String,Graph,Level,bAutoSubmitOTGUI,CLIArgs) {
         Hotkey IfWinActive
         Hotkey !a, % objTOVRHK_Handler
         Hotkey !f, % objTOVRHK_Handler
+
         Hotkey IfWinActive
     }
     if (1) && (bAutoSubmitOTGUI) {
@@ -338,7 +339,7 @@ submitConfigFolder() {
         }
         if not ItemID  ; No more items in tree.
             break ;; BUG: checking two entries should always return the most nested, but it always only returns one line. is this line at fault?
-        if (A_Index>(Graph[1].Count() + Graph[2].Count())) {
+        if (A_Index>(Graph[2].Count()+1)) {
             break
         }
     }
