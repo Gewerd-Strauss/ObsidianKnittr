@@ -189,8 +189,8 @@ chooseTV_Element(TV_String,Graph,Level,bAutoSubmitOTGUI,CLIArgs) {
         }
         objTOVRHK_Handler:=Func("TOVRHK_Handler").Bind(TVIDs)
         Hotkey ifWinActive, % "ahk_id " TOVRGUI
-        loop, 9 {
-            HKey:="!" A_Index-1
+        loop, % TVIDs.Count() {
+            HKey:="!" A_Index
             Hotkey % HKey, % objTOVRHK_Handler
         }
         Hotkey IfWinActive
