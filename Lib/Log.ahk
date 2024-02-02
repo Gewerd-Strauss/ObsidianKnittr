@@ -11,7 +11,7 @@ Manuscript                : `%manuscriptname`%
 Used Verb                 : `%UsedVerb`%
 OHTML - Version           : `%obsidianhtml_version`%
 Used Personal Fork        : `%bUseOwnOHTMLFork`%
-ObsidianKnittr - Version  : `%ObsidianKnittr_Version`%
+ObsidianKnitr - Version   : `%ObsidianKnittr_Version`%
 Quarto - Version          : `%Quarto_Version`%
 
 ___________________________________________________
