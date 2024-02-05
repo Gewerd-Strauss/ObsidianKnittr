@@ -18,7 +18,7 @@ processCLIFlags(Byref Args) {
     } else {
         Args.noMove:=0
     }
-    if (Args.HasKey("--noOKLog")) { ;; TODO: implement disabling the executionlogging via assignment to members of class EL (e.g. `EL.XX:=YYY`)
+    if (Args.HasKey("--noOKLog")) {
         Args.noOKLog:=1
     } else {
         Args.noOKLog:=0
