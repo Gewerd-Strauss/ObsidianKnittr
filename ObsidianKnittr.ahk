@@ -189,7 +189,7 @@ main() {
     ;; OBSIDIANHTML SETUP CONFIGFILE
     obsidianhtml_configfile:=script.config.config.obsidianhtml_configfile
 
-    tmpObsidianHTML_Config:=createTemporaryObsidianHTML_Config(guiOut.manuscriptpath, obsidianhtml_configfile,guiOut.Settings.bConvertInsteadofRun)
+    tmpObsidianHTML_Config:=createTemporaryObsidianHTML_Config(guiOut.manuscriptpath, obsidianhtml_configfile,guiOut.Settings.bConvertInsteadofRun,guiOut.Settings.bUseOwnOHTMLFork)
         , EL.configtemplate_path:=obsidianhtml_configfile
         , EL.configfile_contents:=tmpObsidianHTML_Config[2]
     notify("Running ObsidianHTML",CLIArgs)
