@@ -1,4 +1,4 @@
-﻿ObsidianHtml(manuscript_path:="",config_path:="",bUseConvert:=true,bUseOwnOHTMLFork:=false,bVerbose:=false,OutputDir="",WorkDir:="",WorkDir_OwnFork:="",ScopeRestrictorObject:="") {
+﻿ObsidianHtml(manuscript_path:="",config_path:="",bUseConvert:=true,bUseOwnOHTMLFork:=false,bVerbose:=false,OutputDir="",WorkDir:="",WorkDir_OwnFork:="",ScopeRestrictorObject:="",bAutoSubmitOTGUI:="") {
     if (WorkDir="") {
         WorkDir:= A_Desktop "\ObsidianHTMLOutput"
     }
@@ -184,7 +184,7 @@ getObsidianHTML_CopyDir(String) {
     }
     return
 }
-createTemporaryObsidianHTML_Config(manuscript_path, obsidianhtml_configfile,Convert) {
+createTemporaryObsidianHTML_Config(manuscript_path, obsidianhtml_configfile,Convert,bUseOwnOHTMLFork:=false) {
     if !FileExist(obsidianhtml_configfile) || !InStr(obsidianhtml_configfile,A_ScriptDir) { ;; create a template in this folder
         template:="
             (LTRIM
@@ -202,25 +202,49 @@ createTemporaryObsidianHTML_Config(manuscript_path, obsidianhtml_configfile,Conv
                 max_note_depth: 15
                 # preserve_inline_tags: False
                 copy_vault_to_tempdir: True
-                exclude_glob:
-                %A_Space%%A_Space%- "".git""
-                %A_Space%%A_Space%- "".obsidian""
-                %A_Space%%A_Space%- "".trash""
-                %A_Space%%A_Space%- "".vscode""
-                %A_Space%%A_Space%- "".DS_Store""
-                %A_Space%%A_Space%- ""002 templates""
-                %A_Space%%A_Space%- "".Rproj.user""
-                %A_Space%%A_Space%- ""renv""
-                exclude_subfolders:
-                %A_Space%%A_Space%- "".git""
-                %A_Space%%A_Space%- "".obsidian""
-                %A_Space%%A_Space%- "".trash""
-                %A_Space%%A_Space%- "".vscode""
-                %A_Space%%A_Space%- "".DS_Store""
-                %A_Space%%A_Space%- ""002 templates""
-                %A_Space%%A_Space%- "".Rproj.user""
-                %A_Space%%A_Space%- ""renv""
+                #exclude_glob:
+                #%A_Space%%A_Space%- "".git""
+                #%A_Space%%A_Space%- "".obsidian""
+                #%A_Space%%A_Space%- "".trash""
+                #%A_Space%%A_Space%- ""/.github""
+                #%A_Space%%A_Space%- "".vscode""
+                #%A_Space%%A_Space%- "".DS_Store""
+                #%A_Space%%A_Space%- ""002 templates""
+                #%A_Space%%A_Space%- "".Rproj.user""
+                #%A_Space%%A_Space%- "".quarto""
+                #%A_Space%%A_Space%- "".""
+                #%A_Space%%A_Space%- "".renv""
 
+                #exclude_subfolders:
+                #%A_Space%%A_Space%- "".git""
+                #%A_Space%%A_Space%- "".obsidian""
+                #%A_Space%%A_Space%- "".trash""
+                #%A_Space%%A_Space%- "".vscode""
+                #%A_Space%%A_Space%- "".DS_Store""
+                #%A_Space%%A_Space%- ""002 templates""
+                #%A_Space%%A_Space%- "".Rproj.user""
+                #%A_Space%%A_Space%- ""renv""
+                #%A_Space%%A_Space%- "".renv""
+
+                module_config:
+                %A_Space%%A_Space%get_file_list:
+                %A_Space%%A_Space%%A_Space%%A_Space%include_glob:
+                %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%value: '*'
+                %A_Space%%A_Space%%A_Space%%A_Space%exclude_glob:
+                %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%value: 
+                %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%- "".git""
+                %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%- ""/.git/**/*""
+                %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%- ""/.github/**/*""
+                %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%- ""/.obsidian/**/*""
+                %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%- "".trash/**/*""
+                %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%- "".vscode""
+                %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%- ""/002 templates/**/*""
+                %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%- ""/.renv/**/*""
+                %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%- ""/.quarto/**/*""
+                %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%- ""/_freeze/**/*""
+                %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%- ""/_site/**/*""
+                %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%- ""/.Rproj.user/**/*""
+                %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%- "".DS_Store/**/*""
 
 
 
@@ -237,6 +261,8 @@ createTemporaryObsidianHTML_Config(manuscript_path, obsidianhtml_configfile,Conv
                 toggles:
                 # When true, Obsidianhtml will not add three spaces at the end of every line
                 strict_line_breaks: True
+                wrap_inclusions: False
+                strip_inclusion_headers: True
                 # compile_html: False
                 features:
                 %A_Space%%A_Space%embedded_note_titles:
@@ -245,6 +271,7 @@ createTemporaryObsidianHTML_Config(manuscript_path, obsidianhtml_configfile,Conv
                 # and read in that scales with the size of the site.
                 %A_Space%%A_Space%graph:
                 %A_Space%%A_Space%%A_Space%%A_Space%enabled: False
+                %A_Space%%A_Space%%A_Space%%A_Space%show_inclusions_in_graph: False
                 %A_Space%%A_Space%search:
                 %A_Space%%A_Space%%A_Space%%A_Space%enabled: False
 
@@ -269,7 +296,11 @@ createTemporaryObsidianHTML_Config(manuscript_path, obsidianhtml_configfile,Conv
     if (Convert) {
         configfile_contents:=StrReplace(configfile_contents,"#obsidian_entrypoint_path_str: '%obsidian_entrypoint_path_str%'","obsidian_entrypoint_path_str: '" manuscript_path "'")
     }
-    writeFile_ObsidianHTML(configfile_path:=A_ScriptDir "\OHTMLconfig_temp.yaml",configfile_contents,,,true)
+    if (bUseOwnOHTMLFork) {
+        writeFile_ObsidianHTML(configfile_path:=A_ScriptDir "\OHTMLconfig_temp.yaml",configfile_contents,"UTF-16",,true)
+    } else {
+        writeFile_ObsidianHTML(configfile_path:=A_ScriptDir "\OHTMLconfig_temp.yaml",configfile_contents,,,true)
+    }
     return [(FileExist(configfile_path)?configfile_path:false),configfile_contents]
 }
 
@@ -348,8 +379,8 @@ updateObsidianHTMLToMaster() {
 }
 obsidianhtml_check() {
     static obsidianhtml_on_path:=false
-    static out:=""
-    if !obsidianhtml_on_path {
+        , out:=""
+    if (out="") {
         GetStdStreams_WithInput("where obsidianhtml",,out)
         out:=strreplace(out,"`n")
         if !FileExist(out) {
@@ -362,8 +393,8 @@ obsidianhtml_check() {
 }
 python_check() {
     static python_on_path:=false
-    static out:=""
-    if !python_on_path {
+        , out:=""
+    if (out="") {
         GetStdStreams_WithInput("where python.exe",,out)
         out:=strsplit(out,"`n")
         for _, path in out {

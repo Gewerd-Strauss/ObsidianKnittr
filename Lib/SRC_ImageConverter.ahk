@@ -1,4 +1,4 @@
-ConvertSRC_SYNTAX_V4(PathOrContent,bInsertSetupChunk,bRemoveObsidianHTMLErrors,bStripLocalMarkdownLinks) {
+ConvertSRC_SYNTAX_V4(PathOrContent,bRemoveObsidianHTMLErrors,bStripLocalMarkdownLinks) {
     if (FileExist(PathOrContent)) {
         Current_FileEncoding:=A_FileEncoding
         FileEncoding UTF-8
@@ -37,18 +37,6 @@ ConvertSRC_SYNTAX_V4(PathOrContent,bInsertSetupChunk,bRemoveObsidianHTMLErrors,b
         buffer:=RegexReplace(buffer,"<figcaption>" Clean(match.alt) "</figcaption>","") ;; 09.03.2023 - required for removing the new figure syntax.
             , buffer := StrReplace(buffer, match[0], tpl)
             , p += StrLen(tpl)
-    }
-    buffer:=Regexreplace(buffer, "``````\{r setup(|.|\n)*``````","") ;; get rid of all potential r setup chunks
-    tpl =
-        (LTrim
-            ---
-            ``````{r setup, include=FALSE}
-            knitr::opts_chunk$set(echo = FALSE)
-            ``````
-
-        )
-    if bInsertSetupChunk {
-        buffer := RegExReplace(buffer, "\n---", "`n" tpl,,1,1) ;; 09.03.2023 - required for removing the new figure syntax
     }
     buffer:=Regexreplace(buffer,"<figure>","") ;; 09.03.2023 - required for removing the new figure syntax
         , buffer:=Regexreplace(buffer,"</figure>","") ;; 09.03.2023 - required for removing the new figure syntax

@@ -1,9 +1,9 @@
-buildRScriptContent(Path,output_filename="",out="") {
+buildRScriptContent(Path,output_filename="",guiOut="") {
     SplitPath % Path,, Path2,, Name
     RScriptFilePath:=strreplace(Path2,"\","\\")
         , RScriptFolder:=strreplace(Path2,"\","/")
     OutputType_Print:=""
-    for _, output_type in out.sel {
+    for _, output_type in guiOut.sel {
         OutputType_Print.="sprintf('" output_type "')`n"
     }
     Str=
@@ -21,34 +21,13 @@ buildRScriptContent(Path,output_filename="",out="") {
             %OutputType_Print%
             version
         )
-    if out.settings.bForceFixPNGFiles {
-        Str2=
-            (LTrim
-                files <- list.files(pattern="*.PNG",recursive = TRUE)
-                files2 <- list.files(pattern="*.png",recursive = TRUE)
-                filesF <- c(files,files2)
-                lapply(filesF,ImgFix  <- function(Path="")
-                {
-                png_image  <- magick::image_read(Path)
-                jpeg_image <- magick::image_convert(png_image,"JPEG")
-                png_image  <- magick::image_convert(jpeg_image,"PNG")
-                magick::image_write(png_image,Path)
-                sprintf( "Fixed Path '`%s'", Path)
-                })
-            )
-        Str.="`n" Str2
-        bFixPNGs:=true
-    }
-    else {
-        bFixPNGs:=false
-    }
     Name:=(output_filename!=""?output_filename:"index")
         , FormatOptions:=""
-    for _, Class in out.Outputformats { 
+    for _, Class in guiOut.Outputformats { 
         Class.FilenameMod:=" (" Class.package ")"
             , Class.Filename:=Name
     }
-    for _,Class in out.Outputformats {
+    for _,Class in guiOut.Outputformats {
         format:=Class.AssembledFormatString
         if Instr(format,"pdf") {
             continue
@@ -68,7 +47,7 @@ buildRScriptContent(Path,output_filename="",out="") {
             , FormatOptions.= A_Tab strreplace(format,"`n",A_Tab "`n") "`n`n"
     }
     ;; pdf handling
-    for _, Class in out.Outputformats { 
+    for _, Class in guiOut.Outputformats { 
         format:=Class.AssembledFormatString
         if !Instr(format,"pdf") {
 
@@ -85,28 +64,6 @@ buildRScriptContent(Path,output_filename="",out="") {
             Str3:=format
         }
         Str3:=Strreplace(Str3,"%Name%",Name Class.FilenameMod)
-        Str2=
-            (LTrim
-                files <- list.files(pattern="*.PNG",recursive = TRUE)
-                files2 <- list.files(pattern="*.png",recursive = TRUE)
-                filesF <- c(files,files2)
-                lapply(filesF,ImgFix  <- function(Path="")
-                {
-                png_image  <- magick::image_read(Path)
-                jpeg_image <- magick::image_convert(png_image,"JPEG")
-                png_image  <- magick::image_convert(jpeg_image,"PNG")
-                magick::image_write(png_image,Path)
-                sprintf( "Fixed Path '`%s'", Path)
-                })
-
-
-
-
-                rmarkdown::render(`"index.rmd`",%format%,`"%Name%"`)`n
-            )
-        if bFixPNGs {
-            ;Str2:="`n" Str3 "`n"
-        }
         Str.="`n`n" Str3
             , FormatOptions.= A_Tab strreplace(format,"`n",A_Tab "`n") "`n`n"
     }

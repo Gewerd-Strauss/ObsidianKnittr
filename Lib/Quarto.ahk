@@ -184,19 +184,21 @@ quartogetVersion() {
     if quarto_check().1 {
         GetStdStreams_WithInput("quarto -V",,out)
         out:=RegexReplace(out,"\s+")
+    } else {
+        out:="<not found. Is Quarto Installed?>"
     }
     return out
 }
 quarto_check() {
     static quarto_on_path:=false
-    static out:=""
-    if !quarto_on_path {
+        , out:=""
+    if (out="") {
         GetStdStreams_WithInput("where quarto.exe",,out)
-            , GetStdStreams_WithInput("where quarto.cmd",,out2)
-            , GetStdStreams_WithInput("where quarto.js",,out3)
             , out:=strreplace(out,"`n")
-            , out2:=strreplace(out2,"`n")
-        if (!FileExist(out) || !FileExist(out2)) {
+        ; , GetStdStreams_WithInput("where quarto.cmd",,out2)
+        ; , GetStdStreams_WithInput("where quarto.js",,out3)
+        ; , out2:=strreplace(out2,"`n")
+        if (!FileExist(out)) {
             quarto_on_path:=false
         } else {
             quarto_on_path:=true
@@ -222,7 +224,131 @@ write_quarto_yaml(output_type,OutDir,yaml_file) {
         , String:=Strreplace(String,"date: FALSEw","date: now")
         , String:=Strreplace(String,": true`n",": TRUE`n")
         , String:=Strreplace(String,": false`n",": FALSE`n")
-    ;Clipboard:=String
     writeFile(yaml_path,String,Encoding:="utf-8",Flags:=0x2,bSafeOverwrite:=true)
-    return
+    return String
+}
+cleanupIntermediatequartoFiles(guiOut) {
+    FilesArr:=guiOut.removableintermediates
+        , failed:=[]
+    loop, 4 {
+        type:=A_Index
+        for _, file in FilesArr {
+            if (type=1) { ;; folders
+                if (InStr(FileExist(file),"D")) {
+                    FileRemoveDir % file, true
+                    if (FileExist(file)) {
+                        failed.push(file)
+                    }
+                }
+            } else if (type=2) { ;; *
+                if (InStr(file,"*")) {
+                    Loop, Files, % file, F
+                    {
+                        msgbox % A_LoopFileFullPath
+                        FileDelete % A_LoopFileFullPath
+
+                    }
+                }
+            } else if (type=3) { ;; scripts r/ahk/cmd
+
+            } else if (type=4) { ;; compilation assets (bib, yaml)
+
+            }
+            if (fileExist(file)) {
+                FileDelete % file
+                if (FileExist(file)) {
+                    failed.push(file)
+                }
+            }
+        }
+    }
+    return failed
+}
+collectQuartoIntermediates(guiOut,CLIArgs) {
+
+    purgeable_names:=["%root%\index.md"
+            ,"%root%\not_created.md"]
+        , removable_inputsuffixes:={}
+    for _, suffix in guiOut.inputsuffixes { ;; check which filetypes of `index\.(<fileending>?\w*)` are required by the formats given, then remove all types that aren't.
+        removable_inputsuffixes[suffix]:=true
+    }
+    for __,inputsuffix in guiOut.inputsuffixes {
+        keep_suffix:=false
+        for _, object in guiOut.Outputformats {
+            if (object.inputsuffix=inputsuffix) {
+                keep_suffix:=true
+                break
+            } else {
+                continue
+            }
+
+        }
+        if (keep_suffix) {
+            continue
+        } else {
+            if (!HasVal(purgeable_names,"`%root`%\index." inputsuffix)) {
+                purgeable_names.push("`%root`%\index." inputsuffix)
+            }
+        }
+    }
+
+    /*
+    ;;??:
+    index_files | required for r-execution, so... no
+    index_cache | required for r-execution, so... no
+    build.+\.cmd
+
+    ;;intermediates:
+    index.rmd   | only if rmd is not required
+    index.md
+    %filename%_vault.md
+    .rhistory
+
+    ;;to remove:
+    manuscriptdir\*.cmd
+    manuscriptdir\*.ahk
+    manuscriptdir\build.r
+    manuscriptdir\manuscriptname\
+
+
+    ;; default - level 1
+    ;; not recommended - level 2
+    %manuscriptdir%\index_cache
+    %manuscriptdir%\index_files
+
+    ;; really not recommended - level 3
+    %manuscriptdir%\grateful-refs.bib
+    %manuscriptdir%\*.yaml
+    */
+
+    /*
+    HACK: I have no idea why this assignment to `directory` is a conditional, so it currently just does the same either way. 
+    I am typing this in the hope that I review this when I find out that something's wrong
+
+
+    Follow-up question: Why am I not cleaning guiOut.Settings.ExecutionDirectory? Especially in case of !cliargs.noMove, this should be more accurate than guiOut.manuscriptdir
+    */
+    directory:=(CLIArgs.noMove?guiOut.manuscriptdir:guiOut.manuscriptdir) 
+    purgeable_names.push(directory "\*.cmd")
+    purgeable_names.push(directory "\*.ahk")
+    purgeable_names.push(directory "\build.r")
+    purgeable_names.push(directory "\" guiOut.manuscriptname "\")
+    if (CLIArgs.HasKey("IntermediatesRemovalLevel")) {
+        if (CLIArgs.IntermediatesRemovalLevel>1) {
+            purgeable_names.push(directory "\index_cache")
+            purgeable_names.push(directory "\index_files")
+        }
+        if (CLIArgs.IntermediatesRemovalLevel>2) {
+            purgeable_names.push(directory "\grateful-refs.bib")
+            purgeable_names.push(directory "\*.yaml")
+        }
+    }
+
+    ; if (guiOut.HasKey("intermediates")) {
+    ; currentIntermediates:=guiOut.intermediates
+    ; } else {
+    ; 
+    ; }
+
+    return purgeable_names
 }

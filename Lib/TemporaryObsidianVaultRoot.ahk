@@ -1,9 +1,42 @@
+/*
+LOGIC BEHIND THE NUMERIC ASSIGNMENT FOR THE OHTML-RESTRICTOR:
+By specifying a an integer level between -1 → +inf, a directory above the manuscript_path can be configured to temporarily contain  an `.obsidian`-directory.
+
+A couple notes:
+1.levels marked `(x)` signify the actual vault-root of the obsidian-vault, which is not removed after OHTML-execution has concluded.
+2..levels marked `(y)` signify the directory in which the manuscript lies _directly, e.g. the following structure holds true:
+.   - obsidian_vaultroot/path/to/folder/manuscript.md
+.   - obsidian_vaultroot/path/to/folder/.obsidian/
+3. If there are N folders between the true vault-root & the manuscriptpath, setting `OHTMLLevel>=N` will behave the same as setting `OHTMLLevel=N`: the true vault-root will be used.
+There are two special cases:
+
+1. OHTMLLevel = -1
+.  In this case, the true vault-root is used (see `(x)` in examples below). As this is the "valid" vault-root of the Obsidian.md-vault, this folder will not be removed after execution of ObsidianHTML() returns
+2. OHTMLLevel = 0
+.  In this case, the folder immediately containing the manuscript_path will be turned into a temporary vault-root.
+
+EXAMPLES:
+path: D:\Dokumente neu\Obsidian NoteTaking\The Universe\019-Bugtesting-Subvault\nesting\nesting2\nesting3\019-ObsHTML_EmbeddedTitleStripping_Main.md
+;; ohtmllevel = 0 → (y) "D:\Dokumente neu\Obsidian NoteTaking\The Universe\019-Bugtesting-Subvault\nesting\nesting2\nesting3\.obsidian"
+;; ohtmllevel = 1 →     "D:\Dokumente neu\Obsidian NoteTaking\The Universe\019-Bugtesting-Subvault\nesting\nesting2\.obsidian"
+;; ohtmllevel = 2 →     "D:\Dokumente neu\Obsidian NoteTaking\The Universe\019-Bugtesting-Subvault\nesting\.obsidian"
+;; ohtmllevel = 3 → (x) "D:\Dokumente neu\Obsidian NoteTaking\The Universe\019-Bugtesting-Subvault\.obsidian"
+;; ohtmllevel =-1 → (x) "D:\Dokumente neu\Obsidian NoteTaking\The Universe\019-Bugtesting-Subvault\.obsidian"
+
+path: D:\Dokumente neu\Obsidian NoteTaking\The Universe\200 University\06 Interns and Unis\BE28 Internship Report\Submission\BE28 Internship Report.md
+;; ohtmllevel = 0 → (y) "D:\Dokumente neu\Obsidian NoteTaking\The Universe\200 University\06 Interns and Unis\BE28 Internship Report\Submission\.obsidian"
+;; ohtmllevel = 1 →     "D:\Dokumente neu\Obsidian NoteTaking\The Universe\200 University\06 Interns and Unis\BE28 Internship Report\.obsidian"
+;; ohtmllevel = 2 →     "D:\Dokumente neu\Obsidian NoteTaking\The Universe\200 University\06 Interns and Unis\.obsidian"
+;; ohtmllevel = 3 →     "D:\Dokumente neu\Obsidian NoteTaking\The Universe\200 University\.obsidian"
+;; ohtmllevel = 4 → (x) "D:\Dokumente neu\Obsidian NoteTaking\The Universe\.obsidian"
+;; ohtmllevel = 5 → (x) "D:\Dokumente neu\Obsidian NoteTaking\The Universe\.obsidian"
+;; ohtmllevel =-1 → (x) "D:\Dokumente neu\Obsidian NoteTaking\The Universe\.obsidian"
+*/
 createTemporaryObsidianVaultRoot(manuscript_location,bAutoSubmitOTGUI,LastRelativeLevel:=-1,CLIArgs:="") {
     if (bAutoSubmitOTGUI) {
         if (script.config.Config.defaultRelativeLevel!="") && (script.config.Config.defaultRelativeLevel >0) {
             Level:=script.config.Config.defaultRelativeLevel + 0
         }
-
     } else {
         Level:=script.config.Config.defaultRelativeLevel + 0
     }
@@ -14,7 +47,10 @@ createTemporaryObsidianVaultRoot(manuscript_location,bAutoSubmitOTGUI,LastRelati
             Level:=LastRelativeLevel
         }
     }
-    Graph:=findObsidianVaultRootFromNote(manuscript_location,true)
+    if (CLIArgs.HasKey("OHTMLLevel")) {
+        Level:=CLIArgs.OHTMLLevel
+    }
+    global Graph:=findObsidianVaultRootFromNote(manuscript_location,true)
     if (Graph="0") {
         AppError(A_ThisFunc " - Graph-object not found", "The program could not find an obsidian root folder`n(``.obsidian\``) above or at the location of """ manuscript_location """.",,"")
     }
@@ -152,11 +188,15 @@ chooseTV_Element(TV_String,Graph,Level,bAutoSubmitOTGUI,CLIArgs) {
             gui show, w600 Autosize, % script.name  " - Set limiting '.obsidian'-folder"
         }
         objTOVRHK_Handler:=Func("TOVRHK_Handler").Bind(TVIDs)
+        sinkTOVRHK_Handler:=Func("sink").Bind(false)
+        sinkTOVRHK_Handler2:=Func("sink").Bind(true)
         Hotkey ifWinActive, % "ahk_id " TOVRGUI
-        loop, 9 {
-            HKey:="!" A_Index-1
+        loop, % TVIDs.Count() {
+            HKey:="!" A_Index
             Hotkey % HKey, % objTOVRHK_Handler
         }
+        Hotkey *LButton, % sinkTOVRHK_Handler
+        Hotkey *Space, % sinkTOVRHK_Handler2
         Hotkey IfWinActive
         Hotkey !a, % objTOVRHK_Handler
         Hotkey !f, % objTOVRHK_Handler
@@ -181,14 +221,25 @@ chooseTV_Element(TV_String,Graph,Level,bAutoSubmitOTGUI,CLIArgs) {
     if !ret.isVaultRoot {
         FileCreateDir % temporary_obsidianconfig_path "\"
         if !FileExist(temporary_obsidianconfig_path) {
-            ;; throw error
+            Title:="temp. config could not be created."
+                , Message:="The temporary '.obsidian'-folder could not be written to path '" temporary_obsidianconfig_path "\'"
+                . "`nYou may either continue execution while using the vault's root itself, or exit the program to investigate the issue."
+                . "`nWhen you continue "
+                . "`n`nDo you want to continue execution while using the vault's root folder now?"
+            AppError(Title, Message,0x40034," > " A_ThisFunc ": ")
         }
     } else {
         return false
     }
     return {Path:temporary_obsidianconfig_path,IsVaultRoot:false} 
 }
+TOVRClose() {
+    ttip("The GUI was closed without selection, using the vault-root...")
+    gui TOVR: destroy
+    return
+}
 TOVREscape() {
+    ttip("The GUI was escaped out-of without selection, using the vault-root...")
     gui TOVR: destroy
     return
 }
@@ -297,7 +348,7 @@ submitConfigFolder() {
         }
         if not ItemID  ; No more items in tree.
             break ;; BUG: checking two entries should always return the most nested, but it always only returns one line. is this line at fault?
-        if (A_Index>(Graph[1].Count() + Graph[2].Count())) {
+        if (A_Index>(Graph[2].Count()+1)) {
             break
         }
     }
@@ -338,4 +389,25 @@ CreateTreeView(TreeViewDefinitionString) {	; by Learning one
     return IDs
 }	; https://www.autohotkey.com/board/topic/92863-function-createtreeview/
 
-
+sink(FullSink:=false) {
+    if (FullSink) {
+        if (DEBUG) {
+            ttip(["The input '" A_ThisHotkey "' is not valid in the ListView-Element of this GUI to prevent potential faulty input.`nPlease use the Numrow-Keys to select a level.",id,ctrl,text,A_ThisHotkey,A_PriorHotkey])
+        } else {
+            ttip("The input '" A_ThisHotkey "' is not valid in the ListView-Element of this GUI to prevent potential faulty input.`nPlease use the Numrow-Keys to select a level.")
+        }
+        return
+    }
+    MouseGetPos,,, id,ctrl
+    ControlGetText Text, % ctrl ,A
+    if (!InStr(ctrl,"SysTreeView321")) { ;; do not allow clicking within the treeview element, but everywhere else
+        SendInput % "{LButton}"
+    } else {
+        if (DEBUG) {
+            ttip(["The input '" A_ThisHotkey "' is not valid in the ListView-Element of this GUI to prevent potential faulty input.`nPlease use the Numrow-Keys to select a level.",id,ctrl,text,A_ThisHotkey,A_PriorHotkey])
+        } else {
+            ttip("The input '" A_ThisHotkey "' is not valid in the ListView-Element of this GUI to prevent potential faulty input.`nPlease use the Numrow-Keys to select a level.")
+        }
+    }
+    return
+}

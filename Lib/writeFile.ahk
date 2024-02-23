@@ -30,6 +30,7 @@
 
 ; #region:Code
 writeFile(Path,Content,Encoding:="",Flags:=0x2,bSafeOverwrite:=false) {
+    Path:=regexreplace(Path,"\\{2,}","\")
     if (bSafeOverwrite && FileExist(Path)) {
         ; if we want to ensure nonexistance.
         FileDelete % Path

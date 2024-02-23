@@ -11,23 +11,23 @@ Manuscript                : `%manuscriptname`%
 Used Verb                 : `%UsedVerb`%
 OHTML - Version           : `%obsidianhtml_version`%
 Used Personal Fork        : `%bUseOwnOHTMLFork`%
-ObsidianKnittr - Version  : `%ObsidianKnittr_Version`%
+ObsidianKnitr - Version   : `%ObsidianKnittr_Version`%
 Quarto - Version          : `%Quarto_Version`%
 
 ___________________________________________________
 Timings:
 
-ObsidianHTML            > `%ObsidianHTML_Start`%
-ObsidianHTML            < `%ObsidianHTML_End`%
-                                       `%ObsidianHTML_Duration`%
-intermediary Processing > `%Intermediary_Start`%
-intermediary Processing < `%Intermediary_End`%
-                                       `%Intermediary_Duration`%
-R                       > `%RScriptExecution_Start`%
-R                       < `%RScriptExecution_End`%
-                                       `%RScriptExecution_Duration`%
+ObsidianHTML              > `%ObsidianHTML_Start`%
+ObsidianHTML              < `%ObsidianHTML_End`%
+                                           `%ObsidianHTML_Duration`%
+intermediary Processing   > `%Intermediary_Start`%
+intermediary Processing   < `%Intermediary_End`%
+                                           `%Intermediary_Duration`%
+Compilation               > `%Compilation_Start`%
+Compilation               < `%Compilation_End`%
+                                         `%Compilation_Duration`%
 
-Total (not ms-precise)                 `%TotalExecution_Duration`%
+Total (not ms-precise)                   `%TotalExecution_Duration`%
 
 ___________________________________________________
 Script Execution Settings:
@@ -36,7 +36,6 @@ ObsidianKnittr:
 ObsidianKnittr - Version  : `%ObsidianKnittr_Version`%
 Output - Formats          : `%formats`%
 Keep Filename             : `%bKeepFilename`%
-SRC_Converter Version     : `%bSRCConverterVersion`% (deprecated, only for completeness)
 Stripped '#' from Tags    : `%bRemoveHashTagFromTags`%
 
 ObsidianHTML:
@@ -49,9 +48,7 @@ Stripped Local MD-Links   : `%bStripLocalMarkdownLinks`%
 Vault Limited             : `%bRestrictOHTMLScope`%
 
 RMD:
-Execute R-Script          : `%bExecuteRScript`%
-Fixed PNG Files           : `%bForceFixPNGFiles`%
-Inserted Setup Chunk      : `%bInsertSetupChunk`%
+Execute R-Script          : `%bRendertoOutputs`%
 
 QMD: 
 Quarto - Version          : `%Quarto_Version`%
@@ -88,7 +85,9 @@ R - StdStreams:
 Issued Command            : `%RCMD`%
 Working Directory         : `%RWD`%
 stdOut                    : `%Rdata_out`%
-
+___________________________________________________
+OK - Errorlog:
+`%Errormessage`%
 )
         ObjRawSet(this, "tpl", tpl)
     }
@@ -96,14 +95,14 @@ stdOut                    : `%Rdata_out`%
         ObjRawSet(this, "__path", Path)
             , ObjRawSet(this, "__encoding", Encoding)
             , ObjRawSet(this, "__Cache", false)
+            , ObjRawSet(this,"autowritetofile",true)
             , writeFile_Log(Path, this.tpl, Encoding,, true)
             , tempfile:=FileOpen(Path,"rw",Encoding)
             , ObjRawSet(this,"content",tempfile.read())
             , tempfile.close()
             , ObjRawSet(this,"__h",FileOpen(Path,"w",Encoding))
             , this.Cache(Cache)
-            , OnExit(this.close)
-            , OnError(this.close)
+            , OnExit(ObjBindMethod(this, "close"))
     }
     cache(Set := "") {
         ;; TODO: implement Cache (false by default, if true we don't close the fo inbetween calls? )
@@ -112,13 +111,22 @@ stdOut                    : `%Rdata_out`%
         }
         return this.__Cache := !!Set
     }
+    toggleAutoWrite(benableWritingToFile) {
+        this.autowritetofile:=benableWritingToFile + 0
+    }
     close() {
-        OutputDebug % this.content
+        if (this.autowritetofile) { ;; string has not been written to file yet, so we need to push it there before closing the object
+            ; this.write(this.content)
+        } else {
+            this.write(this.content)
+        }
         this.__h.close()
     }
     handle() {
-        OutputDebug % this.content
         this.__h.handle()
+    }
+    write(content) {
+        this.__h.write(content)
     }
     getTotalDuration(atc1,atc2) {
         diff:=atc2-atc1
@@ -126,7 +134,6 @@ stdOut                    : `%Rdata_out`%
             , this.TotalExecution_Duration:=RegExReplace(Time,"[hms]")
     }
     __Set(Key, Value) {
-        OutputDebug % this.__h.tell()
         OldLength:=strLen(this.content)
             , this.__h.Pos:=0 ; reset the pointer to the beginning of the file → this apparently still frameshifts?
             , Key:="`%" Key "`%" ; prep the eky
@@ -141,9 +148,15 @@ stdOut                    : `%Rdata_out`%
             if (OldLength!=L) {
                 MsgBox 0x30, % "Log.__Set()", String written to fileobject was improperly padded.`n`nThis is not a catastrophic error`, just means your execution log is going to be ugly at the bottom.
             }
-
         }
-        this.__h.write(this.content)
+        if (this.hasKey("autowritetofile")) {
+            if (!this.autowritetofile) {
+                this.handle()
+                return
+            }
+        }
+        this.write(this.content)
+        this.handle()
     }
 }
 
@@ -178,7 +191,6 @@ stdOut                    : `%Rdata_out`%
 
 ; #region:Code
 writeFile_Log(Path, Content, Encoding := "", Flags := 0x2, bSafeOverwrite := false) {
-
     if (bSafeOverwrite && FileExist(Path)) ;; if we want to ensure nonexistance.
         FileDelete % Path
     if (Encoding != "") {
