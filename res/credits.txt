@@ -5,7 +5,6 @@ SKAN, Goyyah    -      enableGuiDrag                                            
 anonymous1184   -      GetStdStreams_WithInput
 jNizM           -      HasVal                                                               - https://www.autohotkey.com/boards/viewtopic.php?p=109173&sid=e530e129dcf21e26636fec1865e3ee30#p109173
 anonymous1184   -      support for various issues, reworks, providing input and generally being an awesome person. 
-hi5             -      TF.ahk, license                                                      - https://github.com/hi5/TF, https://github.com/hi5/TF/blob/master/license.txt
 AHK-RARE (?)    -      PrettyTickCount                                                      - https://github.com/Ixiko/AHK-Rare
 anonymous1184   -      Quote                                                                - https://www.reddit.com/r/AutoHotkey/comments/p2z9co/comment/h8oq1av/?utm_source=share&utm_medium=web2x&context=3
 anonymous1184   -      RegexMatchAll/RegexMatchLines                                        - https://www.reddit.com/r/AutoHotkey/comments/12l4gr8/comment/jg6ngt7/?utm_source=reddit&utm_medium=web2x&context=3

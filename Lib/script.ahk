@@ -122,7 +122,7 @@ class script {
             MetadataArray:={}
             for _, Line in Lines {
                 Key:=Trim(strsplit(Line, " - ",,2).1)
-                Value:=Trim(strsplit(Line," - ",,2).2)
+                    , Value:=Trim(strsplit(Line," - ",,2).2)
                 if RegexMatch(Value,"http(s)?:\/\/") {
                     Value:=RegexReplace(Value,"http(s)?:\/\/")
                 }
@@ -204,12 +204,12 @@ class script {
                 {
                     CreditsLines:=strsplit(credits,"`n")
                     Credits:={}
-                    for k,v in CreditsLines
+                    for _,v in CreditsLines
                     {
                         if ((InStr(v,"author1") && InStr(v,"snippetName1") && InStr(v,"URL1")) || (InStr(v,"snippetName2|snippetName3")) || (InStr(v,"author2,author3") && Instr(v, "URL2,URL3")))
                             continue
                         val:=strsplit(strreplace(v,"`t"," ")," - ")
-                        Credits[Trim(val.2)]:=Trim(val.1) "|" Trim((strlen(val.3)>5?val.3:""))
+                            , Credits[Trim(val.2)]:=Trim(val.1) "|" Trim((strlen(val.3)>5?val.3:""))
                     }
                 }
                 ; Clipboard:=html
@@ -227,15 +227,15 @@ class script {
                             else
                             {
                                 Name:=strsplit(v,"|").1
-                                Credit_URL:=strsplit(v,"|").2
+                                    , Credit_URL:=strsplit(v,"|").2
                                 if Instr(Author,",") && Instr(Credit_URL,",")
                                 {
                                     tmpAuthors:=""
-                                    AllCurrentAuthors:=strsplit(Author,",")
+                                        , AllCurrentAuthors:=strsplit(Author,",")
                                     for s,w in strsplit(Credit_URL,",")
                                     {
                                         currentAuthor:=AllCurrentAuthors[s]
-                                        tmpAuthors.="<a href=" """" w """" ">" trim(currentAuthor) "</a>"
+                                            , tmpAuthors.="<a href=" """" w """" ">" trim(currentAuthor) "</a>"
                                         if (s!=AllCurrentAuthors.MaxIndex())
                                             tmpAuthors.=", "
                                     }
@@ -262,7 +262,7 @@ class script {
             }
 
             if !FileExist(A_ScriptDir "\res\script_templates\_template.html") {
-                SplitPath % A_LineFile, , LibPath ;; then in directory of the class `script` itself
+                SplitPath % A_LineFile,, LibPath ;; then in directory of the class `script` itself
                 LibPath.="\script_templates\"
                 if !FileExist(LibPath "\_template.html") {
                     LibPath .= "\res\script_templates\"
@@ -296,8 +296,8 @@ class script {
                 if (About_template="") {
 
                     LibPath:=strreplace(LibPath,"\\","\")
-                    About_template_path:=LibPath (InStr(LibPath,"\_template.html")?"":"\_template.html")
-                    About_template_path:=Strreplace(About_template_path,"\\","\")
+                        , About_template_path:=LibPath (InStr(LibPath,"\_template.html")?"":"\_template.html")
+                        , About_template_path:=Strreplace(About_template_path,"\\","\")
                     FileRead About_template, % About_template_path
                 }
                 ;MetadataArray := {ghLink: "anonymous1184/some-repo", ghText: "Some Repo (from anonymous1184)", donate: "https://example.com"}
@@ -310,7 +310,7 @@ class script {
                 ; metadata_element
 
                 if !FileExist(A_ScriptDir "\res\script_templates\" metadata_type ".html") {
-                    SplitPath % A_LineFile, , About_type_path ;; then in directory of the class `script` itself
+                    SplitPath % A_LineFile,, About_type_path ;; then in directory of the class `script` itself
                     About_type_path.="\script_templates\"
 
                     if !FileExist(strreplace(About_type_path "\_template.html","\\","\")) {
@@ -333,12 +333,18 @@ class script {
 
                 }
             }
-            clipboard:=About_template
+            if (IsDebug()) {
+                clipboard:=About_template
+            }
             About_template := script_FormatEx(About_template, MetadataArray)
-            clipboard:=About_template
+            if (IsDebug()) {
+                clipboard:=About_template
+            }
             AHKVARIABLES:={"A_ScriptDir":A_ScriptDir,"A_ScriptName":A_ScriptName,"A_ScriptFullPath":A_ScriptFullPath,"A_ScriptHwnd":A_ScriptHwnd,"A_LineNumber":A_LineNumber,"A_LineFile":A_LineFile,"A_ThisFunc":A_ThisFunc,"A_ThisLabel":A_ThisLabel,"A_AhkVersion":A_AhkVersion,"A_AhkPath":A_AhkPath,"A_IsUnicode":A_IsUnicode,"A_IsCompiled":A_IsCompiled,"A_ExitReason":A_ExitReason,"A_YYY":A_YYY,"A_MM":A_MM,"A_DD":A_DD,"A_MMMM":A_MMMM,"A_MMM":A_MMM} ;"A_DDDD","A_DDD","A_WDay","A_YDay","A_YWeek","A_Hour","A_Min","A_Sec","A_MSec","A_Now","A_NowUTC","A_TickCount","A_IsSuspended","A_IsPaused","A_IsCritical","A_BatchLines","A_ListLines","A_TitleMatchMode","A_TitleMatchModeSpeed","A_DetectHiddenWindows","A_DetectHiddenText","A_AutoTrim","A_StringCaseSense","A_FileEncoding","A_FormatInteger","A_FormatFloat","A_SendMode","A_SendLevel","A_StoreCapsLockMode","A_KeyDelay","A_KeyDuration","A_KeyDelayPlay","A_KeyDurationPlay","A_WinDelay","A_ControlDelay","A_MouseDelay","A_MouseDelayPlay","A_DefaultMouseSpeed","A_CoordModeToolTip","A_CoordModePixel","A_CoordModeMouse","A_CoordModeCaret","A_CoordModeMenu","A_RegView","A_IconHidden","A_IconTip","A_IconFile","A_IconNumber","A_TimeIdle","A_TimeIdlePhysical","A_TimeIdleKeyboard","A_TimeIdleMouse","A_DefaultGUI","A_DefaultListView","A_DefaultTreeView","A_Gui","A_GuiControl","A_GuiWidth","A_GuiHeight","A_GuiX","A_GuiY","A_GuiEvent","A_GuiControlEvent","A_EventInfo","A_ThisMenuItem","A_ThisMenu","A_ThisMenuItemPos","A_ThisHotkey","A_PriorHotkey","A_PriorKey","A_TimeSinceThisHotkey","A_TimeSincePriorHotkey","A_EndChar","A_ComSpec","A_Temp","A_OSType","A_OSVersion","A_Is64bitOS","A_PtrSize","A_Language","A_ComputerName","A_UserName","A_WinDir","A_ProgramFiles","A_AppData","A_AppDataCommon","A_Desktop","A_DesktopCommon"]
-            About_template := script_FormatEx(About_template,AHKVARIABLES)
-            clipboard:=About_template
+                , About_template := script_FormatEx(About_template,AHKVARIABLES)
+            if (IsDebug()) {
+                clipboard:=About_template
+            }
             ;clipboard:=About_template
 
             fo:=FileOpen(this.AboutPath, 0x1, "UTF-8-RAW").Write(About_template)
@@ -351,7 +357,7 @@ class script {
 
         ;clipboard:=About_template
         children := doc.body.children
-        maxBottom := 0
+            , maxBottom := 0
         Loop % children.length {
             rect := children[A_Index - 1].getBoundingClientRect()
             (rect.bottom > maxBottom && maxBottom := rect.bottom)
@@ -509,9 +515,9 @@ class script {
             FileAppend,, % INI_File ".ini"
         SetWorkingDir INI-Files
         IniRead SectionNames, % INI_File ".ini"
-        for each, Section in StrSplit(SectionNames, "`n") {
+        for _, Section in StrSplit(SectionNames, "`n") {
             IniRead OutputVar_Section, % INI_File ".ini", %Section%
-            for each, Haystack in StrSplit(OutputVar_Section, "`n")
+            for __, Haystack in StrSplit(OutputVar_Section, "`n")
             {
                 If (Instr(Haystack,"="))
                 {
@@ -568,7 +574,7 @@ script_FormatEx(FormatStr, Values*) {
     for _, part in Values {
         for search, replace in part {
             replacements.Push(replace)
-            FormatStr := StrReplace(FormatStr, "{" search "}", "{"++index "}")
+                , FormatStr := StrReplace(FormatStr, "{" search "}", "{"++index "}")
         }
     }
     return Format(FormatStr, replacements*)
