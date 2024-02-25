@@ -30,6 +30,7 @@
 
 ; #region:Code
 writeFile(Path,Content,Encoding:="",Flags:=0x2,bSafeOverwrite:=false) {
+    Path:=regexreplace(Path,"\\{2,}","\")
     if (bSafeOverwrite && FileExist(Path)) {
         ; if we want to ensure nonexistance.
         FileDelete % Path
@@ -41,14 +42,14 @@ writeFile(Path,Content,Encoding:="",Flags:=0x2,bSafeOverwrite:=false) {
         }
         else {
 
-            throw Exception("File could not be opened. Flags:`n" Flags, -1, myFile)
+            throw Exception("File could not be opened. Flags: " Flags "`nPath: " Path, -1, Path)
         }
     } else {
         if (fObj:=FileOpen(Path,Flags)) {
             fObj.Write(Content) ;; insert contents
             fObj.Close() ;; close file
         } else {
-            throw Exception("File could not be opened. Flags:`n" Flags, -1, myFile)
+            throw Exception("File could not be opened. Flags: " Flags "`nPath: " Path, -1, Path)
         }
     }
     return

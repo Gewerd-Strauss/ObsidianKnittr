@@ -1,36 +1,36 @@
 Class ot {
     __New(Format:="",ConfigFile:="",DDL_ParamDelimiter:="-<>-",SkipGUI:=FALSE,StepsizedGuiShow:=FALSE) {
         this.type:=Format
-        this.ClassName.= Format ")"
-        this.DDL_ParamDelimiter:=DDL_ParamDelimiter
-        this.SkipGUI:=SkipGUI
-        this.StepsizedGuiShow:=StepsizedGuiShow
+            , this.ClassName.= Format ")"
+            , this.DDL_ParamDelimiter:=DDL_ParamDelimiter
+            , this.SkipGUI:=SkipGUI
+            , this.StepsizedGuiShow:=StepsizedGuiShow
         if FileExist(ConfigFile) {
             this.ConfigFile:=ConfigFile
         } else {
             ID:=-1
             this.Error:=this.Errors[ID] ;.String
-            MsgBox 0x40031,% this.ClassName " > " A_ThisFunc "()" ,% (this.Errors.HasKey(ID)?this.Errors[ID].String:"Fatal: Undefined Error with ID '" ID "'") "'" ConfigFile "'" (this.Errors[ID].HasKey("EndString")?this.Errors[ID].EndString:"Fatal: Undefined Error with ID '" ID "'")
-            ExitApp
+            MsgBox 0x40031,% this.ClassName " > " A_ThisFunc, % (this.Errors.HasKey(ID)?this.Errors[ID].String:"Fatal: Undefined Error with ID '" ID "'") "'" ConfigFile "'" (this.Errors[ID].HasKey("EndString")?this.Errors[ID].EndString:"Fatal: Undefined Error with ID '" ID "'")
+            ExitApp -1
             return
         }
 
         FileRead Text, % ConfigFile
         Lines:=strsplit(Text,Format "`r`n").2
-        Lines:=strsplit(Lines,"`r`n`r`n").1
-        Lines:=strsplit(Lines,"`r`n")
+            , Lines:=strsplit(Lines,"`r`n`r`n").1
+            , Lines:=strsplit(Lines,"`r`n")
         if !Lines.Count() {
             this.Result:=this.type:=Format "()"
-            ID:=+2
-            this.Error:=this.Errors[ID] ;.String
-            MsgBox 0x40031,% this.ClassName " > " A_ThisFunc "()" ,% (this.Errors.HasKey(ID)?this.Errors[ID].String:"Fatal: Undefined Error with ID '" ID "'")
+                , ID:=+2
+                , this.Error:=this.Errors[ID] ;.String
+            MsgBox 0x40031,% this.ClassName " > " A_ThisFunc, % (this.Errors.HasKey(ID)?this.Errors[ID].String:"Fatal: Undefined Error with ID '" ID "'")
             return this
         }
         for _, Line in Lines {
             Count:=1
-            p := 1
-            regex:="(?<Key>\w+\:)(?<Val>[^|]+)" ;; does not support keys a la 'toc-depth' (as required by quarto)
-            regex:="(?<Key>(\-|\w)+\:)(?<Val>[^|]+)"
+                , p := 1
+                , regex:="(?<Key>\w+\:)(?<Val>[^|]+)" ;; does not support keys a la 'toc-depth' (as required by quarto)
+                , regex:="(?<Key>(\-|\w)+\:)(?<Val>[^|]+)"
             if (SubStr(Trim(Line),1,1)=";") {
                 continue
             }
@@ -44,20 +44,20 @@ Class ot {
                         if (Count<2) { ;; initiate Parameter-Object
                             if (InStr(Line,"renderingpackage")) {
                                 This[matchKey]:=StrSplit(Line,"Value:").2
-                                p+=StrLen(Match)
-                                Count++
+                                    , p+=StrLen(Match)
+                                    , Count++
                                 continue
                             } else {
                                 CurrentParam:=matchKey
-                                ObjRawSet(This.Arguments,matchKey,{})
-                                ObjRawSet(This.Arguments[CurrentParam],"Control",matchVal)
+                                    , ObjRawSet(This.Arguments,matchKey,{})
+                                    , ObjRawSet(This.Arguments[CurrentParam],"Control",matchVal)
                             }
                         }
                         if !(InStr(Line,"renderingpackage")) {
                             ObjRawSet(This.Arguments[CurrentParam],matchKey,matchVal) ;; there ought to be a simpler method than ObjRawSet that I am utterly missing, or tested with bad data and assumed faulty...
                         }
                         p+=StrLen(Match)
-                        Count++
+                            , Count++
                     }
                 }
             } else { ;; we reached the first line of the next output format, indicated by its `package::format`-line
@@ -73,14 +73,14 @@ Class ot {
                 -1:{String:"Provided Configfile does not exist:`n`n",EndString:"`n`n---`nExiting Script",Criticality:-100,ID:-1}
                 ,0:{String:"Gui got cancelled",EndString:"`n`n---`nReturning to General Selection",Criticality:0,ID:0}
                 ,+2:{String:"Format not defined.`nCheck your configfile.`n`nReturning default 'outputformat()'",Criticality:20,ID:+2}}
-        this.ClassName:="ot ("
-        this.GUITitle:="Define output format - "
-        this.Version:="0.1.a"
-        this.type:=""
-        this.ConfigFile:=""
-        this.bClosedNoSubmit:=false
-        ObjRawSet(this,"type","")
-        ObjRawSet(this,"Arguments",{})
+            , this.ClassName:="ot ("
+            , this.GUITitle:="Define output format - "
+            , this.Version:="0.1.a"
+            , this.type:=""
+            , this.ConfigFile:=""
+            , this.bClosedNoSubmit:=false
+            , ObjRawSet(this,"type","")
+            , ObjRawSet(this,"Arguments",{})
     }
     __Get(Param*) {
         ret:={}
@@ -140,14 +140,14 @@ Class ot {
                 }
                 if Instr(ParamString,"(") {
                     ParamString:=strsplit(ParamString,"(").2
-                    ParamString:=Trim(ParamString,"""")
+                        , ParamString:=Trim(ParamString,"""")
                     if SubStr(ParamString,0)=")" {
                         tpl_Len:=StrLen(ParamString)-1
-                        ParamString:=SubStr(ParamString, 1, tpl_Len)
+                            , ParamString:=SubStr(ParamString, 1, tpl_Len)
                     }
                 }
                 ParamString:=StrReplace(ParamString, "\", "/")
-                Value.Value:=DA_Quote(ParamString)
+                    , Value.Value:=DA_Quote(ParamString)
                 if (ParamString="") {
                     Value.Value:=DA_Quote(strreplace(Trim(ParamBackup,""""),"\","/"))
                 }
@@ -287,7 +287,7 @@ Class ot {
             if !(SubStr(ID,1,1)="-") {
                 return this
             }
-            MsgBox 0x40031,% this.ClassName " > " A_ThisFunc "()" ,% (this.Errors.HasKey(ID)?this.Errors[ID].String:"Fatal: Undefined Error with ID '" ID "'")
+            MsgBox 0x40031,% this.ClassName " > " A_ThisFunc, % (this.Errors.HasKey(ID)?this.Errors[ID].String:"Fatal: Undefined Error with ID '" ID "'")
             return this
         }
         if (destroyGUI) {
@@ -300,19 +300,19 @@ Class ot {
                 TabHeaders[Value.Tab3Parent]:={Height:0}
             } else {
                 this.Arguments[Parameter,"Tab3Parent"]:="Other"
-                TabHeaders[Value.Tab3Parent]:={Height:0}
+                    , TabHeaders[Value.Tab3Parent]:={Height:0}
             }
         }
         Tab3String:=""
-        ind:=0
-        HiddenHeaders:={}
+            , ind:=0
+            , HiddenHeaders:={}
         for Header,_  in TabHeaders {
             HeaderFound:=false
             for Parameter, Value in this.Arguments {
                 if (Value.Tab3Parent=Header) {
                     if Value.Control!="meta" {
                         HeaderFound:=true
-                        HiddenHeaders[Header]:=false
+                            , HiddenHeaders[Header]:=false
                         break
                     } else {
                         HiddenHeaders[Header]:=true
@@ -322,18 +322,17 @@ Class ot {
             if (HeaderFound) {
 
                 Tab3String.=Header
-                ind++
+                    , ind++
                 if (ind<TabHeaders.Count()) || (ind=1) {
                     Tab3String.="|"
                 }
             }
         }
-        WideControlWidth:=330
         gui %GUI_ID% add, Tab3,% "vvTab3 h900 w" Tab3Width, % Tab3String
         if (this.StepsizedGuishow) {
             gui %GUI_ID% show
         }
-        for Tab, Object in TabHeaders {
+        for Tab, _ in TabHeaders {
             if HiddenHeaders[Tab] {
                 continue
             }
@@ -351,13 +350,8 @@ Class ot {
                 if InStr(Parameter,"-") {
                     Parameter:=strreplace(Parameter,"-","___") ;; fix "toc-depth"-like formatted parameters for quarto syntax when displaying. Three underscores are used to differentiate it from valid syntax for other packages.
                 }
-                if InStr(Parameter,"pandoc") {
-
-                }
-                if (True) {
-                    if !InStr(Value.String,strreplace(Parameter,"___","-")) {
-                        Value.String:= "" strreplace(Parameter,"___","-") "" ":" A_Space Value.String
-                    }
+                if !InStr(Value.String,strreplace(Parameter,"___","-")) {
+                    Value.String:= "" strreplace(Parameter,"___","-") "" ":" A_Space Value.String
                 }
                 ControlHeight:=0
                 if (Tab=Value.Tab3Parent) {
@@ -450,10 +444,10 @@ Class ot {
                             Value.ctrlOptions:=strreplace(Value.ctrlOptions,Value.ctrlOptions "|")
                         }
                         Threshold:=5
-                        tmpctrlOptions:=LTrim(RTrim(strreplace(Value.ctrlOptions,"||","|"),"|"),"|")
-                        tmpctrlOptions_arr:=strsplit(tmpctrlOptions,"|")
-                        Count:=tmpctrlOptions_arr.Count()
-                        shown_rows:=(Count<=1?1:(Count>Threshold?Threshold:Count))
+                            , tmpctrlOptions:=LTrim(RTrim(strreplace(Value.ctrlOptions,"||","|"),"|"),"|")
+                            , tmpctrlOptions_arr:=strsplit(tmpctrlOptions,"|")
+                            , Count:=tmpctrlOptions_arr.Count()
+                            , shown_rows:=(Count<=1?1:(Count>Threshold?Threshold:Count))
                         gui %GUI_ID% add, % Value.Control, % "  vv" Parameter " r" shown_rows , % Value.ctrlOptions
                         if (this.StepsizedGuishow) {
                             gui %GUI_ID% show
@@ -500,9 +494,7 @@ Class ot {
                     }
                     if InStr(Parameter,"pandoc") {
                         GuiControl Move, vTab3, % "h" TabHeight + ControlHeight
-
                     } else {
-
                         GuiControl Move, vTab3, % "h" TabHeight + ControlHeight + 16
                     }
                     TabHeight+=ControlHeight + 3
@@ -569,14 +561,15 @@ Class ot {
         } Else {
             x:=MouseX
         }
-        ;  }
         if (this.StepsizedGuishow) || ShowGui {
-            if (x!="") && (y!="") {
-                gui %GUI_ID% Show,x%x% y%y% w%guiWidth% h%guiHeight%,% GUIName:=this.GUITitle this.type
-            } else {
-                gui %GUI_ID% Show,w%guiWidth% h%guiHeight%,% GUIName:=this.GUITitle this.type
+            if (!this.SkipGUI) {
+                if (x!="") && (y!="") {
+                    gui %GUI_ID% Show,x%x% y%y% w%guiWidth% h%guiHeight%,% GUIName:=this.GUITitle this.type
+                } else {
+                    gui %GUI_ID% Show,w%guiWidth% h%guiHeight%,% GUIName:=this.GUITitle this.type
+                }
+                WinWait % GUIName
             }
-            WinWait % GUIName
             if this.SkipGUI {
                 this.SubmitDynamicArguments() ;; auto-submit the GUI
             } Else {
@@ -593,15 +586,11 @@ Class ot {
         WinWaitClose % "ahk_PID" PID
         Gui +OwnDialogs
         OnMessage(0x44, "DA_OnMsgBox")
-        MsgBox 0x40044, % this.ClassName " > " A_ThisFunc "()", You modified the configuration for this class.`nReload?
+        MsgBox 0x40044, % this.ClassName " > " A_ThisFunc, You modified the configuration for this class.`nReload?
         OnMessage(0x44, "")
-
         IfMsgBox Yes, {
             reload
-        } Else IfMsgBox No, {
-
         }
-
     }
     SubmitDynamicArguments() {
         static
@@ -610,12 +599,12 @@ Class ot {
         gui %GUI_ID% Submit
         for Parameter,_ in this.Arguments {
             ;@ahk-neko-ignore 1 line; at 4/28/2023, 9:49:42 AM ; https://github.com/CoffeeChaton/vscode-autohotkey-NekoHelp/blob/main/note/code107.md
-            parameter:=strreplace(parameter,"-","___")
+            Parameter:=strreplace(Parameter,"-","___")
             ;k=v%Parameter% ;; i know this is jank, but I can't seem to fix it. just don't touch for now?
             ;a:=%k%
             GuiControlGet val,, v%Parameter%
-            parameter:=strreplace(parameter,"___","-")
-            this["Arguments",Parameter].Value:=val
+            Parameter:=strreplace(Parameter,"___","-")
+                , this["Arguments",Parameter].Value:=val
         }
         gui %GUI_ID% destroy
         return this
@@ -626,7 +615,7 @@ Class ot {
         gui %GUI_ID% Submit
         gui %GUI_ID% destroy
         ID:=0
-        this.Error:=this.Errors[ID]
+            , this.Error:=this.Errors[ID]
         return this
     }
 }

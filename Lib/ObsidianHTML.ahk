@@ -1,11 +1,9 @@
-﻿ObsidianHtml(manuscript_path:="",config_path:="",bUseConvert:=true,bUseOwnOHTMLFork:=false,bVerbose:=false,WD="",WorkDir:="",WorkDir_OwnFork:="",ScopeRestrictorObject:="") {
-
+﻿ObsidianHtml(manuscript_path:="",config_path:="",bUseConvert:=true,bUseOwnOHTMLFork:=false,bVerbose:=false,OutputDir="",WorkDir:="",WorkDir_OwnFork:="",ScopeRestrictorObject:="",bAutoSubmitOTGUI:="") {
     if (WorkDir="") {
         WorkDir:= A_Desktop "\ObsidianHTMLOutput"
     }
     if (WorkDir_OwnFork="") {
         WorkDir_OwnFork:= A_Desktop "\ObsidianHTMLOutput"
-
     }
 
     ;; get ObsidianHTML_Path
@@ -16,14 +14,16 @@
             obsidianhtml_path:=obsidianhtml_check().2
             obsidianhtml_path:=Trim(obsidianhtml_path)
         } else {
-            MsgBox 0x2010, script.name " - ObsidianHTML not found ", "The CLI-Utility ObsidianHTML could not be found via 'where obsidianhtml'.`nAs this script is not functional without it, it will exit now."
+            Message:="The external python 3.11-CLI-utility ObsidianHTML could not be found via 'where obsidianhtml'.`nAs this script is not functional without it, it will exit now.`nWithout this package, this program cannot function. Please set up ObsidianHTML first, then rerun this program."
+            Title:="External Dependency not found."
+            AppError(Title, Message,," > " A_ThisFunc)
             return false
         }
     }
 
     ;; ensure the Working Directory exists before running OHTML
-    if (!FileExist(WD)) {
-        FileCreateDir % WD
+    if (!FileExist(OutputDir)) {
+        FileCreateDir % OutputDir
     }
 
     ;; if no manuscript is provided, we must assume the config to contain it and use convert
@@ -31,14 +31,16 @@
 
     ;; Validate config file.
     if (!FileExist(config_path)) {
-        MsgBox 0x2010, script.name " - provided Config file does not exist ", % "The config-file provided to 'obsidianhtml convert - i <config_file> does not exist. Returning early."
+        Message:="The config-file provided to 'obsidianhtml convert - i <config_file> does not exist. Returning early."
+        Title:="provided Config file does not exist"
+        AppError(Title, Message,," > " A_ThisFunc)
         return false
     } else {
         FileRead config_contents, % config_path
         if !Instr(config_contents,"obsidian_entrypoint_path_str: '") && bUseConvert {
-            MsgBox 0x2010
-                , % script.name " - config-field 'obsidian_entrypoint_path_str' not found "
-                , % "The config-file provided does not contain the setting 'obsidian_entrypoint_path_str', which is required for running the 'convert'-option. Please check the code. The script will reload now."
+            Title:="config-field 'obsidian_entrypoint_path_str' not found "
+            Message:="The config-file provided does not contain the setting 'obsidian_entrypoint_path_str', which is required for running the 'convert'-option. Please check the code. The script will reload now."
+            AppError(Title, Message,," > " A_ThisFunc)
             reload
         }
     }
@@ -48,7 +50,9 @@
         command2:= "obsidianhtml convert -i " Quote_ObsidianHTML(Trim(config_path))
     } else {
         if (manuscript_path="") {
-            MsgBox 0x2010, script.name " > " A_ThisFunc, No manuscript_path was provided to the run-verb execution. The script will reload. `n`nPlease provide a valid note-path or choose to convert.
+            Title:="manuscript_path not provided"
+            Message:="No manuscript_path was provided to the run-verb execution. The script will reload. `n`nPlease provide a valid note-path or choose to convert."
+            AppError(Title, Message,," > " A_ThisFunc)
             reload
         }
         command2:= "obsidianhtml run -f " Quote_ObsidianHTML(Trim(manuscript_path)) " -i " Quote_ObsidianHTML(Trim(config_path))
@@ -64,10 +68,10 @@
             GetStdStreams_WithInput("python -m " command2_getversion,WorkDir_OwnFork,ohtmlversion_modded)
         }
         if (script.config.config.ConfirmOHTMLCustomBuild && !bAutoSubmitOTGUI) {
-            MsgBox 0x2034,% "Is the correct build version used?", % "Has the correct build version been used?`n" ohtmlversion_modded "`n`nCMD:`n" command2, 1 ;; TODO: add config option to skip this, and add option to potentially also or never skip this when debugging.
-            IfMsgBox Yes, {
-
-            } Else IfMsgBox No, {
+            Title:="Is the correct build version used?"
+            Message:="Has the correct build version been used?`n" ohtmlversion_modded "`n`nCMD:`n" command2
+            AppError(Title, Message, 0x2034," > " A_ThisFunc,1)
+            IfMsgBox No, {
                 if (FileExist(ScopeRestrictorObject.Path) && !ScopeRestrictorObject.IsVaultRoot) {
                     FileRemoveDir % ScopeRestrictorObject.Path
                 }
@@ -92,6 +96,7 @@
     OutputDebug % "`n`n" command2 "`n`n"
     OutputDebug % "`n`n" WorkDir "`n`n"
     OutputDebug % "`n`n" WorkDir_OwnFork "`n`n"
+    OutputDebug % "`n`n" data_out "`n`n"
 
     if (data!="") {
         OHTML_Output:=getObsidianHTML_WD(data)
@@ -109,7 +114,37 @@
             ,"OutputPath":OHTML_Output
             ,"ObsidianHTMLCopyDir":ObsidianHTMLCopyDir}
 }
-
+getObsidianHTML_MDPath(obsidianhtml_ret) {
+    if RegExMatch(obsidianhtml_ret["stdOut"], "md: (?<MDPath>.*)(\s*)", v) || FileExist(obsidianhtml_ret.OutputPath) {
+        if FileExist(obsidianhtml_ret.OutputPath) {
+            _:=SubStr(obsidianhtml_ret.OutputPath,-1)
+            vMDPath:=strreplace(obsidianhtml_ret.OutputPath (SubStr(obsidianhtml_ret.OutputPath,-1)="md"?"":"/md"),"//","\")
+                , vMDPath:=strreplace(vMDPath ,"/","\")
+        }
+        vMDPath:=Trim(vMDPath)
+            , vMDPath:=strreplace(vMDPath,"`n")
+        script.config.version.ObsidianHTML_Version:=strreplace(obsidianhtml_ret.obsidianhtml_Version,"`n")
+        if !FileExist(vMDPath) {
+            Title:="'md_Path' not found in stdOut"
+            Message:="File md_Path does not seem to exist. Please check manually."
+            AppError(Title, Message,," > " A_ThisFunc)
+        }
+    } else {
+        if RegExMatch(obsidianhtml_ret["stdOut"], "Created empty output folder path (?<MDPath>.*)(\s*)", v) {
+            if !FileExist(vMDPath) {
+                Title:="'md_Path' not found in stdOut"
+                Message:="File md_Path does not seem to exist. Please check manually."
+                AppError(Title, Message,," > " A_ThisFunc)
+            }
+        } else {
+            Title:="Output could not be parsed."
+            Message:="DO NOT CONTINUE WITHOUT FULLY READING THIS!`n`nThe command line output of obsidianhtml does not contain the required information.`nThe output has been copied to the clipboard, and written to file under '" A_ScriptDir "\Executionlog.txt" "'`n`nTo carry on, find the path of the md-file and copy it to your clipboard.`nONLY THEN close this window."
+            AppError(Title, Message,," > " A_ThisFunc)
+            Clipboard:=ttip_Obj2Str(obsidianhtml_ret)
+        }
+    }
+    return vMDPath
+}
 getObsidianHTML_WD(String) {
     NeedleTxt:="
         (LTRIM
@@ -149,7 +184,7 @@ getObsidianHTML_CopyDir(String) {
     }
     return
 }
-createTemporaryObsidianHTML_Config(manuscriptpath, obsidianhtml_configfile,Convert) {
+createTemporaryObsidianHTML_Config(manuscript_path, obsidianhtml_configfile,Convert,bUseOwnOHTMLFork:=false) {
     if !FileExist(obsidianhtml_configfile) || !InStr(obsidianhtml_configfile,A_ScriptDir) { ;; create a template in this folder
         template:="
             (LTRIM
@@ -167,21 +202,49 @@ createTemporaryObsidianHTML_Config(manuscriptpath, obsidianhtml_configfile,Conve
                 max_note_depth: 15
                 # preserve_inline_tags: False
                 copy_vault_to_tempdir: True
-                exclude_glob:
-                %A_Space%%A_Space%- "".git""
-                %A_Space%%A_Space%- "".obsidian""
-                %A_Space%%A_Space%- "".trash""
-                %A_Space%%A_Space%- "".vscode""
-                %A_Space%%A_Space%- "".DS_Store""
-                %A_Space%%A_Space%- ""002 templates""
-                exclude_subfolders:
-                %A_Space%%A_Space%- "".git""
-                %A_Space%%A_Space%- "".obsidian""
-                %A_Space%%A_Space%- "".trash""
-                %A_Space%%A_Space%- "".vscode""
-                %A_Space%%A_Space%- "".DS_Store""
-                %A_Space%%A_Space%- ""002 templates""
+                #exclude_glob:
+                #%A_Space%%A_Space%- "".git""
+                #%A_Space%%A_Space%- "".obsidian""
+                #%A_Space%%A_Space%- "".trash""
+                #%A_Space%%A_Space%- ""/.github""
+                #%A_Space%%A_Space%- "".vscode""
+                #%A_Space%%A_Space%- "".DS_Store""
+                #%A_Space%%A_Space%- ""002 templates""
+                #%A_Space%%A_Space%- "".Rproj.user""
+                #%A_Space%%A_Space%- "".quarto""
+                #%A_Space%%A_Space%- "".""
+                #%A_Space%%A_Space%- "".renv""
 
+                #exclude_subfolders:
+                #%A_Space%%A_Space%- "".git""
+                #%A_Space%%A_Space%- "".obsidian""
+                #%A_Space%%A_Space%- "".trash""
+                #%A_Space%%A_Space%- "".vscode""
+                #%A_Space%%A_Space%- "".DS_Store""
+                #%A_Space%%A_Space%- ""002 templates""
+                #%A_Space%%A_Space%- "".Rproj.user""
+                #%A_Space%%A_Space%- ""renv""
+                #%A_Space%%A_Space%- "".renv""
+
+                module_config:
+                %A_Space%%A_Space%get_file_list:
+                %A_Space%%A_Space%%A_Space%%A_Space%include_glob:
+                %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%value: '*'
+                %A_Space%%A_Space%%A_Space%%A_Space%exclude_glob:
+                %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%value: 
+                %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%- "".git""
+                %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%- ""/.git/**/*""
+                %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%- ""/.github/**/*""
+                %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%- ""/.obsidian/**/*""
+                %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%- "".trash/**/*""
+                %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%- "".vscode""
+                %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%- ""/002 templates/**/*""
+                %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%- ""/.renv/**/*""
+                %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%- ""/.quarto/**/*""
+                %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%- ""/_freeze/**/*""
+                %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%- ""/_site/**/*""
+                %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%- ""/.Rproj.user/**/*""
+                %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%- "".DS_Store/**/*""
 
 
 
@@ -198,6 +261,8 @@ createTemporaryObsidianHTML_Config(manuscriptpath, obsidianhtml_configfile,Conve
                 toggles:
                 # When true, Obsidianhtml will not add three spaces at the end of every line
                 strict_line_breaks: True
+                wrap_inclusions: False
+                strip_inclusion_headers: True
                 # compile_html: False
                 features:
                 %A_Space%%A_Space%embedded_note_titles:
@@ -206,6 +271,7 @@ createTemporaryObsidianHTML_Config(manuscriptpath, obsidianhtml_configfile,Conve
                 # and read in that scales with the size of the site.
                 %A_Space%%A_Space%graph:
                 %A_Space%%A_Space%%A_Space%%A_Space%enabled: False
+                %A_Space%%A_Space%%A_Space%%A_Space%show_inclusions_in_graph: False
                 %A_Space%%A_Space%search:
                 %A_Space%%A_Space%%A_Space%%A_Space%enabled: False
 
@@ -228,11 +294,13 @@ createTemporaryObsidianHTML_Config(manuscriptpath, obsidianhtml_configfile,Conve
     }
     FileRead configfile_contents, % obsidianhtml_configfile
     if (Convert) {
-        configfile_contents:=StrReplace(configfile_contents,"#obsidian_entrypoint_path_str: '%obsidian_entrypoint_path_str%'","obsidian_entrypoint_path_str: '" manuscriptpath "'")
+        configfile_contents:=StrReplace(configfile_contents,"#obsidian_entrypoint_path_str: '%obsidian_entrypoint_path_str%'","obsidian_entrypoint_path_str: '" manuscript_path "'")
     }
-    SplitPath % manuscriptpath
-
-    writeFile_ObsidianHTML(configfile_path:=A_ScriptDir "\OHTMLconfig_temp.yaml",configfile_contents,,,true)
+    if (bUseOwnOHTMLFork) {
+        writeFile_ObsidianHTML(configfile_path:=A_ScriptDir "\OHTMLconfig_temp.yaml",configfile_contents,"UTF-16",,true)
+    } else {
+        writeFile_ObsidianHTML(configfile_path:=A_ScriptDir "\OHTMLconfig_temp.yaml",configfile_contents,,,true)
+    }
     return [(FileExist(configfile_path)?configfile_path:false),configfile_contents]
 }
 
@@ -251,7 +319,7 @@ readObsidianHTML_Config(configpath) {
         }
         if RegExMatch(Line, "(?<Key>.*):(?<Value>.*)", v) {
             conf[vKey]:=vValue
-            confstr.= vKey "=" vValue "`n"
+                , confstr.= vKey "=" vValue "`n"
         }
     }
     if (confstr="") {
@@ -273,7 +341,7 @@ fixYAMLSyntax(template) {
         } else {
             if (!bInTogglesSection && RegexMatch(Line,"mi)^toggles")) {
                 out.=Line "`n"
-                bInTogglesSection:=true
+                    , bInTogglesSection:=true
                 Continue
             }
         }
@@ -285,7 +353,7 @@ fixYAMLSyntax(template) {
             } else { ;; an actual toggle
                 if (SubStr(Line,1,2)!=" ") {
                     Line:=A_Space A_Space Line
-                    out.=Line "`n"
+                        , out.=Line "`n"
                 } else {
                     out.=Line "`n"
                 }
@@ -298,21 +366,21 @@ fixYAMLSyntax(template) {
 }
 
 updateObsidianHTMLToLastRelease() {
-    RunWait % A_Comspec " /k echo y | pip uninstall obsidianhtml", ,
-    RunWait % A_Comspec " /k echo y | pip install obsidianhtml", ,
+    RunWait % A_Comspec " /k echo y | pip uninstall obsidianhtml",,
+    RunWait % A_Comspec " /k echo y | pip install obsidianhtml",,
     MsgBox,, % script.name, % "Successfully updated to last Release."
     return
 }
 updateObsidianHTMLToMaster() {
-    RunWait % A_Comspec " /k echo y | pip uninstall obsidianhtml", ,
-    RunWait % A_Comspec " /k echo y | pip install git+https://github.com/obsidian-html/obsidian-html.git", ,
+    RunWait % A_Comspec " /k echo y | pip uninstall obsidianhtml",,
+    RunWait % A_Comspec " /k echo y | pip install git+https://github.com/obsidian-html/obsidian-html.git",,
     MsgBox,, % script.name, % "Successfully updated to Master."
     return
 }
 obsidianhtml_check() {
     static obsidianhtml_on_path:=false
-    static out:=""
-    if !obsidianhtml_on_path {
+        , out:=""
+    if (out="") {
         GetStdStreams_WithInput("where obsidianhtml",,out)
         out:=strreplace(out,"`n")
         if !FileExist(out) {
@@ -325,11 +393,11 @@ obsidianhtml_check() {
 }
 python_check() {
     static python_on_path:=false
-    static out:=""
-    if !python_on_path {
+        , out:=""
+    if (out="") {
         GetStdStreams_WithInput("where python.exe",,out)
         out:=strsplit(out,"`n")
-        for each, path in out {
+        for _, path in out {
             if !FileExist(path) {
                 python_on_path:=false
             } else {
@@ -416,7 +484,7 @@ writeFile_ObsidianHTML(Path,Content,Encoding:="",Flags:=0x2,bSafeOverwrite:=fals
             fObj.Close() ;; close file
         }
         else {
-            throw Exception("File could not be opened. Flags:`n" Flags, -1, myFile)
+            throw Exception("File could not be opened. Flags: " Flags "`nPath: " Path, -1, Path)
         }
     }
     else
@@ -427,7 +495,7 @@ writeFile_ObsidianHTML(Path,Content,Encoding:="",Flags:=0x2,bSafeOverwrite:=fals
             fObj.Close() ;; close file
         }
         else {
-            throw Exception("File could not be opened. Flags:`n" Flags, -1, myFile)
+            throw Exception("File could not be opened. Flags: " Flags "`nPath: " Path, -1, Path)
         }
     }
     return
