@@ -1168,7 +1168,6 @@ fTraySetup() {
 }
 
 #Include <PrettyTickCount>
-#Include <CodeTimer>
 #Include <st_count>
 #Include <HasVal>
 #Include <Base64PNG_to_HICON>
