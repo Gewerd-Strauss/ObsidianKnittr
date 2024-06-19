@@ -265,8 +265,10 @@ CLI_help() {
         (LTrim
             ---------------------------------------
             CLI-Overview for '%name%' (v.%version%)
-            3/3 - to-be-decided
+            3/3 - misc
             ---------------------------------------
+            AHK Working Directory: '%A_WorkingDir%'
+            Admin: '%A_IsAdmin%'
 
         )
     ;for Arg, Explanation in flags {
@@ -298,8 +300,14 @@ CLI_help() {
             Press [1-9] for further details.
         )
     curr_help:=str1 str1_2
+    Hotkey 1, % "sink2"
+    Hotkey 2, % "sink2"
+    Hotkey 3, % "sink2"
     while (1) {
         if GetKeyState("Escape") {
+            Hotkey 1, Off
+            Hotkey 2, Off
+            Hotkey 3, Off
             break
         }
         if (GetKeyState(1)) {
@@ -314,4 +322,8 @@ CLI_help() {
         ttip(curr_help,5)
     }
     return
+}
+
+sink2() {
+
 }
