@@ -677,24 +677,6 @@ getDefinedOutputFormats(Path) {
     }
     return [Arr,filesuffixes,inputsuffixes]
 }
-populateLV(last_output,PotentialOutputs) {
-    for _,potential_output_type in PotentialOutputs {
-        Cond:=Instr(last_output,potential_output_type)
-        if Cond {
-            Options:="Check"
-                , last_output:=strreplace(last_output,potential_output_type)
-        } else {
-            Options:="-Check"
-        }
-        if (filesuffixes.HasKey(potential_output_type)) {
-            Options.=" cGreen"
-        } else {
-            Options.=" cRed"
-        }
-        LV_Add(Options,potential_output_type)
-    }
-    return
-}
 concat_formats(formats) {
     for _,format in formats {
         if format.HasKey("Error") && (format.Error.ID=0) {
