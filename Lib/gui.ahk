@@ -1,6 +1,112 @@
-﻿GCAutoSubmit() {
-    global bAutoSubmitOTGUI:=True
-    return guiSubmit()
+﻿;; main GUI
+guiCreate(runCLI,CLIArgs) {
+    global
+    gui destroy
+    if (!FileExist(A_ScriptDir "\INI-Files\DynamicArguments.ini")) {
+        setupDefaultDA(A_ScriptDir "\INI-Files\DynamicArguments.ini")
+    }
+    ret:=getDefinedOutputFormats(A_ScriptDir "\INI-Files\DynamicArguments.ini")
+        , PotentialOutputs:=ret[1]
+        , filesuffixes:=ret[2]
+        , inputsuffixes:=ret[3]
+    if (CLIArgs.count()) {
+        return [filesuffixes,inputsuffixes]
+    }
+    Gui Margin, 16, 16
+    Gui +AlwaysOnTop -SysMenu -ToolWindow -caption +Border +LabelGC +hwndOKGui
+    Gui Color, 1d1f21, 373b41,
+    Gui Font, s11 cWhite, Segoe UI
+    gui add, text,xm ym, ObsidianKnittr - automate Obsidian.md conversion
+    WideControlWidth:=330
+    gui add, listview,% "vvLV1 LV0x8 w" WideControlWidth " h245 checked NoSortHdr " , % "Chooses an output Type"
+    gui add, Groupbox, % "xm" " yp" + 248 " w" WideControlWidth " h170", Execution Directories
+    for each, File in script.config.DDLHistory {
+        if (!FileExist(File)) {
+            script.config.DDLHistory.RemoveAt(each,1)
+        }
+    }
+    DDLRows:=(script.config.Config.HistoryLimit>25?25:script.config.Config.HistoryLimit)
+    gui add, text, % "yp+25 xp+10 w" WideControlWidth -  3*5, % "Choose execution directory for Quarto/R"
+    gui add, Radio,% "vExecutionDirectory Checked",% "&1. OHTML-Output-Dir"
+    gui add, Radio,,% "&2. subfolder of note-location in vault"
+    ;gui add, DDL,% "yp+20 xp w" WideControlWidth -  4*5 " vExecutionDirectory hwndExeDir r" DDLRows, % ExecutionDirectories
+    gui add, Groupbox, % "xm" " yp" + 78 " w" WideControlWidth " h70", Last execution
+    SplitPath % script.config.LastRun.manuscriptpath ,, OutDir,, OutNameNoExt
+    SplitPath % OutDir,,,, OutDir,
+    gui add, text, % "yp+20 xp+5", % "LM: " OutNameNoExt " (" OutDir ")"
+    gui add, text, % "yp+20 xp", % "LL: " script.config.LastRun.LastRelativeLevel (script.config.LastRun.LastRelativeLevel=0?" (manuscript-folder)":"") " DL: " script.config.Config.defaultRelativeLevel
+    gui add, text, % "ym xm" + WideControlWidth + 5,% " via Obsidian-HTML, RMarkdown and Quarto"
+    populateLV(script.config.LastRun.last_output_type,PotentialOutputs)
+    HistoryString:=""
+    for each, File in script.config.DDLHistory {
+        if (!FileExist(File)) {
+            script.config.DDLHistory.RemoveAt(each,1)
+        }
+    }
+    for each, File in script.config.DDLHistory {
+        if (FileExist(File)) {
+            SplitPath % File,, OutDir,, FileName
+            SplitPath % OutDir,OutFileName
+            HistoryString.=((each=1)?"":"|") FileName "(" OutFileName ")" " -<>- " File
+            if (each=1) {
+                HistoryString.="|"
+            }
+        }
+    }
+    if (!CLIArgs.Count()) { ;; only change config when running in GUI mode
+        script.config.LastRun.manuscriptpath:=StrReplace(script.config.LastRun.manuscriptpath, "/","\")
+        script.save()
+    }
+    Gui add, button, gChooseFile, &Choose Manuscript
+    DDLRows:=(script.config.Config.HistoryLimit>25?25:script.config.Config.HistoryLimit)
+    gui add, DDL,% "w" WideControlWidth " vChosenFile hwndChsnFile r" DDLRows " ggetPotentialWorkDir", % HistoryString
+    gui add, Groupbox, % "w" WideControlWidth " h150", Obsidian HTML
+    ;; OHTML
+    gui add, checkbox,% "xp+10 yp+20" " vbConvertInsteadofRun", % "!!Use verb 'Convert' for OHTML-call?"
+    gui add, checkbox,% "xp yp+20" " vbUseOwnOHTMLFork", % "!!!Use the personal fork? *CAUTION*"
+    gui add, checkbox,% "xp yp+20" " vbRemoveObsidianHTMLErrors", % "!Purge OHTML-Error-strings?"
+    gui add, checkbox,% "xp yp+20" " vbVerboseCheckbox", % "Set OHTML's Verbose-Flag?"
+    gui add, checkbox,% "xp yp+20" " vbRestrictOHTMLScope", % "Limit scope of OHTML?"
+
+    ;; post-processing
+    gui add, Groupbox, % "xm" +WideControlWidth + 5 " yp" + 55 " w" WideControlWidth " h170", General configuration
+    gui add, checkbox, % "xp+10 yp+20" " vbRemoveHashTagFromTags", % "Remove '#' from tags?"
+    gui add, checkbox, % "xp yp+20" " vbStripLocalMarkdownLinks", % "Strip local markdown links?"
+    gui add, checkbox, % "xp yp+20" " vbKeepFilename", % "Keep Filename?"
+    gui add, checkbox, % "xp yp+20" " vbRendertoOutputs", % "Render manuscripts to chosen outputs?"
+    gui add, checkbox, % "xp yp+20" " vbBackupOutput", % "Backup Output files before rendering?"
+
+    gui add, Groupbox, % "xm" +WideControlWidth + 5 " yp" + 75 " w" WideControlWidth " h70", Engine-Specific Stuff
+    gui add, checkbox, % "xp+10 yp+20" " vbRemoveQuartoReferenceTypesFromCrossrefs", % "Remove ""figure""/""table""/""equation"" from`ninline references in quarto-documents?"
+    gui add, text,xp yp+20 w0
+    Gui Font, s7 cWhite, Verdana
+    gui add, button, gGCSubmit yp+38 xp-10, &Submit
+    gui add, button, gGCAutoSubmit yp xp+60, &Full Submit
+    onOpenConfig:=Func("EditMainConfig").Bind(script.configfile)
+    gui add, button, hwndOpenConfig yp xp+81, Edit General Config
+    gui add, button, gGCAbout hwndAbout yp xp+122, &About
+    GuiControl +g,%OpenConfig%, % onOpenConfig
+    Gui Add, Text,x15 yp,% script.name " v." regexreplace(script.config.version.ObsidianKnittr_Version,"\s*","") " | Obsidian-HTML v." strreplace(script.config.version.ObsidianHTML_Version,"commit:")
+    Gui Add, Text,x15 yp+15,% "Quarto-cli" " v." regexreplace(quartogetVersion(),"\s*","") " | Using " (script.config.config.useQuartoCLI?"quarto-cli":"quarto's R-package")
+    script.version:=script.config.version.ObsidianKnittr_Version
+    if (script.config.LastRun.manuscriptpath!="") && (script.config.LastRun.last_output_type!="") {
+        SplitPath % script.config.lastrun.manuscriptpath,, OutDir
+        SplitPath % OutDir, OutFileName, OutDir,
+        guicontrol,, bVerboseCheckbox, % (script.config.LastRun.Verbose)
+        guicontrol,, bRestrictOHTMLScope, % (script.config.LastRun.RestrictOHTMLScope)
+        guicontrol,, bKeepFilename, % (script.config.LastRun.KeepFileName)
+        guicontrol,, bRendertoOutputs, % (script.config.LastRun.RenderToOutputs)
+        guicontrol,, bBackupOutput, % (script.config.LastRun.BackupOutput)
+        guicontrol,, bRemoveHashTagFromTags, % (script.config.LastRun.RemoveHashTagFromTags)
+        guicontrol,, bConvertInsteadofRun, % (script.config.LastRun.ConvertInsteadofRun)
+        guicontrol,, bRemoveObsidianHTMLErrors, % (script.config.LastRun.RemoveObsidianHTMLErrors)
+        guicontrol,, bStripLocalMarkdownLinks, % (script.config.LastRun.bStripLocalMarkdownLinks)
+        guicontrol,, bUseOwnOHTMLFork, % (script.config.LastRun.UseOwnOHTMLFork)
+        guicontrol,, bRemoveQuartoReferenceTypesFromCrossrefs, % (script.config.LastRun.RemoveQuartoReferenceTypesFromCrossrefs)
+        guicontrol,, Button2, % (script.config.LastRun.LastExecutionDirectory=1?1:0)
+        guicontrol,, Button3, % (script.config.LastRun.LastExecutionDirectory=1?0:1)
+    }
+    return [filesuffixes,inputsuffixes]
 }
 guiShow(runCLI:=FALSE,CLIArgs:="") {
     global
@@ -175,16 +281,6 @@ guiShow(runCLI:=FALSE,CLIArgs:="") {
         ExitApp 2
     }
 }
-GCAbout() {
-    script.About()
-}
-GCEscape() {
-    guiEscape()
-}
-GCSubmit() {
-    ret:=guiSubmit()
-    return ret
-}
 guiEscape() {
     gui destroy
     return
@@ -244,7 +340,21 @@ guiSubmit() {
     }
     return [DDLval,manuscriptpath,sel]
 }
-
+;; wrappers
+GCAutoSubmit() {
+    global bAutoSubmitOTGUI:=True
+    return guiSubmit()
+}
+GCAbout() {
+    script.About()
+}
+GCEscape() {
+    guiEscape()
+}
+GCSubmit() {
+    return guiSubmit()
+}
+;; helpers
 getSelectedLVEntries() {
     vRowNum:=0
         , sel:=[]
