@@ -705,19 +705,6 @@ buildHistory(History,NumberOfRecords,manuscriptpath:="") {
     History:=h.clone()
     return History
 }
-getSelectedLVEntries() {
-    vRowNum:=0
-        , sel:=[]
-    loop {
-        vRowNum:=LV_GetNext(vRowNum,"C")
-        if not vRowNum {
-            break ; The above returned zero, so there are no more selected rows.
-        }
-        LV_GetText(sCurrText1,vRowNum,1)
-            , sel.push(sCurrText1)
-    }
-    return sel
-}
 editMainConfig(configfile) {
     static
     gui Submit, NoHide

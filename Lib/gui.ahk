@@ -244,6 +244,20 @@ guiSubmit() {
     }
     return [DDLval,manuscriptpath,sel]
 }
+
+getSelectedLVEntries() {
+    vRowNum:=0
+        , sel:=[]
+    loop {
+        vRowNum:=LV_GetNext(vRowNum,"C")
+        if not vRowNum {
+            break ; The above returned zero, so there are no more selected rows.
+        }
+        LV_GetText(sCurrText1,vRowNum,1)
+            , sel.push(sCurrText1)
+    }
+    return sel
+}
 populateLV(last_output,PotentialOutputs) {
     for _,potential_output_type in PotentialOutputs {
         Cond:=Instr(last_output,potential_output_type)
