@@ -210,6 +210,9 @@ write_quarto_yaml(output_type,OutDir,yaml_file) {
     yaml_path:=OutDir "\" yaml_file
         , String:=""
     for Parameter, Value in output_type.Arguments {
+        if ((Value.Control=="meta") || (Value.Control=="Meta")) {
+            continue
+        }
         Pair:= Parameter ": " strreplace(Value.Value,"""")
             , String:=String "`n" Pair
     }
