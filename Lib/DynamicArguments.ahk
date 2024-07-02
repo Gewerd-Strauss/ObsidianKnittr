@@ -114,10 +114,10 @@ Class ot {
         }
         this._Adjust()
         for Parameter, Value in this.Arguments {
-            if Value.Control="meta" {
+            if (Value.Control="meta") {
                 continue
             }
-            if Value.Value="" && Value.Default="" {
+            if (Value.Value="") && (Value.Default="") {
                 continue
             }
             if InStr(Parameter,"___") {
@@ -165,17 +165,34 @@ Class ot {
             }
             Str.= Parameter " = " Value.Value ",`n"
         }
-        for Parameter, Value in this.Arguments {
-            if Value.Control="meta" {
-                this.Arguments.Remove(Parameter)
-                continue
+        /*
+        For whatever godforsaken reason executing the forloop below is not enough,
+        it simply will not iterate over all meta-keys.
+
+        This is the best solution I could think of that should be reliable.
+        But then again, a normal loop should already find and remove all meta-keys
+        Yes, this is ludicrous. No, I can't seem to figure out why.
+        WHY? 
+        */
+        meta_keys_are_present:=true
+        while (meta_keys_are_present) {
+            present_meta_keys:=0
+            for Parameter, Value in this.Arguments {
+                if ((Value.Control=="meta") || (Value.Control=="Meta")) {
+                    this.Arguments.Delete(Parameter)
+                }
             }
+            for Parameter, Value in this.Arguments {
+                if ((Value.Control=="meta") || (Value.Control=="Meta")) {
+                    present_meta_keys++
+                }
+            }
+            meta_keys_are_present:=present_meta_keys
         }
         Str:=SubStr(Str,1,StrLen(Str)-2)
         Str.=(Instr(Str,"`n")?"`n)":"")
         if InStr(Str,this.renderingpackage_start) {
             if this.HasKey("renderingpackage_end") {
-
                 Str:=strreplace(Str,"`n)",this.renderingpackage_end)
             }
         }
