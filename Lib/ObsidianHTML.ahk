@@ -232,19 +232,20 @@ createTemporaryObsidianHTML_Config(manuscript_path, obsidianhtml_configfile,Conv
                 %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%value: '*'
                 %A_Space%%A_Space%%A_Space%%A_Space%exclude_glob:
                 %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%value: 
-                %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%- "".git""
                 %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%- ""/.git/**/*""
                 %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%- ""/.github/**/*""
                 %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%- ""/.obsidian/**/*""
-                %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%- "".trash/**/*""
-                %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%- "".vscode""
-                %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%- ""/002 templates/**/*""
-                %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%- ""/.renv/**/*""
                 %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%- ""/.quarto/**/*""
+                %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%- ""/.renv/**/*""
+                %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%- ""/.Rproj.user/**/*""
+                %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%- ""/.trash/**/*""
+                %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%- ""/.vscode/**/*""
+                %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%- ""/002 templates/**/*""
                 %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%- ""/_freeze/**/*""
                 %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%- ""/_site/**/*""
-                %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%- ""/.Rproj.user/**/*""
-                %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%- "".DS_Store/**/*""
+                %A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%%A_Space%- ""/.DS_Store/**/*""
+
+
 
 
 
