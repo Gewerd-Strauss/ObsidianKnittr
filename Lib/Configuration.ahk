@@ -132,7 +132,7 @@ setupDefaultDA(Path) {
             `t;order:Edit|Tab3Parent:Title && Author|Link:"https://quarto.org/docs/reference/formats/pdf.html#title-author"|Linktext:?
             `t; Format Options
             `tpdf-engine:combobox|Type:String|Default:xelatex|String:"Use specified pdf engine. Give full path if engine not on PATH. Do not use 'pdflatex' if you have unicode-characters"|ctrlOptions:xelatex,pdflatex,lualatex,tectonic,latexmk,context,wkhtmltopdf,prince,weasyprint,pdfroff|Tab3Parent:Format options|Link:"https://quarto.org/docs/reference/formats/pdf.html#format-options"|LinkText:?
-            `tpdf-engine-opt:edit|Type:String|Default:""|String:"Give command-line argument to the pdf-engine"|Tab3Parent:Format options|Link:"https://quarto.org/docs/reference/formats/pdf.html#format-options"|LinkText:?
+            `tpdf-engine-opt:edit|Type:String|Default:"[]"|String:"Give command-line argument to the pdf-engine"|Tab3Parent:Format options|Link:"https://quarto.org/docs/reference/formats/pdf.html#format-options"|LinkText:?
             `t; Table of contents
             `ttoc:checkbox|Type:boolean|Default:1|String:"Include an automatically generated ToC"|Tab3Parent:Table of Contents|Link:"https://quarto.org/docs/reference/formats/pdf.html#table-of-contents"|LinkText:?
             `ttoc-depth:edit|Type:integer|Default:3|String:"Specify the number of section levels to include in the ToC"|Tab3Parent:Table of Contents|Link:"https://quarto.org/docs/reference/formats/pdf.html#table-of-contents"|LinkText:?
