@@ -10,7 +10,56 @@ convertToQMD(String,bRemoveQuartoReferenceTypesFromCrossrefs) {
     String:=moveEquationLabelsUpIntoLatexEquation(String)                                               ;; 
     String:=fixCitationpathing(String)                                                                  ;; "csl" and "bibliography" frontmatter keys
     String:=fixNullFields(String)                                                                       ;; fix null-valued yaml fields
+    String:=fixInvalidQuartoFrontmatterFields(String)                                                   ;; fix 'aliases: "null"' > 'aliases: []', and similar
     return String
+}
+fixInvalidQuartoFrontmatterFields(String) {
+    Lines:=strsplit(String,"`n")
+        , inFrontMatter:=false
+        , Rebuild:=""
+        , Rebuild:=String
+    for _, Line in Lines {
+        Trimmed:=Trim(Line)
+        if InStr(Trimmed,"---") && !inFrontMatter && (_=1) {            ;; encountered first fence
+            inFrontMatter:=true
+        } else if !InStr(Trimmed,"---") && !inFrontMatter {             ;; not a code-fence, not in front matter -> text after frontmatter
+            inFrontMatter:=false
+            break
+        } else if !InStr(Trimmed,"---") && inFrontMatter {              ;; not a code-fence, but after first codefence -> we are in frontmatter
+            /*
+            If the following principal error
+
+            ""
+            ERROR: Validation of YAML front matter failed.
+            ERROR: In file index.qmd
+            (line 2, columns 10--16) Field "aliases" has value "null", which must instead be an array of values, where each element must be a string
+            ""
+
+            occurs, add the respective field to the array of keys below which are treated for this:
+            */
+            erroneous_keys:=["aliases"]
+            for _, key in erroneous_keys {
+                if (!InStr(Line, key)) {
+                    continue
+                }
+                needle:="^(?<erroneous_key>""*" key "*\:\s*""*null""*)"
+                if RegExMatch(Line, needle,v) {
+                    Line2:=StrReplace(Line, verroneous_key,key ": []")
+                        , Rebuild:=Strreplace(Rebuild,Line,Line2,,1)
+                }
+                ; if RegexMatch(Line,".+\:$") {
+                ;     if InStr(Line, "tags") {
+                ;         if !InStr(Lines[_+1],"- ") {    ;; make sure that an empty array is only added when no tags are added yet
+                ;             Rebuild:=Strreplace(Rebuild,"tags:","tags: []",,1)
+                ;         }
+                ;     }
+                ; }
+            }
+        } else if InStr(Trimmed,"---") && inFrontMatter  && (_>1) {     ;; encountered the second code-fence of the yaml front matter
+            inFrontMatter:=false
+        }
+    }
+    return Rebuild
 }
 moveEquationreferencesToEndofBlock(String) {
     ;; fix equation reference keys
