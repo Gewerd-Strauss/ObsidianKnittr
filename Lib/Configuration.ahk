@@ -1,5 +1,9 @@
 ﻿setupDefaultConfig(Path,RS_C,OHTML_C,QUARTO_C) {
     InputBox given_searchroot, % script.name " - Initiate settings","Please give the search root folder."
+    InputBox given_OHTML_ownFork,% " - Initiate settings",% "If`n- you intend to use a private version of ObsidianHTML,`n- or ObsidianHTML is not located on your path,`n- or you use a non-compiled version elsewhere`n- ...`nenter the directory here.",,500,220
+    if ((!FileExist(given_OHTML_ownFork) || given_OHTML_ownFork=="")) {
+        given_OHTML_ownFork:=""
+    }
     InitialSettings=
         (LTrim
             [Config]
@@ -13,7 +17,7 @@
             obsidianTagEndChars=():'
             OHTML_OutputDir=%A_Desktop%\TempTemporal\
             OHTML_WorkDir=%A_Desktop%\TempTemporal
-            OHTML_WorkDir_OwnFork=D:\Dokumente neu\Repositories\obsidian-html
+            OHTML_WorkDir_OwnFork=%given_OHTML_ownFork%
             OpenParentfolderInstead=1
             RScriptPath=%rscript_path%
             searchroot=%given_searchroot%
@@ -21,7 +25,7 @@
             confirmOHTMLCustomBuild=0
             [Version]
             ObsidianHTML_Version=3.4.1
-            ObsidianKnittr_Version=4.1.8
+            ObsidianKnittr_Version=4.1.9
             [LastRun]
             BackupOutput=1
             bStripLocalMarkdownLinks=0
