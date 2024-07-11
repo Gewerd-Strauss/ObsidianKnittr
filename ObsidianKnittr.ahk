@@ -311,7 +311,7 @@ main() {
                 notify("Backing up Files",CLIArgs)
                 BackupDirectory:=backupOutput(qmd_Path,guiOut)
             }
-            if script.config.config.backupCount {
+            if (script.config.config.backupCount) {
                 limitBackups(BackupDirectory,script.config.config.backupCount)
             }
             ttip(-1)
