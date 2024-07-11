@@ -300,6 +300,8 @@ createTemporaryObsidianHTML_Config(manuscript_path, obsidianhtml_configfile,Conv
     if (bUseOwnOHTMLFork) {
         writeFile_ObsidianHTML(configfile_path:=A_ScriptDir "\OHTMLconfig_temp.yaml",configfile_contents,"UTF-16",,true)
     } else {
+        ;; make sure that the custom key is not implemented
+        configfile_contents:=StrReplace(configfile_contents,"strip_inclusion_headers: True","")
         writeFile_ObsidianHTML(configfile_path:=A_ScriptDir "\OHTMLconfig_temp.yaml",configfile_contents,,,true)
     }
     return [(FileExist(configfile_path)?configfile_path:false),configfile_contents]
