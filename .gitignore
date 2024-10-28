@@ -1,5 +1,5 @@
 *log.txt
-Executionlog.txt
+Executionlog*.txt
 OHTMLconfig_temp.yaml
 INI-Files/OHTMLconfig_template.yaml
 output/*
