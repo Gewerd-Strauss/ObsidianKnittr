@@ -23,6 +23,11 @@ processCLIFlags(Byref Args) {
     } else {
         Args.noOKLog:=0
     }
+    if (Args.HasKey("--keepOKLog")) {
+        Args.keepOKLog:=1
+    } else {
+        Args.keepOKLog:=0
+    }
     if (Args.HasKey("--noRender")) {
         Args.RenderToOutputs:=0
     } else { ;; default
@@ -178,7 +183,7 @@ validateCLIArgs(Byref Args) {
                 striplocalMDLinks stripHashesfromTags
 
                 //flags//
-                nointermediates nomove noopen notify
+                nointermediates nomove noopen notify keepOKLog
 
                 //flags-extensions//
                 IntermediatesRemovalLevel
@@ -219,11 +224,14 @@ validateCLIArgs(Byref Args) {
     }
 }
 CLI_help() {
-    flags:={"--noMove":"`t`t-`tSet to '1' to convert the note locally and create the '.qmd'-file at the location of the root."
-            , "--noIntermediates": "`t-`tSet to '1' to delete/not store intermediate files after finishing execution.`n`t`t`t`t`t`t`tDeletes the output directory itself(?)"
-            , "--noOpen":"`t`t-`tSet to '1' to not open the output directory after execution finishes."
-            , "--SourceNameIndex":"`t-`tSet to '1' to force the resulting md/rmd/qmd-file to use the filename 'index',`n`t`t`t`t`t`t`tinstead of the name of the note itself."
-            , "--noRender":"`t`t-`tSet to '1' to only create the '.qmd'-file, without rendering to outputs.`n`t`t`t`t`t`t`tOverwrites CL-Arg 'RenderToOutputs'."}
+    name:=script.name
+    version:=script.version
+    flags:={"--noMove":"`t`t-`tSet flag to convert the note locally and create the '.qmd'-file at the location of the root."
+            , "--noIntermediates": "`t-`tSet flag to delete/not store intermediate files after finishing execution.`n`t`t`t`t`t`t`tDeletes the output directory itself(?)"
+            , "--noOpen":"`t`t-`tSet flag to not open the output directory after execution finishes."
+            , "--keepOKLog":"`t`t-`tSet flag to keep the OK-log in the Working-Directory of '" name "' with format 'Executionlog ({manuscript_name}).txt'."
+            , "--SourceNameIndex":"`t-`tSet flag to force the resulting md/rmd/qmd-file to use the filename 'index',`n`t`t`t`t`t`t`tinstead of the name of the note itself."
+            , "--noRender":"`t`t-`tSet flag to only create the '.qmd'-file, without rendering to outputs.`n`t`t`t`t`t`t`tOverwrites CL-Arg 'RenderToOutputs'."}
     Obj:={Path:"`t`t`t-`t(req): absolute path to the note being processed. The note must lie within an obsidian-Vault, as detected`n`t`t`t`t`t`tby the presence of an ``.obsidian``-folder somewhere above the note's location."
             , format:"`t`t`t-`t(req): key of the output-format used. Output format must be defined in 'DynamicArguments.ini'."
             , FullLog:"`t`t`t-`tNOT IMPLEMENTED"
@@ -232,8 +240,6 @@ CLI_help() {
             , "quarto::XXXX.YY":"`t`t-`tPass along parameter modifications for parameter 'YY' of quarto-format 'XXXX'. Use quarto's parameter naming-scheme`n`t`t`t`t`t`tExample: ``quarto::html.number-depth=1``"
             , RenderToOutputs:"`t`t-`tSet to '1' to execute file-compilation via quarto-cli/``rscript``"
             , LastExecutionDirectory:"`t-`tSet to '1' to process in OHTML-output directory, set to '2' to process in vault-subfolder."}
-    name:=script.name
-    version:=script.version
     str1=
         (LTRIM
             ---------------------------------------

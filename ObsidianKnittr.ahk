@@ -417,6 +417,8 @@ main() {
         if (FileExist(EL.__path)) {
             if (CLIArgs.noOKLog) {
                 FileDelete % EL.__path
+            } else if (CLIArgs.keepOKLog) {
+                FileMove % EL.__path , % A_ScriptDir "\Executionlog (" guiOut.manuscriptname ").txt", true
             } else {  ;; only copy back the log if it is required
                 SplitPath % rmd_Path,, OutDir
                 FileMove % EL.__path, % OutDir "\Executionlog.txt",true
