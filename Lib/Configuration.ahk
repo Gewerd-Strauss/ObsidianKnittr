@@ -25,7 +25,7 @@
             confirmOHTMLCustomBuild=0
             [Version]
             ObsidianHTML_Version=3.4.1
-            ObsidianKnittr_Version=4.1.10
+            ObsidianKnittr_Version=4.1.11
             [LastRun]
             BackupOutput=1
             bStripLocalMarkdownLinks=0
