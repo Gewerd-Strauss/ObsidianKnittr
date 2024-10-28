@@ -19,15 +19,16 @@ Timings:
 
 ObsidianHTML              > `%ObsidianHTML_Start`%
 ObsidianHTML              < `%ObsidianHTML_End`%
-                                           `%ObsidianHTML_Duration`%
+                                         `%ObsidianHTML_Duration`%
 intermediary Processing   > `%Intermediary_Start`%
 intermediary Processing   < `%Intermediary_End`%
-                                           `%Intermediary_Duration`%
+                                         `%Intermediary_Duration`%
 Compilation               > `%Compilation_Start`%
 Compilation               < `%Compilation_End`%
                                          `%Compilation_Duration`%
 
 Total (not ms-precise)                   `%TotalExecution_Duration`%
+Total + Startup_AHK (not ms-precise)     `%TOTAL_COUNT`%
 
 ___________________________________________________
 Script Execution Settings:
@@ -128,10 +129,10 @@ OK - Errorlog:
     write(content) {
         this.__h.write(content)
     }
-    getTotalDuration(atc1,atc2) {
+    getTotalDuration(atc1,atc2,key := "TotalExecution_Duration") {
         diff:=atc2-atc1
             , Time:=PrettyTickCount(diff)
-            , this.TotalExecution_Duration:=RegExReplace(Time,"[hms]")
+            , this[key]:=RegExReplace(Time,"[hms]")
     }
     __Set(Key, Value) {
         OldLength:=strLen(this.content)
