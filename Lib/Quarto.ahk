@@ -145,6 +145,50 @@ convertDiagrams(String) {
     return String
 }
 
+quartopurgeContents(String) {
+    Lines:=strsplit(String,"`n")
+        , inFrontMatter:=false
+        , inCodeBlock:=false
+        , Rebuild:=""
+    for _, Line in Lines {
+        Trimmed:=Trim(Line)
+        if InStr(Trimmed,"---") && !inFrontMatter && (_=1) {            ;; encountered first fence
+            inFrontMatter:=true
+            Rebuild.=Line "`n"
+            continue
+        } else if !InStr(Trimmed,"---") && inFrontMatter && (_>1) {     ;; not a code-fence, but after first codefence -> we are in frontmatter
+            Rebuild.=Line "`n"
+            continue
+        } else if InStr(Trimmed,"---") && inFrontMatter  && (_>1) {     ;; encountered the second code-fence of the yaml front matter
+            inFrontMatter:=false
+            Rebuild.=Line "`n"
+            continue
+        } else if InStr(SubStr(Trimmed,1,4),"``````{") && !inCodeBlock && (_>1) {            ;; encountered first fence of a codeblock
+            inCodeBlock:=true
+            continue
+        } else if !InStr(SubStr(Trimmed,1,3),"``````") && inCodeBlock && (_>1) {     ;; not a code-fence, but after first codefence -> we are in codeblock
+            continue
+        } else if InStr(Trimmed,"``````") && inCodeBlock  && (_>1) {     ;; encountered the second code-fence of the codeblock
+            inCodeBlock:=false
+            continue
+
+        } else if !InStr(Trimmed,"---")  && !inFrontMatter && (_>1) {    ;; not a code-fence, not in front matter -> text after frontmatter
+            if (InStr(Trimmed,"``````{") && !inFrontMatter && !inCodeBlock && (_>1)) { ;; in main body, detected opening of a codeblock
+                inCodeBlock:=true
+                continue
+            } else if (!InStr(Trimmed,"``````") && !inFrontMatter && inCodeBlock && (_>1)) { ;; in main body, in codeblock, but not on closing line
+                continue
+            } else if (InStr(Trimmed,"``````") && !inFrontMatter && inCodeBlock && (_>1)) { ;; in main body, detected closing of a codeblock
+                inCodeBlock:=false
+                continue
+            }
+            if (!RegexMatch(Line,"^(?!#{1,}\s{1,}).*")) { ;; and finally, only reinsert the line if it is a valid section-header
+                Rebuild.=Line "`n"
+            }
+        }
+    }
+    return Rebuild
+}
 quartopurgeTags(String) {
     return String
     Lines:=strsplit(String,"`n")

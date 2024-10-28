@@ -302,6 +302,23 @@ main() {
             qmd_Path:=regexreplace(guiOut.manuscriptdir "\" guiOut.manuscriptname ".qmd","\\{2,}","\")
                 , qmdContents:=quartopurgeTags(qmdContents)
         }
+        if (CLIArgs.noContent) {
+            /*
+            ;; #TODO decide if I want to implement this as an actual feature
+            ;; or just as a commandline arg to extract the outline into its own file to be rendered, e.g. 
+
+            qmd_Path_structure:=regexreplace(guiOut.manuscriptdir "\" guiOut.manuscriptname "_structure.qmd","\\{2,}","\")
+            */
+            qmdOutline:=quartopurgeContents(qmdContents) 
+            answer:=AppError("Save outline-doc?", "Do you want to save the outline of the current document as a separte qmd-file?`nOtherwhise, the contents of the document will be copied to the clipboard.", Options := 0x24, TitlePrefix := "",Timeout:=0)
+            if (answer=="Yes") {
+                qmdOutline_Path:=regexreplace(guiOut.manuscriptdir "\" guiOut.manuscriptname "_outline.qmd","\\{2,}","\")
+                writeFile(qmdOutline_Path,qmdOutline,"UTF-8-RAW",,true)
+                MsgBox % "written outline to '" qmdOutline_Path "'"
+            } else {
+                Clipboard:=qmdOutline
+            }
+        }
         writeFile(qmd_Path,qmdContents,"UTF-8-RAW",,true)
     }
     if (script.config.config.useQuartoCLI) {
