@@ -47,6 +47,7 @@ main() {
         , exh:=Func("fonExit").Bind(DEBUG,EL)
         , onExit(exh)
     ;; LOAD/INIT SCRIPT-CONFIGS
+    ATC_TOTAL1:=A_TickCount
     if !script.load() {
         RS_C:=rscript_check()
             , OHTML_C:=obsidianhtml_check()
@@ -351,7 +352,7 @@ main() {
         }
     } else {
         notify("Creating R-BuildScript",CLIArgs)
-        if guiOut.Settings.bKeepFilename {
+        if (guiOut.Settings.bKeepFilename) {
             tmp:=buildRScriptContent(rmd_Path,guiOut.manuscriptName,guiOut)
         } else {
             tmp:=buildRScriptContent(rmd_Path,,guiOut)
@@ -364,10 +365,10 @@ main() {
         if (guiOut.Settings.bRendertoOutputs) {
             ttip(-1)
             notify("Executing R-BuildScript",CLIArgs)
-            if guiOut.Settings.bBackupOutput {
+            if (guiOut.Settings.bBackupOutput) {
                 BackupDirectory:=backupOutput(rmd_Path,guiOut)
             }
-            if script.config.config.backupCount {
+            if (script.config.config.backupCount) {
                 limitBackups(BackupDirectory,script.config.config.backupCount)
             }
             rscript_ret:=runRScript(rmd_Path,script_contents,guiOut.Outputformats,script.config.config.RScriptPath)
@@ -391,10 +392,11 @@ main() {
     EL.Compilation_Duration:=Codetimer_Log()
         , EL.Compilation_End:=A_DD "." A_MM "." A_YYYY " - " A_Hour ":" A_Min ":" A_Sec
         , EL.getTotalDuration(ATC1,A_TickCount)
+        , EL.getTotalDuration(ATC_TOTAL1,A_TickCount,"TOTAL_COUNT")
     ;; moving shit to output folder
     SplitPath % Path,, OutDir
     SplitPath % OutDir,, OutDir2
-    if script.config.config.OpenParentfolderInstead {
+    if (script.config.config.OpenParentfolderInstead) {
         EL.output_path:=OutDir
     } else {
         EL.output_path:=OutDir2
