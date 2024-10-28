@@ -50,6 +50,11 @@ processCLIFlags(Byref Args) {
     } else {
         Args.noIntermediates:=1
     }
+    if (!Args.HasKey("--noContent")) {
+        Args.noContent:=0
+    } else {
+        Args.noContent:=1
+    }
     if (!Args.HasKey("--noBackup")) {
         Args.BackupOutput:=1
     } else {
@@ -183,7 +188,7 @@ validateCLIArgs(Byref Args) {
                 striplocalMDLinks stripHashesfromTags
 
                 //flags//
-                nointermediates nomove noopen notify keepOKLog
+                nointermediates nomove noopen notify keepOKLog nocontent
 
                 //flags-extensions//
                 IntermediatesRemovalLevel
@@ -229,6 +234,7 @@ CLI_help() {
     flags:={"--noMove":"`t`t-`tSet flag to convert the note locally and create the '.qmd'-file at the location of the root."
             , "--noIntermediates": "`t-`tSet flag to delete/not store intermediate files after finishing execution.`n`t`t`t`t`t`t`tDeletes the output directory itself(?)"
             , "--noOpen":"`t`t-`tSet flag to not open the output directory after execution finishes."
+            , "--noContent":"`t`t-`tSet flag to strip content blocks from output-qmd document, generating only its chapter-outline."
             , "--keepOKLog":"`t`t-`tSet flag to keep the OK-log in the Working-Directory of '" name "' with format 'Executionlog ({manuscript_name}).txt'."
             , "--SourceNameIndex":"`t-`tSet flag to force the resulting md/rmd/qmd-file to use the filename 'index',`n`t`t`t`t`t`t`tinstead of the name of the note itself."
             , "--noRender":"`t`t-`tSet flag to only create the '.qmd'-file, without rendering to outputs.`n`t`t`t`t`t`t`tOverwrites CL-Arg 'RenderToOutputs'."}
